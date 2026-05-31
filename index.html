@@ -60,7 +60,7 @@ header{
 #map{width:100%;height:100%;background:#0a0e1a}
 
 /* km overlay on map left */
-.km-overlay{position:absolute;top:0;left:0;width:175px;height:100%;background:rgba(6,8,15,.85);backdrop-filter:blur(4px);z-index:10;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid rgba(26,37,64,.5)}
+.km-overlay{position:absolute;top:0;left:0;width:175px;height:100%;background:rgba(6,8,15,.85);backdrop-filter:blur(4px);z-index:1000;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid rgba(26,37,64,.5)}
 .km-ov-hd{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-bottom:1px solid var(--bd);flex-shrink:0}
 .km-overlay .km-head{display:grid;grid-template-columns:22px 42px 30px 28px 1fr;padding:4px 8px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);border-bottom:1px solid var(--bd);background:rgba(6,8,15,.6);position:sticky;top:0}
 .km-overlay .km-row{display:grid;grid-template-columns:22px 42px 30px 28px 1fr;align-items:center;padding:4px 8px;border-bottom:1px solid rgba(26,37,64,.5);font-size:11px;gap:3px;transition:background .3s}
@@ -71,7 +71,7 @@ header{
 .km-overlay-body::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
 
 /* minimap */
-#minimap{position:absolute;bottom:10px;right:10px;z-index:10;background:rgba(6,8,15,.82);border:1px solid var(--bd);border-radius:8px;overflow:hidden;backdrop-filter:blur(4px);display:none}
+#minimap{position:absolute;bottom:10px;right:10px;z-index:1000;background:rgba(6,8,15,.82);border:1px solid var(--bd);border-radius:8px;overflow:hidden;backdrop-filter:blur(4px);display:none}
 .leaflet-control-attribution{font-size:8px!important;opacity:.4}
 .leaflet-popup-content-wrapper{background:var(--s1);color:var(--tx);border:1px solid var(--bd);border-radius:8px;font-family:var(--fn)}
 .leaflet-popup-tip{background:var(--s1)}
@@ -91,7 +91,8 @@ header{
 .ph-sub{margin-top:5px;display:flex;gap:10px;font-size:11px;font-weight:600;color:var(--mu)}
 .ph-sub b{color:var(--tx)}
 .ph-title{margin-top:5px;font-size:12px;font-weight:700;letter-spacing:.02em;line-height:1.3;transition:color .4s}
-.ph-desc{margin-top:6px;font-size:13px;color:var(--tx);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.ph-desc{margin-top:6px;font-size:13px;color:var(--tx);line-height:1.55}
+.blk-phase{flex:1;overflow-y:auto;min-height:0}
 .ph-title{font-size:11px;font-weight:600;color:var(--mu);margin-top:3px;line-height:1.3;font-style:italic}
 
 /* HR diverging gauge */
@@ -125,12 +126,14 @@ header{
 .pb-lbl{font-size:7px;color:var(--mu);font-family:var(--fm);text-align:center;margin-top:2px}
 
 /* ravito block */
-.rav-blk{padding:9px 14px;border-bottom:1px solid var(--bd);flex-shrink:0;display:flex;align-items:center;gap:10px}
-.rav-icon{font-size:24px;flex-shrink:0}
+.rav-blk{padding:12px 14px;border-bottom:1px solid var(--bd);border-top:2px solid var(--gn);flex-shrink:0;display:flex;align-items:center;gap:10px;background:rgba(0,212,160,.04)}
+.rav-icon{font-size:26px;flex-shrink:0}
 .rav-info{flex:1;min-width:0}
-.rav-name{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rav-sub{font-size:10px;color:var(--mu);margin-top:1px}
-.rav-eta{font-family:var(--fm);font-size:13px;font-weight:500;color:var(--gn);flex-shrink:0}
+.rav-name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rav-sub{font-size:11px;color:var(--mu);margin-top:3px}
+.rav-right{text-align:right;flex-shrink:0}
+.rav-dur{font-family:var(--fm);font-size:22px;font-weight:700;color:var(--gn);line-height:1}
+.rav-eta{font-size:11px;color:var(--mu);margin-top:3px}
 
 @keyframes kf{0%{background:rgba(255,107,43,.22)}100%{background:transparent}}
 .km-n{font-size:9px;font-weight:700;color:var(--mu)}
@@ -255,7 +258,7 @@ header{
   <!-- DATA PANEL -->
   <div class="dpanel">
 
-    <div class="blk">
+    <div class="blk blk-phase">
       <div class="lbl">Segment en cours</div>
       <div class="ph-tag" id="phTitle" style="color:var(--mu)">
         <span class="ph-dot"></span><span id="phLbl">—</span>
@@ -323,7 +326,10 @@ header{
         <div class="rav-name" id="ravName">—</div>
         <div class="rav-sub"  id="ravSub">—</div>
       </div>
-      <div class="rav-eta" id="ravEta">—</div>
+      <div class="rav-right">
+        <div class="rav-dur" id="ravDur">—</div>
+        <div class="rav-eta" id="ravEta">—</div>
+      </div>
     </div>
 
   </div>
@@ -690,7 +696,9 @@ function renderElev(){
     const x1=parseFloat(xOf(prevKm)),x2=parseFloat(xOf(ph.kmEnd)),mx=(x1+x2)/2;
     h+=`<rect x="${x1.toFixed(2)}" y="0" width="${(x2-x1).toFixed(2)}" height="${H}" fill="${ph.color}28"/>`;
     const phShort=(ph.title||ph.label).split(' ').slice(0,3).join(' ');
-    h+=`<text x="${mx.toFixed(1)}" y="20" fill="${ph.color}" font-size="10" font-family="Barlow Condensed" font-weight="700" text-anchor="middle" clip-path="url(#phclip${i})">${phShort}</text>`;
+    // Label en bas, fond sombre pour contraste
+    h+=`<rect x="${x1.toFixed(1)}" y="${(H-14).toFixed(1)}" width="${(x2-x1).toFixed(1)}" height="14" fill="rgba(6,8,15,.65)" clip-path="url(#phclip${i})"/>`;
+    h+=`<text x="${mx.toFixed(1)}" y="${(H-3).toFixed(1)}" fill="${ph.color}" font-size="10" font-family="Barlow Condensed" font-weight="700" text-anchor="middle" clip-path="url(#phclip${i})">${phShort}</text>`;
     prevKm=ph.kmEnd;
   }
 
@@ -768,8 +776,9 @@ function renderElev(){
     h+=`<line x1="${cx}" y1="0" x2="${cx}" y2="${H}" stroke="rgba(255,255,255,.5)" stroke-width="1.5" stroke-dasharray="3,3" vector-effect="non-scaling-stroke"/>`;
     // Pulse ring
     h+=`<circle cx="${cx}" cy="${cy}" r="6" fill="#ff6b2b" opacity=".4"><animate attributeName="r" values="6;14;6" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" values=".4;0;.4" dur="1.8s" repeatCount="indefinite"/></circle>`;
-    // Runner emoji
-    h+=`<text x="${cx}" y="${(parseFloat(cy)+6).toFixed(1)}" font-size="14" text-anchor="middle" style="pointer-events:none">🏃</text>`;
+    // Runner emoji — retourné vers la droite via matrix mirror centré sur cx
+    const cxN=parseFloat(cx);
+    h+=`<text x="${cx}" y="${(parseFloat(cy)+6).toFixed(1)}" font-size="14" text-anchor="middle" transform="matrix(-1,0,0,1,${(2*cxN).toFixed(1)},0)" style="pointer-events:none">🏃</text>`;
     // Altitude label
     const tx=Math.min(parseFloat(cx)+8,970),ty=Math.max(parseFloat(cy)-8,12);
     h+=`<text x="${tx}" y="${ty}" fill="white" font-size="8" font-family="DM Mono" opacity=".85">${Math.round(cp.ele)}m</text>`;
@@ -811,7 +820,8 @@ function renderMinimap(){
   if(curKm>0){
     const cur=pts.find(p=>p.cumDist>=curKm)||pts.at(-1);
     svg+=`<circle cx="${xOf(cur.lon)}" cy="${yOf(cur.lat)}" r="5" fill="#ff6b2b" opacity=".25"><animate attributeName="r" values="5;10;5" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values=".25;0;.25" dur="2s" repeatCount="indefinite"/></circle>`;
-    svg+=`<text x="${xOf(cur.lon)}" y="${(parseFloat(yOf(cur.lat))+5).toFixed(1)}" font-size="12" text-anchor="middle">🏃</text>`;
+    const mxN=parseFloat(xOf(cur.lon));
+    svg+=`<text x="${xOf(cur.lon)}" y="${(parseFloat(yOf(cur.lat))+5).toFixed(1)}" font-size="12" text-anchor="middle" transform="matrix(-1,0,0,1,${(2*mxN).toFixed(1)},0)">🏃</text>`;
   }
   svg+=`</svg>`;
   el.innerHTML=svg;
@@ -1133,9 +1143,7 @@ function render(){
   const phIdx=C.race.phases.indexOf(ph)+1;
   const phTotal=C.race.phases.length;
   document.getElementById("phSub").innerHTML=`Segment ${phIdx} / ${phTotal} &nbsp;·&nbsp; km ${ph.kmStart}–${ph.kmEnd}`;
-  // title en italique avant la description
-  const desc=document.getElementById("phDesc");
-  desc.innerHTML=(ph.title?`<em style="color:var(--tx);font-style:italic;display:block;margin-bottom:3px">${ph.title}</em>`:"")+(ph.description||"");
+  document.getElementById("phDesc").textContent=ph.description||"";
   // Toast sur changement de phase
   if(S.lastPhaseLabel&&S.lastPhaseLabel!==ph.label){
     showToast(`${ph.label} — ${ph.title||""}`);
@@ -1188,11 +1196,12 @@ function render(){
     const totalSec=Math.max(dist*basePace*0.5,Math.min(dist*basePace*2.5,raw));
     const etaRav=new Date(Date.now()+totalSec*1000);
     const ravH=Math.floor(totalSec/3600),ravM=Math.floor((totalSec%3600)/60);
-    const ravDur=ravH>0?`dans ${ravH}h${String(ravM).padStart(2,"0")}`:`dans ${ravM} min`;
+    const ravDurStr=ravH>0?`${ravH}h${String(ravM).padStart(2,"0")}`:`${ravM} min`;
     document.getElementById("ravBlk").style.display="flex";
     document.getElementById("ravName").textContent=nr.name;
-    document.getElementById("ravSub").textContent=`km ${nr.km} · ${ravDur}${nr.services?" · "+nr.services:""}`;
-    document.getElementById("ravEta").textContent=`~${fmtTime(etaRav)}`;
+    document.getElementById("ravSub").textContent=`km ${nr.km}${nr.services?" · "+nr.services:""}`;
+    document.getElementById("ravDur").textContent=ravDurStr;
+    document.getElementById("ravEta").textContent=`vers ${fmtTime(etaRav)}`;
   } else {
     document.getElementById("ravBlk").style.display="none";
   }
