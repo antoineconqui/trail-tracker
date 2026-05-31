@@ -3,7 +3,7 @@
   "distKm":      61,
   "totalDplus":  1950,
   "totalDminus": 1950,
-  "gpxUrl":      "https://raw.githubusercontent.com/antoineconqui/trail-tracker/refs/heads/main/Ecouves%202025%20off.gpx?token=GHSAT0AAAAAAD6AAMVZ7ELVRNELQDXUBR4Q2Q4PHHQ",
+  "gpxUrl":      "https://raw.githubusercontent.com/antoineconqui/trail-tracker/main/Ecouves%202025%20off.gpx",
   "phases": [
     { "label": "PH 1", "kmStart": 0,  "kmEnd": 15, "fcMax": 148, "color": "#00d4a0" },
     { "label": "PH 2", "kmStart": 15, "kmEnd": 35, "fcMax": 158, "color": "#ffc532" },
