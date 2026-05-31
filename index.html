@@ -336,8 +336,10 @@ header{
 // ═══════════════════════════════════════════════════════════
 const C = {
   proxy:     "https://aged-frog-1690.antoineconqui.workers.dev",
-  sessionId: "",
-  configUrl: "https://raw.githubusercontent.com/antoineconqui/trail-tracker/main/config-ecouves.json",
+  sessionId: "",    // auto-détecté depuis /current
+  // Pointer vers le fichier JSON dans le repo GitHub (raw URL)
+  // Remplacer VOTRE_USER/VOTRE_REPO par les valeurs réelles
+  configUrl: "https://raw.githubusercontent.com/VOTRE_USER/VOTRE_REPO/main/config-ecouves.json",
   race: {
     name:"Trail d'Écouves", distKm:61, totalDplus:1950, totalDminus:1950,
     phases:[
@@ -383,7 +385,9 @@ function parseGpx(text){
     }
     pts.push({lat,lon,ele,cumDist:cd,cumDplus:cdp});
   });
-  GPX.pts=pts; GPX.totalDist=pts.at(-1)?.cumDist||C.race.distKm;
+  GPX.pts=pts;
+  if(!pts.length){console.warn("GPX: aucun trkpt trouvé (fichier vide ou mauvais format)");return;}
+  GPX.totalDist=pts.at(-1).cumDist;
   GPX.totalDplus=pts.at(-1)?.cumDplus||C.race.totalDplus;
   GPX.loaded=true;
   document.getElementById("elevS").classList.add("hgpx");
@@ -514,7 +518,7 @@ function addRavitoMarkers(){
 // ═══════════════════════════════════════════════════════════
 function renderElev(){
   const svg=document.getElementById("elevSvg");
-  if(!GPX.loaded){svg.innerHTML="";return;}
+  if(!GPX.loaded||!GPX.pts.length){svg.innerHTML="";return;}
   const W=1000,H=100,pts=GPX.pts;
   const maxE=Math.max(...pts.map(p=>p.ele));
   const minE=Math.min(...pts.map(p=>p.ele))-5;
@@ -892,12 +896,8 @@ function render(){
     document.getElementById("ravBlk").style.display="none";
   }
 
-  // Signal
+  // Signal (sbar seulement — pill gérée dans renderClock)
   const age=S.lastReceived?(Date.now()-S.lastReceived)/1000:null;
-  const pill=document.getElementById("lPill");
-  if(!age||age>180){pill.className="h-pill lost";document.getElementById("lLbl").textContent="Signal perdu";}
-  else if(age>60){pill.className="h-pill warn";document.getElementById("lLbl").textContent="Retard";}
-  else{pill.className="h-pill ok";document.getElementById("lLbl").textContent="LIVE";}
   document.getElementById("sR").textContent=age?`● ${Math.round(age)}s`:"—";
 
   // Map
@@ -912,6 +912,15 @@ function renderClock(){
   document.getElementById("sTm").textContent=fmtEl(S.sessionStart);
   const age=S.lastReceived?(Date.now()-S.lastReceived)/1000:null;
   if(age!==null) document.getElementById("sL").textContent=`Mis à jour il y a ${age<60?Math.round(age)+"s":Math.floor(age/60)+"min"}`;
+  // Pill : durée depuis dernière mise à jour track uniquement
+  const pill=document.getElementById("lPill");
+  if(!age){
+    pill.className="h-pill wait";
+    document.getElementById("lLbl").textContent="—";
+  } else {
+    pill.className=age>180?"h-pill lost":age>60?"h-pill warn":"h-pill ok";
+    document.getElementById("lLbl").textContent=age<60?`${Math.round(age)}s`:`${Math.floor(age/60)}min`;
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -965,7 +974,9 @@ async function poll(){
 async function init(){
   buildStrip(); initChat(); initGpxDrop();
   await loadConfig();
-  if(C.gpxUrl) fetch(C.gpxUrl).then(r=>r.text()).then(parseGpx).catch(e=>console.warn("GPX:",e));
+  if(C.gpxUrl) fetch(C.gpxUrl)
+    .then(r=>{if(!r.ok) throw new Error(`GPX HTTP ${r.status}`); return r.text();})
+    .then(parseGpx).catch(e=>console.warn("GPX:",e));
   addRavitoMarkers();
   setInterval(renderClock,1000); setInterval(fetchChat,C.chatMs);
   await poll(); setInterval(poll,C.pollMs);
