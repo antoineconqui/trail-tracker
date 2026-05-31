@@ -6,17 +6,18 @@
 
 WORKER="https://aged-frog-1690.antoineconqui.workers.dev"
 ADMIN_SECRET="kapsalon"
-GPX_URL="https://github.com/antoineconqui/trail-tracker/blob/c80b34fa764cdfe9b73898591068bbdb91e868cf/main/Ecouves%202025%20off.gpx"
+GPX_URL="https://raw.githubusercontent.com/antoineconqui/trail-tracker/refs/heads/main/Ecouves%202025%20off.gpx?token=GHSAT0AAAAAAD6AAMVZ7ELVRNELQDXUBR4Q2Q4PHHQ"
 
 # ── Config Trail d'Écouves ────────────────────────────────────
 curl -s -X POST "$WORKER/config" \
   -H "Content-Type: application/json" \
   -H "X-Admin-Secret: $ADMIN_SECRET" \
   -d "{
-    \"name\": \"Trail d'Écouves\",
-    \"distKm\": 61,
-    \"totalDplus\": 1950,
-    \"gpxUrl\": \"$GPX_URL\",
+    \"name\":        \"Trail d'Écouves\",
+    \"distKm\":      60.7,
+    \"totalDplus\":  2200,
+    \"totalDminus\": 2200,
+    \"gpxUrl\":      \"$GPX_URL\",
     \"phases\": [
       {\"label\":\"PH 1\",\"kmStart\":0,   \"kmEnd\":15,   \"fcMax\":148,\"color\":\"#00d4a0\"},
       {\"label\":\"PH 2\",\"kmStart\":15,  \"kmEnd\":35,   \"fcMax\":158,\"color\":\"#ffc532\"},
@@ -27,30 +28,18 @@ curl -s -X POST "$WORKER/config" \
       {\"km\":8.3,  \"label\":\"⛰️ Côte 13%\"},
       {\"km\":35,   \"label\":\"🎿 Bloc descentes\"},
       {\"km\":50,   \"label\":\"🏁 Phase finale\"},
-      {\"km\":55.5, \"label\":\"🦶 Section marche\"},
-      {\"km\":61, \"label\":\"🎉 ARRIVÉE !\"}
+      {\"km\":55.5, \"label\":\"🦶 Section marche\"}
+    ],
+    \"ravitos\": [
+      {\"name\":\"Ravito 1\",\"km\":15,  \"lat\":null,\"lon\":null,\"services\":\"Eau · nourriture\"},
+      {\"name\":\"Ravito 2\",\"km\":35,  \"lat\":null,\"lon\":null,\"services\":\"Eau · nourriture · drop bag\"},
+      {\"name\":\"Ravito 3\",\"km\":50,  \"lat\":null,\"lon\":null,\"services\":\"Eau · nourriture\"}
     ]
-  }" && echo "✓ Config Écouves chargée"
+  }" && echo "✓ Config chargée"
 
-# ── Vérification ──────────────────────────────────────────────
 echo ""
-echo "Vérif /config :"
-curl -s "$WORKER/config" | python3 -m json.tool | grep '"name"'
+echo "Vérif :"
+curl -s "$WORKER/config" | python3 -c "import sys,json; c=json.load(sys.stdin); print(f'  {c[\"name\"]} · {len(c[\"phases\"])} phases · {len(c[\"ravitos\"])} ravitos')"
 
 echo ""
 echo "Dashboard : https://trail-tracker.pages.dev/"
-
-# ═══════════════════════════════════════════════════════════════
-#  WORKFLOW RACE DAY (après setup)
-# ═══════════════════════════════════════════════════════════════
-#
-# J-1 ou matin course :
-#   1. bash setup.sh  (met à jour config + GPX dans KV)
-#
-# Race day :
-#   1. Démarrer LiveTrack sur Garmin Connect (1 tap)
-#   2. Ouvrir l'URL LiveTrack dans Chrome (extension fait le reste)
-#   3. C'est tout — le dashboard se connecte automatiquement
-#
-# Tes amis : ouvrir https://livetrack-dashboard.pages.dev
-# ═══════════════════════════════════════════════════════════════

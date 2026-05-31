@@ -1,0 +1,27 @@
+{
+  "name":        "Trail d'Écouves",
+  "distKm":      61,
+  "totalDplus":  1950,
+  "totalDminus": 1950,
+  "gpxUrl":      "https://raw.githubusercontent.com/antoineconqui/trail-tracker/refs/heads/main/Ecouves%202025%20off.gpx?token=GHSAT0AAAAAAD6AAMVZ7ELVRNELQDXUBR4Q2Q4PHHQ",
+  "phases": [
+    { "label": "PH 1", "kmStart": 0,  "kmEnd": 15, "fcMax": 148, "color": "#00d4a0" },
+    { "label": "PH 2", "kmStart": 15, "kmEnd": 35, "fcMax": 158, "color": "#ffc532" },
+    { "label": "PH 3", "kmStart": 35, "kmEnd": 50, "fcMax": 160, "color": "#ff6b2b" },
+    { "label": "PH 4", "kmStart": 50, "kmEnd": 61, "fcMax": 170, "color": "#ff3d5a" }
+  ],
+  "waypoints": [
+    { "km": 17.7,  "label": "⛰️ Montée salopard" },
+    { "km": 28.75, "label": "🏔️ Point culminant" },
+    { "km": 31.5,  "label": "⚠️ Cassure -9%" },
+    { "km": 54.5,  "label": "💀 Double mur final" },
+    { "km": 59.1,  "label": "⚠️ Descente -10.8%" }
+  ],
+  "ravitos": [
+    { "name": "Parc Animalier d'Écouves", "km": 14, "lat": null, "lon": null, "services": "Eau" },
+    { "name": "Carrefour du Rendez-vous", "km": 22, "lat": null, "lon": null, "services": "Solide · eau" },
+    { "name": "Verrerie du Gast",         "km": 27, "lat": null, "lon": null, "services": "Eau" },
+    { "name": "Le Verdier",               "km": 41, "lat": null, "lon": null, "services": "Solide · eau · soutien famille" },
+    { "name": "Réservoir d'Eau",          "km": 51, "lat": null, "lon": null, "services": "Eau" }
+  ]
+}
