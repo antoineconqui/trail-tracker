@@ -36,11 +36,11 @@ header{
 .sbadge.warn  {background:rgba(255,197,50,.1);color:var(--ye)}
 .sbadge.danger{background:rgba(255,61,90,.18);color:var(--rd)}
 .sbadge.info  {background:rgba(79,163,255,.1);color:var(--bl)}
-.sbadge.wait  {background:rgba(63,80,112,.15);color:var(--mu)}
+.sbadge.wait  {background:rgba(63,80,112,.15);color:var(--mu);animation:none}
 @keyframes glow{from{box-shadow:0 0 4px rgba(255,107,43,.3)}to{box-shadow:0 0 16px rgba(255,107,43,.7)}}
 @keyframes live-pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,212,160,0)}60%{box-shadow:0 0 8px rgba(0,212,160,.3)}}
 .h-meta{display:flex;align-items:center;gap:10px;flex-shrink:0}
-.h-pill{display:flex;align-items:center;gap:4px;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:20px;border:1px solid currentColor;white-space:nowrap}
+.h-pill{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:20px;border:1px solid currentColor;white-space:nowrap}
 .h-pill.ok  {color:var(--gn);background:rgba(0,212,160,.08);border-color:rgba(0,212,160,.25)}
 .h-pill.warn{color:var(--ye);background:rgba(255,197,50,.08);border-color:rgba(255,197,50,.25)}
 .h-pill.lost{color:var(--rd);background:rgba(255,61,90,.08);border-color:rgba(255,61,90,.25)}
@@ -53,7 +53,7 @@ header{
 .breach.show{display:block}
 
 /* ── MAIN LAYOUT ─────────────────────────────────────────── */
-.app-main{flex:1;display:grid;grid-template-columns:1fr 320px 220px;min-height:0;overflow:hidden}
+.app-main{flex:1;display:grid;grid-template-columns:1fr 320px 280px;min-height:0;overflow:hidden}
 
 /* ── MAP ─────────────────────────────────────────────────── */
 #map{background:#0a0e1a}
@@ -68,7 +68,7 @@ header{
 /* ── DATA PANEL ──────────────────────────────────────────── */
 .dpanel{background:var(--s1);border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden}
 .blk{padding:11px 14px;border-bottom:1px solid var(--bd);flex-shrink:0}
-.lbl{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mu);margin-bottom:7px}
+.lbl{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mu);margin-bottom:7px}
 
 /* phase */
 .ph-tag{font-size:20px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
@@ -83,22 +83,23 @@ header{
 .hr-row{display:flex;align-items:center;gap:14px}
 .hr-num{font-family:var(--fm);font-size:52px;font-weight:500;line-height:1;letter-spacing:-.02em;transition:color .4s;min-width:80px}
 .hr-side{flex:1}
-.hr-bpm{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--mu)}
+.hr-bpm{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mu)}
 .hr-delta{font-family:var(--fn);font-size:12px;font-weight:700;letter-spacing:.02em;transition:color .3s;line-height:1.3}
-.hr-gauge{position:relative;height:16px;background:var(--bd);border-radius:8px;margin:8px 0 5px;overflow:visible}
+.hr-gauge{position:relative;height:16px;background:linear-gradient(to right,rgba(0,212,160,.2) 0%,rgba(255,190,50,.2) 60%,rgba(255,61,90,.2) 80%);border-radius:8px;margin:8px 0 5px;overflow:visible}
 .hr-g-fill{position:absolute;left:0;top:0;bottom:0;border-radius:8px;transition:width .5s,background .5s}
 .hr-g-tick{position:absolute;top:-3px;bottom:-3px;width:3px;background:rgba(255,255,255,.9);border-radius:2px;box-shadow:0 0 6px rgba(255,255,255,.4);transform:translateX(-50%)}
-.hr-g-zone{position:absolute;top:0;bottom:0;right:0;background:rgba(255,61,90,.12);border-radius:0 8px 8px 0;pointer-events:none}
+.hr-g-zone{display:none}
 .hr-ceil-lbl{font-size:10px;font-weight:600;color:var(--mu)}
 .hr-ceil-lbl b{color:var(--tx)}
 
 /* stats */
 .stats-g{display:grid;grid-template-columns:1fr 1fr;gap:9px 10px}
-.sv{font-family:var(--fm);font-size:28px;font-weight:500;line-height:1;letter-spacing:-.02em}
+.sv{font-family:var(--fm);font-size:32px;font-weight:500;line-height:1;letter-spacing:-.02em}
 .sv-hero{font-size:44px}
 .sl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);margin-top:3px}
 .sl-delta{font-family:var(--fm);font-size:11px;font-weight:500;margin-left:4px}
-.prog-bg{height:3px;background:var(--bd);border-radius:2px;margin-top:9px;overflow:hidden}
+.prog-lbl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;font-weight:700;margin-top:9px}
+.prog-bg{height:5px;background:var(--bd);border-radius:3px;overflow:hidden}
 .prog-fill{height:100%;border-radius:2px;background:var(--ac);transition:width .8s}
 .ph-strip{display:flex;height:3px;gap:2px;margin-top:5px}
 .ph-seg{flex:1;opacity:.18;border-radius:1px;transition:opacity .5s}
@@ -147,9 +148,11 @@ header{
 .mts{font-size:10px;color:#6b82a8;margin-top:4px;font-family:var(--fm)}
 .cmsg.cheer .mt{font-size:28px;line-height:1.2}
 .cmsg.cheer .mts{font-size:11px;color:rgba(255,107,43,.7)}
-.reactions{display:flex;gap:5px;padding:7px 8px 0;flex-shrink:0}
-.rbtn{flex:1;text-align:center;font-size:18px;padding:5px 4px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid var(--bd);cursor:pointer;transition:background .15s,transform .1s}
-.rbtn:hover{background:rgba(255,255,255,.1);transform:scale(1.1)}
+.react-row{display:flex;gap:8px;flex-shrink:0}
+.breact{flex:1;height:36px;font-size:18px;background:var(--bd);border:1px solid #2a3a5c;border-radius:8px;cursor:pointer;transition:transform .1s,background .15s}
+.breact:hover{background:#2a3a5c;transform:scale(1.1)}
+.breact:active{transform:scale(.95)}
+.chat-empty{text-align:center;color:var(--mu);font-size:13px;padding:24px 12px;line-height:1.5;font-style:italic}
 .chat-form{flex-shrink:0;padding:8px;border-top:1px solid var(--bd);display:flex;flex-direction:column;gap:7px}
 .chat-form input{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:9px 12px;color:var(--tx);font-family:var(--fn);font-size:13px;width:100%;outline:none}
 .chat-form input:focus{border-color:var(--ac);box-shadow:0 0 0 2px rgba(255,107,43,.2)}
@@ -288,6 +291,7 @@ header{
           <div class="sl">Distance totale</div>
         </div>
       </div>
+      <div class="prog-lbl">Progression de la course</div>
       <div class="prog-bg"><div class="prog-fill" id="pFill" style="width:0"></div></div>
       <div class="ph-strip" id="phStrip"></div>
       <div class="pb-wrap" id="pbWrap"></div>
@@ -310,7 +314,7 @@ header{
       </div>
     </div>
     <div class="km-hist">
-      <div class="km-head"><span>km</span><span>allure</span><span>FC</span><span>↑ m</span><span></span></div>
+      <div class="km-head"><span>km</span><span>allure</span><span>FC</span><span title="Dénivelé positif (mètres montés)">↑ m</span><span>état</span></div>
       <div id="kmH"></div>
     </div>
 
@@ -323,13 +327,13 @@ header{
       <span class="chat-cnt" id="chatCnt">0</span>
     </div>
     <div class="chat-ms" id="chatMs"></div>
-    <div class="reactions">
-      <button class="rbtn" data-emoji="❤️">❤️</button>
-      <button class="rbtn" data-emoji="💪">💪</button>
-      <button class="rbtn" data-emoji="😤">😤</button>
-      <button class="rbtn" data-emoji="🎉">🎉</button>
-    </div>
     <div class="chat-form">
+      <div class="react-row">
+        <button class="breact" data-emoji="❤️">❤️</button>
+        <button class="breact" data-emoji="💪">💪</button>
+        <button class="breact" data-emoji="😤">😤</button>
+        <button class="breact" data-emoji="🎉">🎉</button>
+      </div>
       <input id="cName" placeholder="Ton prénom" maxlength="30">
       <input id="cMsg"  placeholder="Encourage Antoine ! 💪" maxlength="280">
       <div class="cbtns">
@@ -692,7 +696,7 @@ function renderElev(){
     h+=`<circle cx="${rx}" cy="${rcy}" r="4" fill="${color}" opacity=".9" style="pointer-events:none"/>`;
     h+=`<circle cx="${rx}" cy="${rcy}" r="2.5" fill="white" opacity=".9" style="pointer-events:none"/>`;
     // Icône au-dessus du cercle
-    h+=`<text x="${rx}" y="${rey}" fill="${color}" font-size="10" text-anchor="middle" opacity=".95" style="pointer-events:none">${icon}</text>`;
+    h+=`<text x="${rx}" y="${rey}" fill="${color}" font-size="14" text-anchor="middle" opacity=".95" style="pointer-events:none">${icon}</text>`;
     // Hit area
     h+=`<rect x="${(parseFloat(rx)-7).toFixed(1)}" y="0" width="14" height="${H}" fill="transparent"
       data-tipkm="${r.km}" data-tiplbl="${icon} ${r.name}" data-tipextra="${r.services||""}"/>`;
@@ -709,7 +713,7 @@ function renderElev(){
     // Cercle d'ancrage
     h+=`<circle cx="${wpx}" cy="${wcy}" r="2.5" fill="white" opacity=".75" style="pointer-events:none"/>`;
     // Emoji au-dessus
-    h+=`<text x="${wpx}" y="${wey}" fill="white" font-size="9" text-anchor="middle" opacity=".85" style="pointer-events:none">${emoji}</text>`;
+    h+=`<text x="${wpx}" y="${wey}" fill="white" font-size="12" text-anchor="middle" opacity=".85" style="pointer-events:none">${emoji}</text>`;
     // Hit area
     h+=`<circle cx="${wpx}" cy="${wcy}" r="10" fill="transparent"
       data-tipkm="${wp.km}" data-tiplbl="${wp.label}"/>`;
@@ -844,11 +848,7 @@ async function sendChat(name,msg,type="msg"){
 function renderChat(){
   const el=document.getElementById("chatMs");
   if(!S.chatMsgs.length){
-    el.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--mu);font-size:12px;line-height:1.7;padding:16px">
-      <div style="font-size:36px;margin-bottom:12px">💬</div>
-      <div style="font-weight:700;font-size:14px;color:var(--tx);margin-bottom:4px">Sois le premier à encourager Antoine !</div>
-      <div>Tes messages apparaissent ici en direct 🏃</div>
-    </div>`;
+    el.innerHTML=`<div class="chat-empty">💬<br><br>Sois le premier à encourager Antoine !</div>`;
     document.getElementById("chatCnt").textContent="0";
     return;
   }
@@ -879,7 +879,7 @@ function initChat(){
     await sendChat(n,"🔥🔥🔥","cheer");
     await fetchChat();
   };
-  document.querySelectorAll(".rbtn").forEach(btn=>{
+  document.querySelectorAll(".breact").forEach(btn=>{
     btn.addEventListener("click",async()=>{
       const n=getName()||"Anonyme";
       await sendChat(n,btn.dataset.emoji,"cheer");
