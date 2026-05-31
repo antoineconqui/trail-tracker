@@ -285,9 +285,8 @@ header{
 // ═══════════════════════════════════════════════════════════════
 const C = {
   proxy:     "https://aged-frog-1690.antoineconqui.workers.dev",
-  sessionId: "40f3d112-730f-88c1-80c4-e95ed0754d00",
-  token:     "59A232FEC2CD7F546AE320557E91BB72",
-  gpxUrl:    null,  // ex: "https://..." ou null → drag-drop
+  sessionId: "",    // auto-détecté depuis /current dès que l'extension démarre
+  gpxUrl:    null,  // chargé depuis /config (ou drag-drop en fallback)
   race: {
     name: "Trail d'Écouves",
     distKm: 60.7, totalDplus: 2200,
@@ -838,31 +837,79 @@ function initGpxDrop() {
 //  POLL LOOPS
 // ═══════════════════════════════════════════════════════════════
 async function poll() {
-  try{
+  try {
+    // Auto-detect session si pas encore connue
+    if (!C.sessionId) {
+      const found = await autoDetectSession();
+      if (!found) {
+        document.getElementById("liveLabel").textContent = "Attente session…";
+        document.getElementById("livePill").className = "live-pill warn";
+        return;
+      }
+    }
     await fetchData();
     render();
     renderKmHistory();
-  }catch(e){
-    console.error("poll:",e);
-    document.getElementById("livePill").className="live-pill lost";
-    document.getElementById("liveLabel").textContent="Erreur";
+  } catch(e) {
+    console.error("poll:", e);
+    document.getElementById("livePill").className = "live-pill lost";
+    document.getElementById("liveLabel").textContent = "Erreur";
   }
 }
 
 // ═══════════════════════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════════════════════
+// ── Auto-fetch race config depuis KV ────────────────────────
+async function loadConfig() {
+  try {
+    const r = await fetch(`${C.proxy}/config`);
+    const cfg = await r.json();
+    if (!cfg.name) return;
+    // Merge dans C.race (les clés du dashboard)
+    if (cfg.name)       C.race.name       = cfg.name;
+    if (cfg.distKm)     C.race.distKm     = cfg.distKm;
+    if (cfg.totalDplus) C.race.totalDplus = cfg.totalDplus;
+    if (cfg.phases)     C.race.phases     = cfg.phases;
+    if (cfg.waypoints)  C.race.waypoints  = cfg.waypoints;
+    if (cfg.gpxUrl)     C.gpxUrl          = cfg.gpxUrl;
+    document.getElementById("hTitle").textContent = cfg.name;
+    document.title = cfg.name;
+    // Rebuild phases strip avec la nouvelle config
+    document.getElementById("phasesStrip").innerHTML = "";
+    buildStrip();
+  } catch(e) { console.warn("config:", e); }
+}
+
+// ── Auto-detect session depuis KV (poussée par l'extension) ─
+async function autoDetectSession() {
+  if (C.sessionId) return true;
+  try {
+    const r = await fetch(`${C.proxy}/current`);
+    const { sid } = await r.json();
+    if (sid) { C.sessionId = sid; return true; }
+  } catch(e) {}
+  return false;
+}
+
 async function init() {
   buildStrip();
   initChat();
   initGpxDrop();
 
-  if(C.gpxUrl) fetch(C.gpxUrl).then(r=>r.text()).then(parseGpx).catch(e=>console.warn("GPX URL:",e));
+  // 1. Charger la config de course (phases, GPX URL, etc.)
+  await loadConfig();
 
+  // 2. Charger le GPX si URL disponible
+  if (C.gpxUrl) fetch(C.gpxUrl).then(r=>r.text()).then(parseGpx).catch(e=>console.warn("GPX:",e));
+
+  // 3. Lancer les timers
+  setInterval(renderClock, 1000);
+  setInterval(fetchChat, C.chatPollMs);
+
+  // 4. Démarrer le poll (tente l'auto-detect à chaque fois si pas de session)
   await poll();
   setInterval(poll, C.pollMs);
-  setInterval(fetchChat, C.chatPollMs);
-  setInterval(renderClock, 1000);
 }
 
 init();
