@@ -480,7 +480,7 @@ const map=L.map("map",{zoomControl:true}).setView([48.45,0.05],11);
 L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{
   attribution:"&copy; CARTO",subdomains:"abcd",maxZoom:19}).addTo(map);
 const courseL=L.polyline([],{color:"#2a3a60",weight:3,opacity:.7,dashArray:"5 7"}).addTo(map);
-const trailL =L.polyline([],{color:C.race.phases[0].color,weight:3.5,opacity:.95}).addTo(map);
+const trailL =L.polyline([],{color:"#ff6b2b",weight:3.5,opacity:.95}).addTo(map);
 const pinIcon=L.divIcon({className:"",iconSize:[20,20],iconAnchor:[10,10],
   html:'<div class="live-pin"><div class="live-pin-ring"></div><div class="live-pin-core"></div></div>'});
 let pinMarker=null;
@@ -720,7 +720,7 @@ async function loadConfig(){
     if(cfg.distKm)     C.race.distKm=cfg.distKm;
     if(cfg.totalDplus) C.race.totalDplus=cfg.totalDplus;
     if(cfg.totalDminus)C.race.totalDminus=cfg.totalDminus;
-    if(cfg.phases)     C.race.phases=cfg.phases;
+    if(cfg.phases?.length){ C.race.phases=cfg.phases; trailL.setStyle({color:cfg.phases[0].color}); }
     if(cfg.waypoints)  C.race.waypoints=cfg.waypoints;
     if(cfg.ravitos)    C.race.ravitos=cfg.ravitos;
     if(cfg.gpxUrl)     C.gpxUrl=cfg.gpxUrl;
