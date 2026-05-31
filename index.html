@@ -336,10 +336,8 @@ header{
 // ═══════════════════════════════════════════════════════════
 const C = {
   proxy:     "https://aged-frog-1690.antoineconqui.workers.dev",
-  sessionId: "",    // auto-détecté depuis /current
-  // Pointer vers le fichier JSON dans le repo GitHub (raw URL)
-  // Remplacer VOTRE_USER/VOTRE_REPO par les valeurs réelles
-  configUrl: "https://raw.githubusercontent.com/VOTRE_USER/VOTRE_REPO/main/config-ecouves.json",
+  sessionId: "",
+  configUrl: "https://raw.githubusercontent.com/antoineconqui/trail-tracker/refs/heads/main/config-ecouves.json?token=GHSAT0AAAAAAD6AAMVY5RVLVT4H6SJCNVDQ2Q4P7YA",
   race: {
     name:"Trail d'Écouves", distKm:61, totalDplus:1950, totalDminus:1950,
     phases:[
@@ -863,7 +861,6 @@ function render(){
     dEl.textContent=(deltaS>=0?"+":"")+fmtPace(Math.abs(deltaS));
     dEl.style.color=deltaS<0?"var(--gn)":deltaS>30?"var(--rd)":"var(--ye)";
   }
-  document.getElementById("progFill")||document.getElementById("pFill").style.width=pct+"%";
   document.getElementById("pFill").style.width=pct+"%";
 
   // Header
