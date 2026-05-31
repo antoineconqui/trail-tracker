@@ -56,7 +56,22 @@ header{
 .app-main{flex:1;display:grid;grid-template-columns:1fr 320px 280px;min-height:0;overflow:hidden}
 
 /* ── MAP ─────────────────────────────────────────────────── */
-#map{background:#0a0e1a}
+.map-wrap{position:relative;flex:1;min-height:0;background:#0a0e1a}
+#map{width:100%;height:100%;background:#0a0e1a}
+
+/* km overlay on map left */
+.km-overlay{position:absolute;top:0;left:0;width:175px;height:100%;background:rgba(6,8,15,.85);backdrop-filter:blur(4px);z-index:10;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid rgba(26,37,64,.5)}
+.km-ov-hd{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-bottom:1px solid var(--bd);flex-shrink:0}
+.km-overlay .km-head{display:grid;grid-template-columns:22px 42px 30px 28px 1fr;padding:4px 8px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);border-bottom:1px solid var(--bd);background:rgba(6,8,15,.6);position:sticky;top:0}
+.km-overlay .km-row{display:grid;grid-template-columns:22px 42px 30px 28px 1fr;align-items:center;padding:4px 8px;border-bottom:1px solid rgba(26,37,64,.5);font-size:11px;gap:3px;transition:background .3s}
+.km-overlay .km-row.new{animation:kf .6s ease-out}
+.km-overlay .km-row:first-child{border-top:1px solid var(--ac);background:rgba(255,107,43,.04)}
+.km-overlay-body{flex:1;overflow-y:auto}
+.km-overlay-body::-webkit-scrollbar{width:3px}
+.km-overlay-body::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
+
+/* minimap */
+#minimap{position:absolute;bottom:10px;right:10px;z-index:10;background:rgba(6,8,15,.82);border:1px solid var(--bd);border-radius:8px;overflow:hidden;backdrop-filter:blur(4px);display:none}
 .leaflet-control-attribution{font-size:8px!important;opacity:.4}
 .leaflet-popup-content-wrapper{background:var(--s1);color:var(--tx);border:1px solid var(--bd);border-radius:8px;font-family:var(--fn)}
 .leaflet-popup-tip{background:var(--s1)}
@@ -117,19 +132,11 @@ header{
 .rav-sub{font-size:10px;color:var(--mu);margin-top:1px}
 .rav-eta{font-family:var(--fm);font-size:13px;font-weight:500;color:var(--gn);flex-shrink:0}
 
-/* km history */
-.km-hist{flex:1;overflow-y:auto}
-.km-hist::-webkit-scrollbar{width:3px}
-.km-hist::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
-.km-head{display:grid;grid-template-columns:22px 42px 34px 32px 1fr;padding:4px 14px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);border-bottom:1px solid var(--bd);background:var(--bg);position:sticky;top:0}
-.km-row{display:grid;grid-template-columns:22px 42px 34px 32px 1fr;align-items:center;padding:5px 14px;border-bottom:1px solid rgba(26,37,64,.6);font-size:13px;gap:4px;transition:background .3s}
-.km-row.new{animation:kf .6s ease-out}
 @keyframes kf{0%{background:rgba(255,107,43,.22)}100%{background:transparent}}
-.km-row:first-child{border-top:1px solid var(--ac);background:rgba(255,107,43,.04)}
-.km-n{font-size:10px;font-weight:700;color:var(--mu)}
+.km-n{font-size:9px;font-weight:700;color:var(--mu)}
 .km-p{font-family:var(--fm);font-weight:500}
-.km-h{font-family:var(--fm);font-weight:500;font-size:10px}
-.km-d{font-size:10px;color:var(--mu)}
+.km-h{font-family:var(--fm);font-weight:500;font-size:9px}
+.km-d{font-size:9px;color:var(--mu)}
 
 /* ── CHAT ────────────────────────────────────────────────── */
 .cpanel{background:var(--s2);border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden}
@@ -230,7 +237,20 @@ header{
 
 <div class="app-main">
 
-  <div id="map"></div>
+  <div class="map-wrap">
+    <div id="map"></div>
+    <!-- km history overlay -->
+    <div class="km-overlay">
+      <div class="km-ov-hd">
+        <span style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mu)">Par km</span>
+        <span style="color:var(--ac);font-family:var(--fm);font-size:9px" id="kmCnt">—</span>
+      </div>
+      <div class="km-head"><span>km</span><span>allure</span><span>FC</span><span title="Dénivelé positif">↑ m</span><span>état</span></div>
+      <div class="km-overlay-body"><div id="kmH"></div></div>
+    </div>
+    <!-- minimap -->
+    <div id="minimap"></div>
+  </div>
 
   <!-- DATA PANEL -->
   <div class="dpanel">
@@ -288,7 +308,7 @@ header{
         </div>
         <div>
           <div class="sv" id="sKT">—</div>
-          <div class="sl">Distance totale</div>
+          <div class="sl">km restants</div>
         </div>
       </div>
       <div class="prog-bg"><div class="prog-fill" id="pFill" style="width:0"></div></div>
@@ -304,17 +324,6 @@ header{
         <div class="rav-sub"  id="ravSub">—</div>
       </div>
       <div class="rav-eta" id="ravEta">—</div>
-    </div>
-
-    <div class="blk" style="padding-bottom:0;flex-shrink:0">
-      <div class="lbl" style="display:flex;justify-content:space-between;margin-bottom:0">
-        <span>Par kilomètre</span>
-        <span style="color:var(--ac);font-family:var(--fm);font-size:9px" id="kmCnt">—</span>
-      </div>
-    </div>
-    <div class="km-hist">
-      <div class="km-head"><span>km</span><span>allure</span><span>FC</span><span title="Dénivelé positif (mètres montés)">↑ m</span><span>état</span></div>
-      <div id="kmH"></div>
     </div>
 
   </div>
@@ -401,6 +410,7 @@ function parseGpx(text){
   GPX.loaded=true;
   document.getElementById("elevS").classList.add("hgpx");
   renderElev();
+  renderMinimap();
 }
 
 function projectFwd(lat,lon){
@@ -565,7 +575,7 @@ function checkpointTip(km,label,extra){
   const rows=[];
 
   // Distance restante
-  rows.push({l:"Distance",v:`+${dist.toFixed(1)} km`});
+  rows.push({l:"À",v:`${dist.toFixed(1)} km`});
 
   // D+ et D- depuis GPX
   if(GPX.loaded){
@@ -593,14 +603,14 @@ function checkpointTip(km,label,extra){
     // Bornes : 50% à 250% du temps base (protection contre extrapolations folles)
     const totalSec=Math.max(dist*base*0.5,Math.min(dist*base*2.5,raw));
     const etaDate=new Date(Date.now()+totalSec*1000);
-    rows.push({l:"Arrivée",v:`~${fmtTime(etaDate)}`});
-    // Durée
+    rows.push({l:"Heure estimée",v:`~${fmtTime(etaDate)}`});
     const h=Math.floor(totalSec/3600),m=Math.floor((totalSec%3600)/60);
-    rows.push({l:"Dans",v:h>0?`${h}h${String(m).padStart(2,"0")}`:`${m} min`});
+    rows.push({l:"Temps restant",v:h>0?`${h}h${String(m).padStart(2,"0")}`:`${m} min`});
   }
 
   const rowsHtml=rows.map(r=>`<div class="tip-row"><span>${r.l}</span><span>${r.v}</span></div>`).join("");
-  return `<b>${label}</b>${extra?`<div style="font-size:9px;color:var(--bl);margin-bottom:4px">${extra}</div>`:""}${rowsHtml}`;
+  const extraHtml=extra?`<div style="font-size:12px;color:var(--gn);margin:4px 0 6px;font-weight:600">🧃 ${extra}</div>`:"";
+  return `<b>${label}</b>${extraHtml}${rowsHtml}`;
 }
 
 function attachElevTooltips(){
@@ -657,27 +667,58 @@ function renderElev(){
   const td=GPX.totalDist;
   const xOf=km=>(km/td*W).toFixed(2);
   const yOf=e=>(H-6-(e-minE)/(maxE-minE+1)*(H-18)).toFixed(2);
-  let h=`<defs><linearGradient id="eg" x1="0" y1="0" x2="0" y2="1">
+  const curKm=S.projKm||S.distKm;
+  // Build clipPaths for phase zones
+  let clipDefs=`<defs><linearGradient id="eg" x1="0" y1="0" x2="0" y2="1">
     <stop offset="0%" stop-color="#ff6b2b" stop-opacity=".5"/>
     <stop offset="100%" stop-color="#ff6b2b" stop-opacity=".03"/>
-  </linearGradient></defs>`;
+  </linearGradient>`;
+  let prevKm=0;
+  for(let i=0;i<C.race.phases.length;i++){
+    const ph=C.race.phases[i];
+    const x1=parseFloat(xOf(prevKm)),x2=parseFloat(xOf(ph.kmEnd));
+    clipDefs+=`<clipPath id="phclip${i}"><rect x="${x1.toFixed(1)}" y="0" width="${(x2-x1).toFixed(1)}" height="${H}"/></clipPath>`;
+    prevKm=ph.kmEnd;
+  }
+  clipDefs+="</defs>";
+  let h=clipDefs;
 
-  // Phase zones + labels
-  let prev=0;
-  for(const ph of C.race.phases){
-    const x1=parseFloat(xOf(prev)),x2=parseFloat(xOf(ph.kmEnd)),mx=(x1+x2)/2;
+  // Phase zones + labels (clipped to zone, y=20 pour éviter coupure haut)
+  prevKm=0;
+  for(let i=0;i<C.race.phases.length;i++){
+    const ph=C.race.phases[i];
+    const x1=parseFloat(xOf(prevKm)),x2=parseFloat(xOf(ph.kmEnd)),mx=(x1+x2)/2;
     h+=`<rect x="${x1.toFixed(2)}" y="0" width="${(x2-x1).toFixed(2)}" height="${H}" fill="${ph.color}28"/>`;
     const phShort=(ph.title||ph.label).split(' ').slice(0,3).join(' ');
-    h+=`<text x="${mx.toFixed(1)}" y="12" fill="${ph.color}" font-size="10" font-family="Barlow Condensed" font-weight="700" text-anchor="middle" opacity="1">${phShort}</text>`;
-    prev=ph.kmEnd;
+    h+=`<text x="${mx.toFixed(1)}" y="20" fill="${ph.color}" font-size="10" font-family="Barlow Condensed" font-weight="700" text-anchor="middle" clip-path="url(#phclip${i})">${phShort}</text>`;
+    prevKm=ph.kmEnd;
   }
 
-  // Elevation path (downsampled)
+  // Elevation path (downsampled) — split done/remaining
   const step=Math.max(1,Math.floor(pts.length/700));
   const sp=pts.filter((_,i)=>i%step===0||i===pts.length-1);
-  const pd=sp.map((p,i)=>`${i===0?"M":"L"}${xOf(p.cumDist)},${yOf(p.ele)}`).join(" ");
-  h+=`<path d="${pd} L${xOf(sp.at(-1).cumDist)},${H} L0,${H} Z" fill="url(#eg)"/>`;
-  h+=`<path d="${pd}" fill="none" stroke="#ff6b2b" stroke-width="1.5" vector-effect="non-scaling-stroke"/>`;
+
+  if(curKm>0.1){
+    // Find split index
+    let splitI=sp.findIndex(p=>p.cumDist>=curKm);
+    if(splitI<0) splitI=sp.length-1;
+    const doneSp=sp.slice(0,splitI+1);
+    const remSp=sp.slice(splitI);
+    if(doneSp.length>1){
+      const pd=doneSp.map((p,i)=>`${i===0?"M":"L"}${xOf(p.cumDist)},${yOf(p.ele)}`).join(" ");
+      h+=`<path d="${pd} L${xOf(doneSp.at(-1).cumDist)},${H} L0,${H} Z" fill="url(#eg)"/>`;
+      h+=`<path d="${pd}" fill="none" stroke="#ff6b2b" stroke-width="2" vector-effect="non-scaling-stroke"/>`;
+    }
+    if(remSp.length>1){
+      const pd=remSp.map((p,i)=>`${i===0?"M":"L"}${xOf(p.cumDist)},${yOf(p.ele)}`).join(" ");
+      h+=`<path d="${pd} L${xOf(remSp.at(-1).cumDist)},${H} L${xOf(remSp[0].cumDist)},${H} Z" fill="url(#eg)" opacity=".15"/>`;
+      h+=`<path d="${pd}" fill="none" stroke="#4fa3ff" stroke-width="1.5" opacity=".3" vector-effect="non-scaling-stroke"/>`;
+    }
+  } else {
+    const pd=sp.map((p,i)=>`${i===0?"M":"L"}${xOf(p.cumDist)},${yOf(p.ele)}`).join(" ");
+    h+=`<path d="${pd} L${xOf(sp.at(-1).cumDist)},${H} L0,${H} Z" fill="url(#eg)"/>`;
+    h+=`<path d="${pd}" fill="none" stroke="#ff6b2b" stroke-width="1.5" vector-effect="non-scaling-stroke"/>`;
+  }
 
   // km labels
   for(let km=10;km<td;km+=10)
@@ -720,18 +761,60 @@ function renderElev(){
       data-tipkm="${wp.km}" data-tiplbl="${wp.label}"/>`;
   }
 
-  // Live cursor
-  const curKm=S.projKm||S.distKm;
+  // Live cursor — icône coureur avec pulse
   if(curKm>0){
     const cx=xOf(curKm),cp=GPX.pts.find(p=>p.cumDist>=curKm)||GPX.pts.at(-1);
     const cy=yOf(cp.ele);
-    h+=`<line x1="${cx}" y1="0" x2="${cx}" y2="${H}" stroke="rgba(255,255,255,.6)" stroke-width="1.5" stroke-dasharray="3,3" vector-effect="non-scaling-stroke"/>`;
-    h+=`<circle cx="${cx}" cy="${cy}" r="8" fill="#ff6b2b" opacity=".2"/><circle cx="${cx}" cy="${cy}" r="5" fill="white" opacity=".95"/><circle cx="${cx}" cy="${cy}" r="3" fill="#ff6b2b"/>`;
-    const tx=Math.min(parseFloat(cx)+6,970),ty=Math.max(parseFloat(cy)-6,12);
-    h+=`<text x="${tx}" y="${ty}" fill="white" font-size="9" font-family="DM Mono" opacity=".9">${Math.round(cp.ele)}m</text>`;
+    h+=`<line x1="${cx}" y1="0" x2="${cx}" y2="${H}" stroke="rgba(255,255,255,.5)" stroke-width="1.5" stroke-dasharray="3,3" vector-effect="non-scaling-stroke"/>`;
+    // Pulse ring
+    h+=`<circle cx="${cx}" cy="${cy}" r="6" fill="#ff6b2b" opacity=".4"><animate attributeName="r" values="6;14;6" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" values=".4;0;.4" dur="1.8s" repeatCount="indefinite"/></circle>`;
+    // Runner emoji
+    h+=`<text x="${cx}" y="${(parseFloat(cy)+6).toFixed(1)}" font-size="14" text-anchor="middle" style="pointer-events:none">🏃</text>`;
+    // Altitude label
+    const tx=Math.min(parseFloat(cx)+8,970),ty=Math.max(parseFloat(cy)-8,12);
+    h+=`<text x="${tx}" y="${ty}" fill="white" font-size="8" font-family="DM Mono" opacity=".85">${Math.round(cp.ele)}m</text>`;
   }
   svg.innerHTML=h;
   attachElevTooltips();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MINIMAP
+// ═══════════════════════════════════════════════════════════
+function renderMinimap(){
+  const el=document.getElementById("minimap");
+  if(!GPX.loaded||!GPX.pts.length){el.style.display="none";return;}
+  el.style.display="block";
+  const W=160,H=120,pad=10;
+  const pts=GPX.pts;
+  const lats=pts.map(p=>p.lat),lons=pts.map(p=>p.lon);
+  const minLat=Math.min(...lats),maxLat=Math.max(...lats);
+  const minLon=Math.min(...lons),maxLon=Math.max(...lons);
+  const latR=maxLat-minLat||1,lonR=maxLon-minLon||1;
+  const cosLat=Math.cos((minLat+maxLat)/2*Math.PI/180);
+  // Preserve aspect ratio
+  const scaleX=(W-2*pad)/lonR,scaleY=(H-2*pad)/latR;
+  const scale=Math.min(scaleX,scaleY/cosLat);
+  const offX=(W-lonR*scale)/2,offY=(H-latR*cosLat*scale)/2;
+  const xOf=lon=>(offX+(lon-minLon)*scale).toFixed(1);
+  const yOf=lat=>(offY+(maxLat-lat)*cosLat*scale).toFixed(1);
+  const step=Math.max(1,Math.floor(pts.length/300));
+  const sp=pts.filter((_,i)=>i%step===0||i===pts.length-1);
+  const curKm=S.projKm||S.distKm;
+  const splitI=curKm>0?sp.findIndex(p=>p.cumDist>=curKm):-1;
+  const doneSp=splitI>0?sp.slice(0,splitI+1):[];
+  const remSp=splitI>0?sp.slice(splitI):sp;
+  const path=pts=>`M ${pts.map(p=>`${xOf(p.lon)},${yOf(p.lat)}`).join(" L ")}`;
+  let svg=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`;
+  if(remSp.length>1) svg+=`<path d="${path(remSp)}" fill="none" stroke="rgba(79,163,255,.25)" stroke-width="2" stroke-linecap="round"/>`;
+  if(doneSp.length>1) svg+=`<path d="${path(doneSp)}" fill="none" stroke="#ff6b2b" stroke-width="2.5" stroke-linecap="round"/>`;
+  if(curKm>0){
+    const cur=pts.find(p=>p.cumDist>=curKm)||pts.at(-1);
+    svg+=`<circle cx="${xOf(cur.lon)}" cy="${yOf(cur.lat)}" r="5" fill="#ff6b2b" opacity=".25"><animate attributeName="r" values="5;10;5" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values=".25;0;.25" dur="2s" repeatCount="indefinite"/></circle>`;
+    svg+=`<text x="${xOf(cur.lon)}" y="${(parseFloat(yOf(cur.lat))+5).toFixed(1)}" font-size="12" text-anchor="middle">🏃</text>`;
+  }
+  svg+=`</svg>`;
+  el.innerHTML=svg;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1069,7 +1152,7 @@ function render(){
   const dpRest=Math.max(0,C.race.totalDplus-Math.round(S.elevGain));
   const dmRest=Math.max(0,C.race.totalDminus-Math.round(S.elevLoss));
   document.getElementById("sKm").textContent=S.distKm.toFixed(1);
-  document.getElementById("sKT").textContent=km.toFixed(1);
+  document.getElementById("sKT").textContent=Math.max(0,td-km).toFixed(1);
   document.getElementById("sDp").textContent=dpRest;
   document.getElementById("sDm").textContent=dmRest;
   document.getElementById("sPc").textContent=curPaceS?fmtPace(curPaceS):"—";
@@ -1125,6 +1208,7 @@ function render(){
   // Charts
   renderPaceBars();
   renderElev();
+  renderMinimap();
 }
 function renderClock(){
   document.getElementById("sTm").textContent=fmtEl(S.sessionStart);
