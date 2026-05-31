@@ -159,7 +159,18 @@ header{
 .elev-strip.hgpx .elev-hint{opacity:0}
 .elev-strip.drag-over .elev-hint{color:var(--ac)}
 
-/* ── SBAR ───────────────────────────────────────────────── */
+/* ── ELEVATION TOOLTIP ───────────────────────────────────── */
+#elevTip{
+  position:absolute;pointer-events:none;z-index:50;
+  background:var(--s1);border:1px solid var(--bd);border-radius:8px;
+  padding:8px 11px;font-size:11px;line-height:1.55;
+  box-shadow:0 4px 16px rgba(0,0,0,.5);
+  max-width:200px;white-space:normal;
+}
+#elevTip b{color:var(--tx);font-size:12px;font-weight:700;display:block;margin-bottom:3px}
+#elevTip .tip-row{display:flex;justify-content:space-between;gap:12px;color:var(--mu)}
+#elevTip .tip-row span:last-child{color:var(--tx);font-family:var(--fm);font-weight:500;text-align:right}
+#elevTip .tip-passed{color:var(--mu);font-style:italic}
 .sbar{flex-shrink:0;height:30px;padding:0 14px;background:var(--bg);border-top:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mu)}
 
 /* ── OVERLAYS ────────────────────────────────────────────── */
@@ -214,12 +225,11 @@ header{
   <div class="dpanel">
 
     <div class="blk">
-      <div class="lbl">Phase</div>
-      <div class="ph-tag" id="phTag" style="color:var(--mu)">
+      <div class="lbl">Phase en cours</div>
+      <div class="ph-tag" id="phTitle" style="color:var(--mu)">
         <span class="ph-dot"></span><span id="phLbl">—</span>
       </div>
       <div class="ph-sub">km <b id="phKm">—</b> &nbsp;·&nbsp; FC ≤ <b id="phFc">—</b></div>
-      <div class="ph-title" id="phTitle"></div>
       <div class="ph-desc"  id="phDesc"></div>
     </div>
 
@@ -320,6 +330,7 @@ header{
 <div class="elev-strip" id="elevS">
   <svg id="elevSvg" viewBox="0 0 1000 100" preserveAspectRatio="none"></svg>
   <div class="elev-hint">⬆ Glisser le GPX du parcours ici</div>
+  <div id="elevTip" style="display:none"></div>
 </div>
 <div class="sbar"><span id="sL">En attente…</span><span id="sR" style="color:var(--mu)">● —</span></div>
 
@@ -473,6 +484,13 @@ function nextRav(km){
   return (C.race.ravitos||[]).filter(r=>r.km>km)[0]||null;
 }
 
+function ravitoIcon(services=""){
+  const s=services.toLowerCase();
+  if(s.includes("famille"))  return{icon:"❤️",color:"#ff3d5a"};
+  if(s.includes("solide"))   return{icon:"🍽️",color:"#ffc532"};
+  return                            {icon:"💧",color:"#4fa3ff"};
+}
+
 // ═══════════════════════════════════════════════════════════
 //  MAP
 // ═══════════════════════════════════════════════════════════
@@ -488,11 +506,121 @@ let pinMarker=null;
 function addRavitoMarkers(){
   for(const r of C.race.ravitos||[]){
     if(!r.lat||!r.lon) continue;
+    const{icon,color}=ravitoIcon(r.services);
     const ic=L.divIcon({className:"",iconSize:[26,26],iconAnchor:[13,26],
-      html:`<div style="width:26px;height:26px;border-radius:6px;background:#4fa3ff;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.5)">🏕️</div>`});
+      html:`<div style="width:26px;height:26px;border-radius:6px;background:${color};border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.5)">${icon}</div>`});
     L.marker([r.lat,r.lon],{icon:ic}).addTo(map)
       .bindPopup(`<b>${r.name}</b><br>km ${r.km}${r.services?`<br><small>${r.services}</small>`:""}`);
   }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ELEVATION TOOLTIPS
+// ═══════════════════════════════════════════════════════════
+function paceDriftModel(){
+  const h=S.kmHist; if(!h.length) return{base:null,slope:0};
+  const last=h.slice(-Math.min(8,h.length));
+  const n=last.length;
+  const base=last.reduce((a,b)=>a+b.pace,0)/n;
+  if(n<4) return{base,slope:0};
+  const xm=last.reduce((a,b)=>a+b.km,0)/n;
+  const ym=base;
+  const num=last.reduce((s,b)=>s+(b.km-xm)*(b.pace-ym),0);
+  const den=last.reduce((s,b)=>s+(b.km-xm)**2,0)||1;
+  return{base,slope:num/den}; // sec/km per km — positive = degradation
+}
+
+function checkpointTip(km,label,extra){
+  const curKm=S.projKm||S.distKm;
+  const tip=document.getElementById("elevTip");
+
+  if(km<=curKm){
+    // Point déjà passé
+    return `<span class="tip-passed">✓ ${label}</span>`;
+  }
+
+  const dist=km-curKm;
+  const rows=[];
+
+  // Distance restante
+  rows.push({l:"Distance",v:`+${dist.toFixed(1)} km`});
+
+  // D+ et D- depuis GPX
+  if(GPX.loaded){
+    const dp=gpxDpKm(curKm,km);
+    if(dp!==null&&dp>0) rows.push({l:"D+",v:`+${dp} m`});
+    // D- : trouver les points GPX
+    const p0=GPX.pts.find(p=>p.cumDist>=curKm);
+    const p1=GPX.pts.find(p=>p.cumDist>=km);
+    if(p0&&p1){
+      // Calculer D- cumulé entre les deux
+      let dm=0;
+      for(let i=GPX.pts.indexOf(p0)+1;i<=GPX.pts.indexOf(p1);i++){
+        const dz=GPX.pts[i].ele-GPX.pts[i-1].ele;
+        if(dz<-0.5) dm+=Math.abs(dz);
+      }
+      if(dm>5) rows.push({l:"D-",v:`−${Math.round(dm)} m`});
+    }
+  }
+
+  // ETA avec modèle de dérive
+  const{base,slope}=paceDriftModel();
+  if(base){
+    // Intégrale : totalSec = base*d + 0.5*slope*d²
+    const raw=base*dist+0.5*slope*dist*dist;
+    // Bornes : 50% à 250% du temps base (protection contre extrapolations folles)
+    const totalSec=Math.max(dist*base*0.5,Math.min(dist*base*2.5,raw));
+    const etaDate=new Date(Date.now()+totalSec*1000);
+    rows.push({l:"Arrivée",v:`~${fmtTime(etaDate)}`});
+    // Durée
+    const h=Math.floor(totalSec/3600),m=Math.floor((totalSec%3600)/60);
+    rows.push({l:"Dans",v:h>0?`${h}h${String(m).padStart(2,"0")}`:`${m} min`});
+  }
+
+  const rowsHtml=rows.map(r=>`<div class="tip-row"><span>${r.l}</span><span>${r.v}</span></div>`).join("");
+  return `<b>${label}</b>${extra?`<div style="font-size:9px;color:var(--bl);margin-bottom:4px">${extra}</div>`:""}${rowsHtml}`;
+}
+
+function attachElevTooltips(){
+  const svg=document.getElementById("elevSvg");
+  const tip=document.getElementById("elevTip");
+  const strip=document.getElementById("elevS");
+
+  svg.querySelectorAll("[data-tipkm]").forEach(el=>{
+    el.style.cursor="pointer";
+    el.addEventListener("mouseenter",()=>{
+      const km=parseFloat(el.dataset.tipkm);
+      const lbl=el.dataset.tiplbl||"";
+      const extra=el.dataset.tipextra||"";
+      tip.innerHTML=checkpointTip(km,lbl,extra);
+      tip.style.display="block";
+    });
+    el.addEventListener("mousemove",(e)=>{
+      const rect=strip.getBoundingClientRect();
+      const x=e.clientX-rect.left;
+      const y=e.clientY-rect.top;
+      // Positionner à gauche si on est dans le tiers droit
+      const tipW=210;
+      tip.style.left=(x>rect.width*0.65?x-tipW-8:x+10)+"px";
+      tip.style.top=Math.max(2,y-tip.offsetHeight-8)+"px";
+    });
+    el.addEventListener("mouseleave",()=>tip.style.display="none");
+    // Touch
+    el.addEventListener("click",(e)=>{
+      const km=parseFloat(el.dataset.tipkm);
+      const lbl=el.dataset.tiplbl||"";
+      const extra=el.dataset.tipextra||"";
+      tip.innerHTML=checkpointTip(km,lbl,extra);
+      tip.style.display=tip.style.display==="block"?"none":"block";
+      const rect=strip.getBoundingClientRect();
+      tip.style.left=Math.min(e.clientX-rect.left,rect.width-220)+"px";
+      tip.style.top="5px";
+      e.stopPropagation();
+    });
+  });
+
+  // Fermer au clic en dehors
+  strip.addEventListener("click",()=>tip.style.display="none");
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -536,15 +664,21 @@ function renderElev(){
   for(const r of C.race.ravitos||[]){
     if(r.km>td) continue;
     const rx=xOf(r.km);
-    h+=`<line x1="${rx}" y1="14" x2="${rx}" y2="${H-8}" stroke="#4fa3ff" stroke-width="1" stroke-dasharray="3,2" vector-effect="non-scaling-stroke" opacity=".7"/>`;
-    h+=`<text x="${rx}" y="13" fill="#4fa3ff" font-size="7.5" text-anchor="middle" font-family="Barlow Condensed" font-weight="700">🏕</text>`;
+    const{icon,color}=ravitoIcon(r.services);
+    h+=`<line x1="${rx}" y1="14" x2="${rx}" y2="${H-8}" stroke="${color}" stroke-width="1" stroke-dasharray="3,2" vector-effect="non-scaling-stroke" opacity=".8" style="pointer-events:none"/>`;
+    h+=`<text x="${rx}" y="13" fill="${color}" font-size="8" text-anchor="middle" style="pointer-events:none">${icon}</text>`;
+    h+=`<rect x="${(parseFloat(rx)-7).toFixed(1)}" y="0" width="14" height="${H}" fill="transparent"
+      data-tipkm="${r.km}" data-tiplbl="${icon} ${r.name}" data-tipextra="${r.services||""}"/>`;
   }
 
   // Waypoints
   for(const wp of C.race.waypoints||[]){
     if(wp.km>td) continue;
     const px=GPX.pts.find(p=>p.cumDist>=wp.km)||GPX.pts.at(-1);
-    h+=`<circle cx="${xOf(wp.km)}" cy="${yOf(px.ele)}" r="3" fill="white" opacity=".6"/>`;
+    h+=`<circle cx="${xOf(wp.km)}" cy="${yOf(px.ele)}" r="3" fill="white" opacity=".6" style="pointer-events:none"/>`;
+    // Hit area transparente
+    h+=`<circle cx="${xOf(wp.km)}" cy="${yOf(px.ele)}" r="10" fill="transparent"
+      data-tipkm="${wp.km}" data-tiplbl="${wp.label}"/>`;
   }
 
   // Live cursor
@@ -558,6 +692,7 @@ function renderElev(){
     h+=`<text x="${tx}" y="${ty}" fill="white" font-size="8" font-family="DM Mono" opacity=".8">${Math.round(cp.ele)}m</text>`;
   }
   svg.innerHTML=h;
+  attachElevTooltips();
 }
 
 // ═══════════════════════════════════════════════════════════
