@@ -9,6 +9,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{zoom:1.1}
 :root{
   --bg:#06080f;--s1:#0c1020;--s2:#111828;--bd:#1a2540;
   --tx:#ccd6f0;--mu:#6b82a8;--ac:#ff6b2b;
@@ -71,7 +72,20 @@ header{
 .km-overlay-body::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
 
 /* minimap */
-#minimap{position:absolute;bottom:10px;right:10px;z-index:1000;background:rgba(6,8,15,.82);border:1px solid var(--bd);border-radius:8px;overflow:hidden;backdrop-filter:blur(4px);display:none}
+#minimap{position:absolute;top:8px;left:183px;z-index:1000;background:rgba(6,8,15,.82);border:1px solid var(--bd);border-radius:8px;overflow:hidden;backdrop-filter:blur(4px);display:none}
+
+/* next events */
+.events-blk{border-bottom:1px solid var(--bd);flex-shrink:0}
+.ev-row{display:flex;align-items:center;gap:8px;padding:8px 14px;border-top:1px solid rgba(26,37,64,.4)}
+.ev-row:first-child{border-top:2px solid var(--gn);background:rgba(0,212,160,.04)}
+.ev-icon{font-size:18px;flex-shrink:0;width:22px;text-align:center}
+.ev-info{flex:1;min-width:0}
+.ev-name{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ev-sub{font-size:10px;color:var(--mu);margin-top:2px}
+.ev-right{text-align:right;flex-shrink:0}
+.ev-dur{font-family:var(--fm);font-size:16px;font-weight:700;color:var(--gn);line-height:1}
+.ev-row:first-child .ev-dur{font-size:22px}
+.ev-eta{font-size:10px;color:var(--mu);margin-top:2px}
 .leaflet-control-attribution{font-size:8px!important;opacity:.4}
 .leaflet-popup-content-wrapper{background:var(--s1);color:var(--tx);border:1px solid var(--bd);border-radius:8px;font-family:var(--fn)}
 .leaflet-popup-tip{background:var(--s1)}
@@ -310,8 +324,16 @@ header{
           <div class="sl">Allure min/km <span class="sl-delta" id="sPcD"></span></div>
         </div>
         <div>
+          <div class="sv" id="sSpd">—</div>
+          <div class="sl">km/h</div>
+        </div>
+        <div>
           <div class="sv" id="sKT">—</div>
           <div class="sl">km restants</div>
+        </div>
+        <div>
+          <div class="sv" id="sTr">—</div>
+          <div class="sl">Temps restant</div>
         </div>
       </div>
       <div class="prog-bg"><div class="prog-fill" id="pFill" style="width:0"></div></div>
@@ -319,18 +341,8 @@ header{
       <div class="pb-wrap" id="pbWrap"></div>
     </div>
 
-    <!-- Prochain ravito -->
-    <div class="rav-blk" id="ravBlk" style="display:none">
-      <div class="rav-icon">🏕️</div>
-      <div class="rav-info">
-        <div class="rav-name" id="ravName">—</div>
-        <div class="rav-sub"  id="ravSub">—</div>
-      </div>
-      <div class="rav-right">
-        <div class="rav-dur" id="ravDur">—</div>
-        <div class="rav-eta" id="ravEta">—</div>
-      </div>
-    </div>
+    <!-- Prochains événements -->
+    <div class="events-blk" id="eventsBlk"></div>
 
   </div>
 
@@ -694,11 +706,13 @@ function renderElev(){
   for(let i=0;i<C.race.phases.length;i++){
     const ph=C.race.phases[i];
     const x1=parseFloat(xOf(prevKm)),x2=parseFloat(xOf(ph.kmEnd)),mx=(x1+x2)/2;
+    // Zone rect + label en bas centré (group clippé pour éviter débordement latéral)
+    h+=`<g clip-path="url(#phclip${i})">`;
     h+=`<rect x="${x1.toFixed(2)}" y="0" width="${(x2-x1).toFixed(2)}" height="${H}" fill="${ph.color}28"/>`;
     const phShort=(ph.title||ph.label).split(' ').slice(0,3).join(' ');
-    // Label en bas, fond sombre pour contraste
-    h+=`<rect x="${x1.toFixed(1)}" y="${(H-14).toFixed(1)}" width="${(x2-x1).toFixed(1)}" height="14" fill="rgba(6,8,15,.65)" clip-path="url(#phclip${i})"/>`;
-    h+=`<text x="${mx.toFixed(1)}" y="${(H-3).toFixed(1)}" fill="${ph.color}" font-size="10" font-family="Barlow Condensed" font-weight="700" text-anchor="middle" clip-path="url(#phclip${i})">${phShort}</text>`;
+    h+=`<rect x="${x1.toFixed(1)}" y="${(H-14).toFixed(1)}" width="${(x2-x1).toFixed(1)}" height="14" fill="rgba(6,8,15,.7)"/>`;
+    h+=`<text x="${mx.toFixed(1)}" y="${(H-3).toFixed(1)}" fill="${ph.color}" font-size="10" font-family="Barlow Condensed" font-weight="700" text-anchor="middle">${phShort}</text>`;
+    h+=`</g>`;
     prevKm=ph.kmEnd;
   }
 
@@ -794,19 +808,19 @@ function renderMinimap(){
   const el=document.getElementById("minimap");
   if(!GPX.loaded||!GPX.pts.length){el.style.display="none";return;}
   el.style.display="block";
-  const W=160,H=120,pad=10;
+  const W=150,H=160,pad=8;
   const pts=GPX.pts;
   const lats=pts.map(p=>p.lat),lons=pts.map(p=>p.lon);
   const minLat=Math.min(...lats),maxLat=Math.max(...lats);
   const minLon=Math.min(...lons),maxLon=Math.max(...lons);
   const latR=maxLat-minLat||1,lonR=maxLon-minLon||1;
   const cosLat=Math.cos((minLat+maxLat)/2*Math.PI/180);
-  // Preserve aspect ratio
-  const scaleX=(W-2*pad)/lonR,scaleY=(H-2*pad)/latR;
-  const scale=Math.min(scaleX,scaleY/cosLat);
-  const offX=(W-lonR*scale)/2,offY=(H-latR*cosLat*scale)/2;
-  const xOf=lon=>(offX+(lon-minLon)*scale).toFixed(1);
-  const yOf=lat=>(offY+(maxLat-lat)*cosLat*scale).toFixed(1);
+  // Correct aspect ratio: 1° lon = cosLat × 1° lat in physical distance
+  const physW=lonR*cosLat, physH=latR;
+  const scale=Math.min((W-2*pad)/physW,(H-2*pad)/physH);
+  const offX=(W-physW*scale)/2,offY=(H-physH*scale)/2;
+  const xOf=lon=>(offX+(lon-minLon)*cosLat*scale).toFixed(1);
+  const yOf=lat=>(offY+(maxLat-lat)*scale).toFixed(1);
   const step=Math.max(1,Math.floor(pts.length/300));
   const sp=pts.filter((_,i)=>i%step===0||i===pts.length-1);
   const curKm=S.projKm||S.distKm;
@@ -1126,6 +1140,47 @@ function startAnim(){
 }
 
 // ═══════════════════════════════════════════════════════════
+//  NEXT EVENTS
+// ═══════════════════════════════════════════════════════════
+function getNextEvents(km){
+  const evs=[];
+  for(const r of C.race.ravitos||[])
+    if(r.km>km) evs.push({km:r.km,label:r.name,icon:ravitoIcon(r.services).icon,sub:r.services||"",color:"var(--gn)"});
+  for(const wp of C.race.waypoints||[])
+    if(wp.km>km) evs.push({km:wp.km,label:wp.label,icon:labelEmoji(wp.label),sub:`km ${wp.km}`,color:"var(--mu)"});
+  for(const ph of C.race.phases)
+    if(ph.kmStart>km) evs.push({km:ph.kmStart,label:ph.title||ph.label,icon:"🏁",sub:`Segment · FC≤${ph.fcMax} bpm`,color:ph.color});
+  return evs.sort((a,b)=>a.km-b.km).slice(0,3);
+}
+function renderNextEvents(km){
+  const el=document.getElementById("eventsBlk");
+  const evs=getNextEvents(km);
+  if(!evs.length){el.innerHTML="";return;}
+  const{base,slope}=paceDriftModel();
+  el.innerHTML=evs.map((ev,i)=>{
+    const dist=ev.km-km;
+    let durStr="—",etaStr="";
+    if(base){
+      const totalSec=Math.max(dist*base*0.5,Math.min(dist*base*2.5,base*dist+0.5*slope*dist*dist));
+      const h=Math.floor(totalSec/3600),m=Math.floor((totalSec%3600)/60);
+      durStr=h>0?`${h}h${String(m).padStart(2,"0")}`:`${m} min`;
+      etaStr=`~${fmtTime(new Date(Date.now()+totalSec*1000))}`;
+    }
+    return `<div class="ev-row">
+      <div class="ev-icon">${ev.icon}</div>
+      <div class="ev-info">
+        <div class="ev-name">${ev.label}</div>
+        <div class="ev-sub">km ${ev.km}${ev.sub&&ev.sub!==`km ${ev.km}`?` · ${ev.sub}`:""}</div>
+      </div>
+      <div class="ev-right">
+        <div class="ev-dur" style="color:${ev.color}">${durStr}</div>
+        <div class="ev-eta">${etaStr}</div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+// ═══════════════════════════════════════════════════════════
 //  RENDER
 // ═══════════════════════════════════════════════════════════
 function render(){
@@ -1160,7 +1215,18 @@ function render(){
   const dpRest=Math.max(0,C.race.totalDplus-Math.round(S.elevGain));
   const dmRest=Math.max(0,C.race.totalDminus-Math.round(S.elevLoss));
   document.getElementById("sKm").textContent=S.distKm.toFixed(1);
-  document.getElementById("sKT").textContent=Math.max(0,td-km).toFixed(1);
+  document.getElementById("sKT").textContent=Math.max(0,C.race.distKm-km).toFixed(1);
+  const spdKmh=spd*3.6;
+  document.getElementById("sSpd").textContent=spdKmh>0.5?spdKmh.toFixed(1):"—";
+  // Temps restant via pace drift
+  const{base:pBase,slope:pSlope}=paceDriftModel();
+  if(pBase&&S.kmHist.length>=2){
+    const dRem=Math.max(0,C.race.distKm-km);
+    const rawR=pBase*dRem+0.5*pSlope*dRem*dRem;
+    const remSec=Math.max(dRem*pBase*0.5,Math.min(dRem*pBase*2.5,rawR));
+    const rh=Math.floor(remSec/3600),rm=Math.floor((remSec%3600)/60);
+    document.getElementById("sTr").textContent=rh>0?`${rh}h${String(rm).padStart(2,"0")}`:`${rm} min`;
+  }
   document.getElementById("sDp").textContent=dpRest;
   document.getElementById("sDm").textContent=dmRest;
   document.getElementById("sPc").textContent=curPaceS?fmtPace(curPaceS):"—";
@@ -1186,25 +1252,8 @@ function render(){
     s.classList.toggle("lit",parseFloat(s.dataset.e)<=ph.kmEnd);
   });
 
-  // Next ravito
-  const nr=nextRav(km);
-  if(nr){
-    const dist=nr.km-km;
-    const{base,slope}=paceDriftModel();
-    const basePace=base||avgPaceS||360;
-    const raw=basePace*dist+0.5*slope*dist*dist;
-    const totalSec=Math.max(dist*basePace*0.5,Math.min(dist*basePace*2.5,raw));
-    const etaRav=new Date(Date.now()+totalSec*1000);
-    const ravH=Math.floor(totalSec/3600),ravM=Math.floor((totalSec%3600)/60);
-    const ravDurStr=ravH>0?`${ravH}h${String(ravM).padStart(2,"0")}`:`${ravM} min`;
-    document.getElementById("ravBlk").style.display="flex";
-    document.getElementById("ravName").textContent=nr.name;
-    document.getElementById("ravSub").textContent=`km ${nr.km}${nr.services?" · "+nr.services:""}`;
-    document.getElementById("ravDur").textContent=ravDurStr;
-    document.getElementById("ravEta").textContent=`vers ${fmtTime(etaRav)}`;
-  } else {
-    document.getElementById("ravBlk").style.display="none";
-  }
+  // Prochains événements (ravito + waypoint + phase)
+  renderNextEvents(km);
 
   // Signal (sbar seulement — pill gérée dans renderClock)
   const age=S.lastReceived?(Date.now()-S.lastReceived)/1000:null;
