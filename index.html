@@ -67,7 +67,7 @@ header{
 
 /* ── DATA PANEL ──────────────────────────────────────────── */
 .dpanel{background:var(--s1);border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden}
-.blk{padding:11px 14px;border-bottom:1px solid var(--bd);flex-shrink:0}
+.blk{padding:8px 14px;border-bottom:1px solid var(--bd);flex-shrink:0}
 .lbl{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mu);margin-bottom:7px}
 
 /* phase */
@@ -76,7 +76,7 @@ header{
 .ph-sub{margin-top:5px;display:flex;gap:10px;font-size:11px;font-weight:600;color:var(--mu)}
 .ph-sub b{color:var(--tx)}
 .ph-title{margin-top:5px;font-size:12px;font-weight:700;letter-spacing:.02em;line-height:1.3;transition:color .4s}
-.ph-desc{margin-top:6px;font-size:13px;color:var(--tx);line-height:1.5}
+.ph-desc{margin-top:6px;font-size:13px;color:var(--tx);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .ph-title{font-size:11px;font-weight:600;color:var(--mu);margin-top:3px;line-height:1.3;font-style:italic}
 
 /* HR diverging gauge */
@@ -95,7 +95,7 @@ header{
 /* stats */
 .stats-g{display:grid;grid-template-columns:1fr 1fr;gap:9px 10px}
 .sv{font-family:var(--fm);font-size:32px;font-weight:500;line-height:1;letter-spacing:-.02em}
-.sv-hero{font-size:44px}
+.sv-hero{font-size:38px}
 .sl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);margin-top:3px}
 .sl-delta{font-family:var(--fm);font-size:11px;font-weight:500;margin-left:4px}
 .prog-lbl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;font-weight:700;margin-top:9px}
@@ -136,7 +136,7 @@ header{
 .chat-hd{height:40px;padding:0 14px;border-bottom:1px solid var(--bd);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
 .chat-ttl{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#6b82a8}
 .chat-cnt{font-size:12px;font-weight:700;color:var(--ac);font-family:var(--fm)}
-.chat-ms{flex:1;overflow-y:auto;padding:10px 8px;display:flex;flex-direction:column;justify-content:flex-end;gap:7px}
+.chat-ms{flex:1;overflow-y:auto;padding:10px 8px;display:flex;flex-direction:column;gap:7px}
 .chat-ms::-webkit-scrollbar{width:5px}
 .chat-ms::-webkit-scrollbar-thumb{background:#2a3a5c;border-radius:3px}
 .chat-ms::-webkit-scrollbar-thumb:hover{background:#3f5070}
@@ -173,12 +173,12 @@ header{
 /* ── ELEVATION TOOLTIP ───────────────────────────────────── */
 #elevTip{
   position:absolute;pointer-events:none;z-index:50;
-  background:var(--s1);border:1px solid var(--bd);border-radius:8px;
-  padding:8px 11px;font-size:11px;line-height:1.55;
-  box-shadow:0 4px 16px rgba(0,0,0,.5);
-  max-width:200px;white-space:normal;
+  background:var(--s1);border:1px solid var(--bd);border-radius:10px;
+  padding:10px 14px;font-size:13px;line-height:1.6;
+  box-shadow:0 4px 20px rgba(0,0,0,.6);
+  max-width:260px;white-space:normal;
 }
-#elevTip b{color:var(--tx);font-size:12px;font-weight:700;display:block;margin-bottom:3px}
+#elevTip b{color:var(--tx);font-size:14px;font-weight:700;display:block;margin-bottom:4px}
 #elevTip .tip-row{display:flex;justify-content:space-between;gap:12px;color:var(--mu)}
 #elevTip .tip-row span:last-child{color:var(--tx);font-family:var(--fm);font-weight:500;text-align:right}
 #elevTip .tip-passed{color:var(--mu);font-style:italic}
@@ -291,7 +291,6 @@ header{
           <div class="sl">Distance totale</div>
         </div>
       </div>
-      <div class="prog-lbl">Progression de la course</div>
       <div class="prog-bg"><div class="prog-fill" id="pFill" style="width:0"></div></div>
       <div class="ph-strip" id="phStrip"></div>
       <div class="pb-wrap" id="pbWrap"></div>
@@ -440,6 +439,7 @@ const S={
   breachCount:0,prevOverCeil:false,
   lastPhaseLabel:null,
   triggeredWp:new Set(JSON.parse(localStorage.getItem("twp")||"[]")),
+  kmTimeline:[],
 };
 
 // ═══════════════════════════════════════════════════════════
@@ -666,8 +666,9 @@ function renderElev(){
   let prev=0;
   for(const ph of C.race.phases){
     const x1=parseFloat(xOf(prev)),x2=parseFloat(xOf(ph.kmEnd)),mx=(x1+x2)/2;
-    h+=`<rect x="${x1.toFixed(2)}" y="0" width="${(x2-x1).toFixed(2)}" height="${H}" fill="${ph.color}14"/>`;
-    h+=`<text x="${mx.toFixed(1)}" y="11" fill="${ph.color}" font-size="8" font-family="Barlow Condensed" font-weight="700" text-anchor="middle" opacity=".8">${ph.label}</text>`;
+    h+=`<rect x="${x1.toFixed(2)}" y="0" width="${(x2-x1).toFixed(2)}" height="${H}" fill="${ph.color}28"/>`;
+    const phShort=(ph.title||ph.label).split(' ').slice(0,3).join(' ');
+    h+=`<text x="${mx.toFixed(1)}" y="12" fill="${ph.color}" font-size="10" font-family="Barlow Condensed" font-weight="700" text-anchor="middle" opacity="1">${phShort}</text>`;
     prev=ph.kmEnd;
   }
 
@@ -833,6 +834,27 @@ function showToast(lbl){
 // ═══════════════════════════════════════════════════════════
 //  CHAT
 // ═══════════════════════════════════════════════════════════
+function msgRaceContext(ts){
+  const msgMs=new Date(ts).getTime();
+  // Temps de course
+  let timeStr=null;
+  if(S.sessionStart){
+    const elapsed=msgMs-new Date(S.sessionStart).getTime();
+    if(elapsed>=0){
+      const h=Math.floor(elapsed/3600000),m=Math.floor((elapsed%3600000)/60000);
+      timeStr=h>0?`${h}h${String(m).padStart(2,"0")}`:`${m} min`;
+    }
+  }
+  // km au moment du message (point GPS le plus proche dans le temps)
+  let km=null;
+  if(S.kmTimeline.length){
+    let best=S.kmTimeline[0],bestD=Math.abs(best.ts-msgMs);
+    for(const e of S.kmTimeline){const d=Math.abs(e.ts-msgMs);if(d<bestD){bestD=d;best=e;}}
+    km=best.km;
+  }
+  if(!timeStr) return msgAgo(ts); // avant le départ : fallback relatif
+  return `${timeStr}${km!==null?" · km "+km.toFixed(1):""}`;
+}
 async function fetchChat(){
   const since=S.chatLastTs?`&since=${encodeURIComponent(S.chatLastTs)}`:"";
   try{
@@ -848,14 +870,16 @@ async function sendChat(name,msg,type="msg"){
 function renderChat(){
   const el=document.getElementById("chatMs");
   if(!S.chatMsgs.length){
-    el.innerHTML=`<div class="chat-empty">💬<br><br>Sois le premier à encourager Antoine !</div>`;
+    el.innerHTML=`<div style="flex:1"></div><div class="chat-empty">💬<br><br>Sois le premier à encourager Antoine !</div>`;
     document.getElementById("chatCnt").textContent="0";
     return;
   }
-  el.innerHTML=S.chatMsgs.slice(-80).map(m=>{
-    if(m.type==="cheer") return `<div class="cmsg cheer"><div class="mt">${m.msg}</div><div class="mts">${m.name} · ${msgAgo(m.ts)}</div></div>`;
-    return `<div class="cmsg"><div class="mn">${m.name}</div><div class="mt">${m.msg}</div><div class="mts">${msgAgo(m.ts)}</div></div>`;
+  const msgs=S.chatMsgs.slice(-80).map(m=>{
+    const ctx=msgRaceContext(m.ts);
+    if(m.type==="cheer") return `<div class="cmsg cheer"><div class="mt">${m.msg}</div><div class="mts">${m.name} · ${ctx}</div></div>`;
+    return `<div class="cmsg"><div class="mn">${m.name}</div><div class="mt">${m.msg}</div><div class="mts">${ctx}</div></div>`;
   }).join("");
+  el.innerHTML=`<div style="flex:1"></div>${msgs}`;
   el.scrollTop=el.scrollHeight;
   document.getElementById("chatCnt").textContent=S.chatMsgs.length;
 }
@@ -982,6 +1006,7 @@ async function fetchData(){
     }
     checkWp(km);
     S.pts.push(pt);
+    S.kmTimeline.push({ts:new Date(pt.dateTime).getTime(),km});
     trailL.addLatLng([pt.position.lat,pt.position.lon]);
     prev=pt;
   }
@@ -1021,7 +1046,7 @@ function render(){
   const phEl=document.getElementById("phTitle");
   phEl.style.color=ph.color;
   phEl.querySelector(".ph-dot").style.background=ph.color;
-  document.getElementById("phLbl").textContent=ph.label;
+  document.getElementById("phLbl").textContent=ph.title||ph.label;
   const phIdx=C.race.phases.indexOf(ph)+1;
   const phTotal=C.race.phases.length;
   document.getElementById("phSub").innerHTML=`Segment ${phIdx} / ${phTotal} &nbsp;·&nbsp; km ${ph.kmStart}–${ph.kmEnd}`;
