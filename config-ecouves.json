@@ -8,63 +8,103 @@
   "phases": [
     {
       "label":       "PH 1",
-      "title":       "On est partis !",
-      "description": "Les 15 premiers km dans la forêt d'Écouves. Ça monte, ça descend, ça remonte — le terrain ne laisse pas souffler. Antoine gère son rythme et rentre dans sa course.",
+      "title":       "La forêt qui griffe",
+      "description": "Quatre vraies côtes en cinq kilomètres. Sans prévenir. Le terrain crache du dénivelé dès le départ — montée, descente, remontée, encore — dans une forêt dense de chênes et de pins. Puis ça se calme, ça roule, on traverse un ruisseau, et le parcours plonge au point le plus bas depuis le départ. La scène est plantée.",
       "kmStart":     0,
-      "kmEnd":       15,
+      "kmEnd":       13.2,
       "fcMax":       148,
       "color":       "#00d4a0"
     },
     {
       "label":       "PH 2",
-      "title":       "Le cœur du parcours",
-      "description": "Deux grandes montées, deux ravitos, et le point le plus haut du parcours au km 29. La section la plus technique et la plus belle. Si Antoine est encore souriant ici, c'est bon signe.",
-      "kmStart":     15,
-      "kmEnd":       35,
+      "title":       "L'escalier du diable",
+      "description": "Ici, les dents de scie laissent place à la vraie montagne. Une ascension qui s'étale sur 6 km, avec deux ressauts raides km 18 — les locaux appellent ça la montée salopard, ça donne le ton. Au sommet, un bref souffle, un carrefour qui sent le ravito, et le parcours redescend en douceur. Antoine est au tiers de la course. Les jambes parlent.",
+      "kmStart":     13.2,
+      "kmEnd":       22.12,
+      "fcMax":       155,
+      "color":       "#5bc8d0"
+    },
+    {
+      "label":       "PH 3",
+      "title":       "Vers le toit d'Écouves",
+      "description": "Après les deux petits ponts, la montée clé du parcours : 1 km à 7% constant, sans répit. Puis une vallée, une autre montée, et enfin le vrai sommet — km 28.62, +228m, le toit du parcours. Du haut, on voit les crêtes. On ne voit pas encore l'arrivée. On pense qu'on a tout vu. On a tort.",
+      "kmStart":     22.12,
+      "kmEnd":       28.62,
       "fcMax":       158,
       "color":       "#ffc532"
     },
     {
-      "label":       "PH 3",
-      "title":       "Le moment de vérité",
-      "description": "Une longue montée, puis le terrain se casse en dents de scie. C'est là que les jambes commencent à parler. Au km 41, ravito famille — le bon moment pour encourager.",
-      "kmStart":     35,
-      "kmEnd":       50,
+      "label":       "PH 4",
+      "title":       "La grande dégringolade",
+      "description": "Du sommet au fond. Une descente longue et cassante de 1.6 km à -7.4% — là où les quadris décident si on les a respectés ou non depuis le départ. Puis une remontée sèche qui surprend, une plongée finale vers le deuxième point bas du parcours. C'est le test de la maîtrise. Beau à regarder, dur à vivre.",
+      "kmStart":     28.62,
+      "kmEnd":       36.73,
+      "fcMax":       158,
+      "color":       "#ff9b3a"
+    },
+    {
+      "label":       "PH 5",
+      "title":       "Le deuxième géant",
+      "description": "La montée la plus longue du parcours — 5 km d'ascension quasi continue — qui grimpe vers une altitude presque identique au vrai sommet. Personne ne le voit venir. Le ravito famille est à km 41, à +193m d'altitude, en pleine montée. C'est le meilleur endroit pour encourager. Antoine a besoin de l'entendre.",
+      "kmStart":     36.73,
+      "kmEnd":       42.0,
       "fcMax":       160,
       "color":       "#ff6b2b"
     },
     {
-      "label":       "PH 4",
-      "title":       "On rentre à la maison",
-      "description": "Les 11 derniers km. Un double mur, puis la descente finale la plus raide du parcours. Les jambes sont cramées, la tête prend le relais. Chaque kilomètre compte.",
-      "kmStart":     50,
-      "kmEnd":       61,
+      "label":       "PH 6",
+      "title":       "Le monde cassé",
+      "description": "Le dernier tiers commence par trois plongées successives — -7%, -7%, -8% — entrecoupées de remontées sèches. Le terrain pulvérise ce qu'il reste de fraîcheur musculaire. Ce n'est pas un km difficile, c'est la répétition sans répit. Chaque descente cache une montée, chaque montée cache une descente. La tête prend le relais des jambes.",
+      "kmStart":     42.0,
+      "kmEnd":       54.42,
+      "fcMax":       160,
+      "color":       "#e84848"
+    },
+    {
+      "label":       "PH 7",
+      "title":       "Le coup de grâce",
+      "description": "Deux montées de plus — dont une à 15%, la plus raide du parcours — séparées par une descente de -8%. Puis la descente finale : -12.6% sur 600m après 7 heures d'effort. C'est là que les ultras se terminent vraiment. Plus que 7 km. Tout le monde attend l'arrivée.",
+      "kmStart":     54.42,
+      "kmEnd":       61.0,
       "fcMax":       170,
-      "color":       "#ff3d5a"
+      "color":       "#ff1f4a"
     }
   ],
 
   "waypoints": [
-    { "km": 1.0,   "label": "🌲 Dans le bois" },
-    { "km": 9.75,  "label": "💧 Passage de ruisseau" },
-    { "km": 13.0,  "label": "🌊 Deuxième ruisseau" },
-    { "km": 17.7,  "label": "😤 La montée qui pique" },
-    { "km": 19.5,  "label": "😮‍💨 Enfin le sommet" },
-    { "km": 22.5,  "label": "🌉 Les deux petits ponts" },
-    { "km": 28.75, "label": "🏔️ Point le plus haut" },
-    { "km": 31.5,  "label": "🎢 Grande descente" },
-    { "km": 36.8,  "label": "😬 Encore une montée..." },
-    { "km": 41.0,  "label": "💛 Ravito famille !" },
-    { "km": 42.15, "label": "💪 Dernier tiers" },
-    { "km": 54.5,  "label": "🥵 Double mur final" },
-    { "km": 59.1,  "label": "🏁 Plus que 2km !" }
+    { "km": 0.47,  "lat": 48.507396, "lon": 0.097715, "label": "⛰️ Côte 1 — ça commence vite" },
+    { "km": 4.62,  "lat": 48.525158, "lon": 0.094107, "label": "😤 Côte 4 en 5km — la plus raide" },
+    { "km": 7.03,  "lat": 48.534901, "lon": 0.108597, "label": "🌊 Le petit lac" },
+    { "km": 9.47,  "lat": 48.547748, "lon": 0.123301, "label": "💧 Premier ruisseau" },
+    { "km": 13.20, "lat": 48.567298, "lon": 0.136913, "label": "⬇️ Fond de vallée — le plus bas" },
+    { "km": 17.70, "lat": 48.550951, "lon": 0.107415, "label": "😬 La montée salopard" },
+    { "km": 19.05, "lat": 48.547939, "lon": 0.096355, "label": "😮‍💨 Sommet — 1ère montagne" },
+    { "km": 23.27, "lat": 48.544266, "lon": 0.067289, "label": "🌉 Les deux petits ponts" },
+    { "km": 24.02, "lat": 48.547473, "lon": 0.064225, "label": "⛰️ Montée clé — 1km à 7%" },
+    { "km": 28.62, "lat": 48.550232, "lon": 0.030334, "label": "🏔️ LE SOMMET — jamais aussi haut" },
+    { "km": 31.52, "lat": 48.533662, "lon": 0.036709, "label": "🎢 La grande dégringolade — 1.6km à -7%" },
+    { "km": 33.25, "lat": 48.527239, "lon": 0.050954, "label": "🕳️ Fond de vallée" },
+    { "km": 36.73, "lat": 48.513165, "lon": 0.054947, "label": "⬇️ Quasi au niveau du départ" },
+    { "km": 38.35, "lat": 48.509147, "lon": 0.045227, "label": "⛰️ Deuxième montagne — go" },
+    { "km": 42.00, "lat": 48.517482, "lon": 0.027207, "label": "🏔️ Sommet n°2 — presque aussi haut que le vrai" },
+    { "km": 43.02, "lat": 48.512901, "lon": 0.017407, "label": "😰 Premières plongées du dernier tiers" },
+    { "km": 46.08, "lat": 48.504079, "lon": 0.008610, "label": "🌊 Plongée à -10% — la 3ème en 4km" },
+    { "km": 46.95, "lat": 48.500078, "lon": 0.015745, "label": "🕳️ Creux — le plus bas du dernier tiers" },
+    { "km": 49.98, "lat": 48.504319, "lon": 0.025678, "label": "😤 Remontée surprise" },
+    { "km": 52.52, "lat": 48.510920, "lon": 0.052691, "label": "📐 Longue descente technique" },
+    { "km": 54.42, "lat": 48.509673, "lon": 0.066679, "label": "🕳️ Avant-dernier creux — puis ça remonte fort" },
+    { "km": 54.58, "lat": 48.509014, "lon": 0.068305, "label": "💀 Double mur — partie 1" },
+    { "km": 57.12, "lat": 48.497827, "lon": 0.070940, "label": "🫁 Creux entre les deux murs — reprendre son souffle" },
+    { "km": 57.20, "lat": 48.497729, "lon": 0.071970, "label": "💀 Double mur — partie 2 (15% !)" },
+    { "km": 59.08, "lat": 48.506274, "lon": 0.086389, "label": "⚠️ Descente finale — la plus raide du parcours" },
+    { "km": 60.20, "lat": 48.506945, "lon": 0.092270, "label": "🏁 Dernière descente — 1.3km jusqu'à l'arrivée" }
   ],
 
   "ravitos": [
-    { "name": "Parc Animalier d'Écouves", "km": 14, "lat": null, "lon": null, "services": "Eau" },
-    { "name": "Carrefour du Rendez-vous", "km": 22, "lat": null, "lon": null, "services": "Solide · eau" },
-    { "name": "Verrerie du Gast",         "km": 27, "lat": null, "lon": null, "services": "Eau" },
-    { "name": "Le Verdier",               "km": 41, "lat": null, "lon": null, "services": "Solide · eau · famille" },
-    { "name": "Réservoir d'Eau",          "km": 51, "lat": null, "lon": null, "services": "Eau" }
+    { "name": "Parc Animalier d'Écouves", "km": 14,   "lat": null, "lon": null, "services": "Eau" },
+    { "name": "Carrefour du Rendez-vous", "km": 22,   "lat": null, "lon": null, "services": "Solide · eau" },
+    { "name": "Verrerie du Gast",         "km": 27,   "lat": null, "lon": null, "services": "Eau" },
+    { "name": "Le Verdier",               "km": 41,   "lat": null, "lon": null, "services": "Solide · eau · famille" },
+    { "name": "Réservoir d'Eau",          "km": 51,   "lat": null, "lon": null, "services": "Eau" }
   ]
 }
