@@ -9,7 +9,6 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html{zoom:1.1}
 :root{
   --bg:#06080f;--s1:#0c1020;--s2:#111828;--bd:#1a2540;
   --tx:#ccd6f0;--mu:#6b82a8;--ac:#ff6b2b;
@@ -81,11 +80,11 @@ header{
 .ev-icon{font-size:18px;flex-shrink:0;width:22px;text-align:center}
 .ev-info{flex:1;min-width:0}
 .ev-name{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ev-sub{font-size:10px;color:var(--mu);margin-top:2px}
+.ev-sub{font-size:11px;color:var(--mu);margin-top:2px}
 .ev-right{text-align:right;flex-shrink:0}
-.ev-dur{font-family:var(--fm);font-size:16px;font-weight:700;color:var(--gn);line-height:1}
+.ev-dur{font-family:var(--fm);font-size:17px;font-weight:700;color:var(--gn);line-height:1}
 .ev-row:first-child .ev-dur{font-size:22px}
-.ev-eta{font-size:10px;color:var(--mu);margin-top:2px}
+.ev-eta{font-size:11px;color:var(--mu);margin-top:2px}
 .leaflet-control-attribution{font-size:8px!important;opacity:.4}
 .leaflet-popup-content-wrapper{background:var(--s1);color:var(--tx);border:1px solid var(--bd);border-radius:8px;font-family:var(--fn)}
 .leaflet-popup-tip{background:var(--s1)}
@@ -134,10 +133,11 @@ header{
 .ph-strip{display:flex;height:3px;gap:2px;margin-top:5px}
 .ph-seg{flex:1;opacity:.18;border-radius:1px;transition:opacity .5s}
 .ph-seg.lit{opacity:1}
-.pb-wrap{display:flex;align-items:flex-end;gap:3px;height:36px;margin-top:6px}
-.pb-bar{flex:1;border-radius:2px 2px 0 0;min-height:2px;transition:height .4s;opacity:.65}
+.pb-title{font-size:9px;color:var(--mu);letter-spacing:.08em;text-transform:uppercase;margin-top:8px;margin-bottom:3px}
+.pb-wrap{display:flex;align-items:flex-end;gap:3px;height:56px;margin-top:0}
+.pb-bar{flex:1;border-radius:3px 3px 0 0;min-height:3px;transition:height .4s;opacity:.7}
 .pb-bar.lt{opacity:1}
-.pb-lbl{font-size:7px;color:var(--mu);font-family:var(--fm);text-align:center;margin-top:2px}
+.pb-lbl{font-size:9px;color:var(--mu);font-family:var(--fm);text-align:center;margin-top:3px}
 
 /* ravito block */
 .rav-blk{padding:12px 14px;border-bottom:1px solid var(--bd);border-top:2px solid var(--gn);flex-shrink:0;display:flex;align-items:center;gap:10px;background:rgba(0,212,160,.04)}
@@ -150,10 +150,10 @@ header{
 .rav-eta{font-size:11px;color:var(--mu);margin-top:3px}
 
 @keyframes kf{0%{background:rgba(255,107,43,.22)}100%{background:transparent}}
-.km-n{font-size:9px;font-weight:700;color:var(--mu)}
+.km-n{font-size:10px;font-weight:700;color:var(--mu)}
 .km-p{font-family:var(--fm);font-weight:500}
-.km-h{font-family:var(--fm);font-weight:500;font-size:9px}
-.km-d{font-size:9px;color:var(--mu)}
+.km-h{font-family:var(--fm);font-weight:500;font-size:10px}
+.km-d{font-size:10px;color:var(--mu)}
 
 /* ── CHAT ────────────────────────────────────────────────── */
 .cpanel{background:var(--s2);border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden}
@@ -169,7 +169,7 @@ header{
 .cmsg.cheer{background:rgba(255,107,43,.1);border-color:rgba(255,107,43,.3);text-align:center;box-shadow:0 0 12px rgba(255,107,43,.2)}
 .mn{font-size:13px;font-weight:700;color:var(--ac);letter-spacing:.04em}
 .mt{font-size:14px;margin-top:2px;line-height:1.5;word-break:break-word}
-.mts{font-size:10px;color:#6b82a8;margin-top:4px;font-family:var(--fm)}
+.mts{font-size:11px;color:#6b82a8;margin-top:4px;font-family:var(--fm)}
 .cmsg.cheer .mt{font-size:28px;line-height:1.2}
 .cmsg.cheer .mts{font-size:11px;color:rgba(255,107,43,.7)}
 .react-row{display:flex;gap:8px;flex-shrink:0}
@@ -338,6 +338,7 @@ header{
       </div>
       <div class="prog-bg"><div class="prog-fill" id="pFill" style="width:0"></div></div>
       <div class="ph-strip" id="phStrip"></div>
+      <div class="pb-title">Allure des derniers km — rapide en haut</div>
       <div class="pb-wrap" id="pbWrap"></div>
     </div>
 
@@ -876,12 +877,15 @@ function updateHrGauge(hr,fcMax){
 function renderPaceBars(){
   const el=document.getElementById("pbWrap"),h=S.kmHist.slice(-8);
   if(!h.length){el.innerHTML="";return;}
-  const maxP=Math.max(...h.map(x=>x.pace));
+  const paces=h.map(k=>k.pace);
+  const minP=Math.min(...paces),maxP=Math.max(...paces),range=maxP-minP||1;
   el.innerHTML=h.map((k,i)=>{
-    const pct=(k.pace/maxP*100).toFixed(1);
+    // Rapide (allure basse) = barre haute — plus intuitif
+    const pct=Math.round((1-(k.pace-minP)/range)*70+20);
     const col=k.ok?"var(--gn)":"var(--rd)";
+    const isLast=i===h.length-1;
     return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
-      <div class="pb-bar ${i===h.length-1?"lt":""}" style="width:100%;height:${pct}%;background:${col}"></div>
+      <div class="pb-bar${isLast?' lt':''}" style="width:100%;height:${pct}%;background:${col}"></div>
       <div class="pb-lbl">${fmtPace(k.pace)}</div>
     </div>`;
   }).join("");
@@ -895,9 +899,9 @@ function renderKmHist(){
   document.getElementById("kmCnt").textContent=`${S.kmHist.length} km`;
   if(!h.length){el.innerHTML=`<div style="padding:14px;text-align:center;font-size:11px;color:var(--mu)">Les données apparaîtront km par km</div>`;return;}
   el.innerHTML=h.map((k,i)=>{
-    const col=hrCol(k.hr,getPhase(k.km+0.5).fcMax);
+    const col=hrCol(k.hr,k.phase.fcMax);
     const dp=k.dplus!==null?`+${k.dplus}`:"—";
-    const overCeil=k.hr/getPhase(k.km+0.5).fcMax>1;
+    const overCeil=k.hr/k.phase.fcMax>1;
     return `<div class="km-row ${i===0?"new":""}">
       <span class="km-n">${k.km}</span>
       <span class="km-p">${fmtPace(k.pace)}</span>
@@ -1105,8 +1109,8 @@ async function fetchData(){
       const hrA=samples.reduce((a,b)=>a+b,0)/samples.length;
       const phs=getPhase(ck-0.5);
       const dp=gpxDpKm(ck-1,ck);
-      // Label 0-indexé : km 0 = segment 0→1, km 1 = segment 1→2, etc.
-      S.kmHist.push({km:ck-1,pace:el,hr:hrA,dplus:dp,phase:phs,ok:hrA<phs.fcMax});
+      // Label 1-indexé : km 1 = segment 0→1 complété, km 2 = 1→2, etc.
+      S.kmHist.push({km:ck,pace:el,hr:hrA,dplus:dp,phase:phs,ok:hrA<phs.fcMax});
       S.kmCursor=ck;
       S.kmStartTs=new Date(pt.dateTime).getTime();
       S.kmStartHr=[pt.heartRateBeatsPerMin]; // conserver le point courant pour le km suivant
