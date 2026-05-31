@@ -3,6 +3,9 @@
 #  SETUP LIVETRACK — à exécuter une fois avant chaque course
 #  Usage : bash setup.sh
 # ═══════════════════════════════════════════════════════════════
+#
+# https://raw.githubusercontent.com/antoineconqui/trail-tracker/main/config-ecouves.json
+# https://raw.githubusercontent.com/antoineconqui/trail-tracker/main/Ecouves%202025%20off.gpx
 
 WORKER="https://aged-frog-1690.antoineconqui.workers.dev"
 ADMIN_SECRET="kapsalon"

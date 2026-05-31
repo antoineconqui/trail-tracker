@@ -74,6 +74,9 @@ header{
 .ph-dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0}
 .ph-sub{margin-top:5px;display:flex;gap:10px;font-size:11px;font-weight:600;color:var(--mu)}
 .ph-sub b{color:var(--tx)}
+.ph-title{margin-top:5px;font-size:12px;font-weight:700;letter-spacing:.02em;line-height:1.3;transition:color .4s}
+.ph-desc{margin-top:4px;font-size:10px;color:var(--mu);line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.ph-title{font-size:11px;font-weight:600;color:var(--mu);margin-top:3px;line-height:1.3;font-style:italic}
 
 /* HR diverging gauge */
 .hr-row{display:flex;align-items:center;gap:14px}
@@ -166,7 +169,7 @@ header{
 .mbox p{font-size:12px;color:var(--mu);margin-bottom:20px}
 .mbox input{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:10px 14px;color:var(--tx);font-family:var(--fn);font-size:14px;width:100%;outline:none;margin-bottom:14px;text-align:center}
 .mbox input:focus{border-color:var(--ac)}
-.wp-toast{position:fixed;bottom:48px;left:50%;transform:translateX(-50%);background:var(--s1);border:1px solid var(--ac);border-radius:24px;padding:10px 24px;font-size:16px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--ac);z-index:900;animation:tIn .3s ease-out;pointer-events:none;box-shadow:0 4px 20px rgba(255,107,43,.3)}
+.wp-toast{position:fixed;bottom:48px;left:50%;transform:translateX(-50%);background:var(--s1);border:1px solid var(--ac);border-radius:16px;padding:9px 20px;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ac);z-index:900;animation:tIn .3s ease-out;pointer-events:none;box-shadow:0 4px 20px rgba(255,107,43,.3);max-width:min(90vw,520px);text-align:center;white-space:normal;line-height:1.3}
 @keyframes tIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 
 /* ── MOBILE ──────────────────────────────────────────────── */
@@ -216,6 +219,8 @@ header{
         <span class="ph-dot"></span><span id="phLbl">—</span>
       </div>
       <div class="ph-sub">km <b id="phKm">—</b> &nbsp;·&nbsp; FC ≤ <b id="phFc">—</b></div>
+      <div class="ph-title" id="phTitle"></div>
+      <div class="ph-desc"  id="phDesc"></div>
     </div>
 
     <div class="blk">
@@ -338,29 +343,7 @@ const C = {
   proxy:     "https://aged-frog-1690.antoineconqui.workers.dev",
   sessionId: "",    // auto-détecté depuis /current
   configUrl: "https://raw.githubusercontent.com/antoineconqui/trail-tracker/main/config-ecouves.json",
-  race: {
-    name:"Trail d'Écouves", distKm:61, totalDplus:1950, totalDminus:1950,
-    phases:[
-      {label:"PH 1",kmStart:0,  kmEnd:15, fcMax:148,color:"#00d4a0"},
-      {label:"PH 2",kmStart:15, kmEnd:35, fcMax:158,color:"#ffc532"},
-      {label:"PH 3",kmStart:35, kmEnd:50, fcMax:160,color:"#ff6b2b"},
-      {label:"PH 4",kmStart:50, kmEnd:61, fcMax:170,color:"#ff3d5a"},
-    ],
-    waypoints:[
-      {km:17.7,  label:"⛰️ Montée salopard"},
-      {km:28.75, label:"🏔️ Point culminant"},
-      {km:31.5,  label:"⚠️ Cassure -9%"},
-      {km:54.5,  label:"💀 Double mur final"},
-      {km:59.1,  label:"⚠️ Descente -10.8%"},
-    ],
-    ravitos:[
-      {name:"Parc Animalier d'Écouves", km:14, lat:null,lon:null,services:"Eau"},
-      {name:"Carrefour du Rendez-vous", km:22, lat:null,lon:null,services:"Solide · eau"},
-      {name:"Verrerie du Gast",         km:27, lat:null,lon:null,services:"Eau"},
-      {name:"Le Verdier",               km:41, lat:null,lon:null,services:"Solide · eau · soutien famille"},
-      {name:"Réservoir d'Eau",          km:51, lat:null,lon:null,services:"Eau"},
-    ],
-  },
+  race: { name:"LiveTrack", distKm:0, totalDplus:0, totalDminus:0, phases:[], waypoints:[], ravitos:[] },
   pollMs:30_000, chatMs:15_000,
 };
 
@@ -426,6 +409,7 @@ const S={
   kmHist:[],kmCursor:0,kmStartTs:null,kmStartHr:[],
   chatMsgs:[],chatLastTs:null,
   breachCount:0,prevOverCeil:false,
+  lastPhaseLabel:null,
   triggeredWp:new Set(JSON.parse(localStorage.getItem("twp")||"[]")),
 };
 
@@ -843,6 +827,15 @@ function render(){
   document.getElementById("phLbl").textContent=ph.label;
   document.getElementById("phKm").textContent=`${ph.kmStart}–${ph.kmEnd}`;
   document.getElementById("phFc").textContent=`${ph.fcMax} bpm`;
+  const titleEl=document.getElementById("phTitle");
+  titleEl.textContent=ph.title||"";
+  titleEl.style.color=ph.color;
+  document.getElementById("phDesc").textContent=ph.description||"";
+  // Toast sur changement de phase
+  if(S.lastPhaseLabel&&S.lastPhaseLabel!==ph.label){
+    showToast(`${ph.label} — ${ph.title||""}`);
+  }
+  S.lastPhaseLabel=ph.label;
 
   // HR gauge
   updateHrGauge(hr,ph.fcMax);

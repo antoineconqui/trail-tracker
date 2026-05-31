@@ -4,24 +4,67 @@
   "totalDplus":  1950,
   "totalDminus": 1950,
   "gpxUrl":      "https://raw.githubusercontent.com/antoineconqui/trail-tracker/main/Ecouves%202025%20off.gpx",
+
   "phases": [
-    { "label": "PH 1", "kmStart": 0,  "kmEnd": 15, "fcMax": 148, "color": "#00d4a0" },
-    { "label": "PH 2", "kmStart": 15, "kmEnd": 35, "fcMax": 158, "color": "#ffc532" },
-    { "label": "PH 3", "kmStart": 35, "kmEnd": 50, "fcMax": 160, "color": "#ff6b2b" },
-    { "label": "PH 4", "kmStart": 50, "kmEnd": 61, "fcMax": 170, "color": "#ff3d5a" }
+    {
+      "label":       "PH 1",
+      "title":       "On est partis !",
+      "description": "Les 15 premiers km dans la forêt d'Écouves. Ça monte, ça descend, ça remonte — le terrain ne laisse pas souffler. Antoine gère son rythme et rentre dans sa course.",
+      "kmStart":     0,
+      "kmEnd":       15,
+      "fcMax":       148,
+      "color":       "#00d4a0"
+    },
+    {
+      "label":       "PH 2",
+      "title":       "Le cœur du parcours",
+      "description": "Deux grandes montées, deux ravitos, et le point le plus haut du parcours au km 29. La section la plus technique et la plus belle. Si Antoine est encore souriant ici, c'est bon signe.",
+      "kmStart":     15,
+      "kmEnd":       35,
+      "fcMax":       158,
+      "color":       "#ffc532"
+    },
+    {
+      "label":       "PH 3",
+      "title":       "Le moment de vérité",
+      "description": "Une longue montée, puis le terrain se casse en dents de scie. C'est là que les jambes commencent à parler. Au km 41, ravito famille — le bon moment pour encourager.",
+      "kmStart":     35,
+      "kmEnd":       50,
+      "fcMax":       160,
+      "color":       "#ff6b2b"
+    },
+    {
+      "label":       "PH 4",
+      "title":       "On rentre à la maison",
+      "description": "Les 11 derniers km. Un double mur, puis la descente finale la plus raide du parcours. Les jambes sont cramées, la tête prend le relais. Chaque kilomètre compte.",
+      "kmStart":     50,
+      "kmEnd":       61,
+      "fcMax":       170,
+      "color":       "#ff3d5a"
+    }
   ],
+
   "waypoints": [
-    { "km": 17.7,  "label": "⛰️ Montée salopard" },
-    { "km": 28.75, "label": "🏔️ Point culminant" },
-    { "km": 31.5,  "label": "⚠️ Cassure -9%" },
-    { "km": 54.5,  "label": "💀 Double mur final" },
-    { "km": 59.1,  "label": "⚠️ Descente -10.8%" }
+    { "km": 1.0,   "label": "🌲 Dans le bois" },
+    { "km": 9.75,  "label": "💧 Passage de ruisseau" },
+    { "km": 13.0,  "label": "🌊 Deuxième ruisseau" },
+    { "km": 17.7,  "label": "😤 La montée qui pique" },
+    { "km": 19.5,  "label": "😮‍💨 Enfin le sommet" },
+    { "km": 22.5,  "label": "🌉 Les deux petits ponts" },
+    { "km": 28.75, "label": "🏔️ Point le plus haut" },
+    { "km": 31.5,  "label": "🎢 Grande descente" },
+    { "km": 36.8,  "label": "😬 Encore une montée..." },
+    { "km": 41.0,  "label": "💛 Ravito famille !" },
+    { "km": 42.15, "label": "💪 Dernier tiers" },
+    { "km": 54.5,  "label": "🥵 Double mur final" },
+    { "km": 59.1,  "label": "🏁 Plus que 2km !" }
   ],
+
   "ravitos": [
     { "name": "Parc Animalier d'Écouves", "km": 14, "lat": null, "lon": null, "services": "Eau" },
     { "name": "Carrefour du Rendez-vous", "km": 22, "lat": null, "lon": null, "services": "Solide · eau" },
     { "name": "Verrerie du Gast",         "km": 27, "lat": null, "lon": null, "services": "Eau" },
-    { "name": "Le Verdier",               "km": 41, "lat": null, "lon": null, "services": "Solide · eau · soutien famille" },
+    { "name": "Le Verdier",               "km": 41, "lat": null, "lon": null, "services": "Solide · eau · famille" },
     { "name": "Réservoir d'Eau",          "km": 51, "lat": null, "lon": null, "services": "Eau" }
   ]
 }
