@@ -11,7 +11,7 @@
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{
   --bg:#06080f;--s1:#0c1020;--s2:#111828;--bd:#1a2540;
-  --tx:#ccd6f0;--mu:#3f5070;--ac:#ff6b2b;
+  --tx:#ccd6f0;--mu:#6b82a8;--ac:#ff6b2b;
   --gn:#00d4a0;--ye:#ffc532;--rd:#ff3d5a;--bl:#4fa3ff;
   --fn:'Barlow Condensed',sans-serif;--fm:'DM Mono',monospace;
 }
@@ -20,24 +20,25 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--fn)
 
 /* ── HEADER ──────────────────────────────────────────────── */
 header{
-  flex-shrink:0;height:48px;padding:0 14px;
+  flex-shrink:0;height:64px;padding:0 16px;
   background:var(--s1);border-bottom:1px solid var(--bd);
   display:flex;align-items:center;gap:12px;
 }
 .h-id{flex-shrink:0}
-.h-race{font-size:14px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
-.h-ath{font-size:11px;font-weight:600;color:var(--mu);letter-spacing:.06em;text-transform:uppercase}
+.h-race{font-size:22px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+.h-ath{font-size:13px;font-weight:600;color:var(--mu);letter-spacing:.06em;text-transform:uppercase}
 .sbadge{
-  flex:1;text-align:center;font-size:13px;font-weight:900;letter-spacing:.1em;
-  text-transform:uppercase;padding:3px 10px;border-radius:20px;transition:all .4s;
+  flex:1;text-align:center;font-size:15px;font-weight:900;letter-spacing:.1em;
+  text-transform:uppercase;padding:4px 12px;border-radius:20px;transition:all .4s;
 }
-.sbadge.ok    {background:rgba(0,212,160,.1);color:var(--gn)}
+.sbadge.ok    {background:rgba(0,212,160,.1);color:var(--gn);animation:live-pulse 2.5s ease-in-out infinite}
 .sbadge.fire  {background:rgba(255,107,43,.18);color:var(--ac);animation:glow 1s ease-in-out infinite alternate}
 .sbadge.warn  {background:rgba(255,197,50,.1);color:var(--ye)}
 .sbadge.danger{background:rgba(255,61,90,.18);color:var(--rd)}
 .sbadge.info  {background:rgba(79,163,255,.1);color:var(--bl)}
 .sbadge.wait  {background:rgba(63,80,112,.15);color:var(--mu)}
 @keyframes glow{from{box-shadow:0 0 4px rgba(255,107,43,.3)}to{box-shadow:0 0 16px rgba(255,107,43,.7)}}
+@keyframes live-pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,212,160,0)}60%{box-shadow:0 0 8px rgba(0,212,160,.3)}}
 .h-meta{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .h-pill{display:flex;align-items:center;gap:4px;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:20px;border:1px solid currentColor;white-space:nowrap}
 .h-pill.ok  {color:var(--gn);background:rgba(0,212,160,.08);border-color:rgba(0,212,160,.25)}
@@ -46,13 +47,13 @@ header{
 .h-dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:blink 1.5s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 .hstat{text-align:right;line-height:1.2}
-.hstat-v{font-family:var(--fm);font-size:13px;font-weight:500}
-.hstat-l{font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--mu)}
+.hstat-v{font-family:var(--fm);font-size:18px;font-weight:500}
+.hstat-l{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mu)}
 .breach{font-size:11px;font-weight:700;color:var(--rd);background:rgba(255,61,90,.12);border:1px solid rgba(255,61,90,.3);padding:2px 7px;border-radius:12px;display:none}
 .breach.show{display:block}
 
 /* ── MAIN LAYOUT ─────────────────────────────────────────── */
-.app-main{flex:1;display:grid;grid-template-columns:1fr 282px 220px;min-height:0;overflow:hidden}
+.app-main{flex:1;display:grid;grid-template-columns:1fr 320px 220px;min-height:0;overflow:hidden}
 
 /* ── MAP ─────────────────────────────────────────────────── */
 #map{background:#0a0e1a}
@@ -67,7 +68,7 @@ header{
 /* ── DATA PANEL ──────────────────────────────────────────── */
 .dpanel{background:var(--s1);border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden}
 .blk{padding:11px 14px;border-bottom:1px solid var(--bd);flex-shrink:0}
-.lbl{font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--mu);margin-bottom:7px}
+.lbl{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mu);margin-bottom:7px}
 
 /* phase */
 .ph-tag{font-size:20px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
@@ -75,7 +76,7 @@ header{
 .ph-sub{margin-top:5px;display:flex;gap:10px;font-size:11px;font-weight:600;color:var(--mu)}
 .ph-sub b{color:var(--tx)}
 .ph-title{margin-top:5px;font-size:12px;font-weight:700;letter-spacing:.02em;line-height:1.3;transition:color .4s}
-.ph-desc{margin-top:4px;font-size:10px;color:var(--mu);line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.ph-desc{margin-top:6px;font-size:13px;color:var(--tx);line-height:1.5}
 .ph-title{font-size:11px;font-weight:600;color:var(--mu);margin-top:3px;line-height:1.3;font-style:italic}
 
 /* HR diverging gauge */
@@ -83,18 +84,18 @@ header{
 .hr-num{font-family:var(--fm);font-size:52px;font-weight:500;line-height:1;letter-spacing:-.02em;transition:color .4s;min-width:80px}
 .hr-side{flex:1}
 .hr-bpm{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--mu)}
-.hr-delta{font-family:var(--fm);font-size:18px;font-weight:500;transition:color .3s}
-.hr-gauge{position:relative;height:8px;background:var(--bd);border-radius:4px;margin:7px 0 4px;overflow:visible}
-.hr-g-fill{position:absolute;left:0;top:0;bottom:0;border-radius:4px;transition:width .5s,background .5s}
-.hr-g-tick{position:absolute;top:-4px;bottom:-4px;width:3px;background:rgba(255,255,255,.9);border-radius:2px;box-shadow:0 0 6px rgba(255,255,255,.4);transform:translateX(-50%)}
-.hr-g-zone{position:absolute;top:0;bottom:0;right:0;background:rgba(255,61,90,.12);border-radius:0 4px 4px 0;pointer-events:none}
+.hr-delta{font-family:var(--fn);font-size:12px;font-weight:700;letter-spacing:.02em;transition:color .3s;line-height:1.3}
+.hr-gauge{position:relative;height:16px;background:var(--bd);border-radius:8px;margin:8px 0 5px;overflow:visible}
+.hr-g-fill{position:absolute;left:0;top:0;bottom:0;border-radius:8px;transition:width .5s,background .5s}
+.hr-g-tick{position:absolute;top:-3px;bottom:-3px;width:3px;background:rgba(255,255,255,.9);border-radius:2px;box-shadow:0 0 6px rgba(255,255,255,.4);transform:translateX(-50%)}
+.hr-g-zone{position:absolute;top:0;bottom:0;right:0;background:rgba(255,61,90,.12);border-radius:0 8px 8px 0;pointer-events:none}
 .hr-ceil-lbl{font-size:10px;font-weight:600;color:var(--mu)}
 .hr-ceil-lbl b{color:var(--tx)}
 
 /* stats */
 .stats-g{display:grid;grid-template-columns:1fr 1fr;gap:9px 10px}
-.sv{font-family:var(--fm);font-size:26px;font-weight:500;line-height:1;letter-spacing:-.02em}
-.sl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);margin-top:2px}
+.sv{font-family:var(--fm);font-size:32px;font-weight:500;line-height:1;letter-spacing:-.02em}
+.sl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);margin-top:3px}
 .sl-delta{font-family:var(--fm);font-size:11px;font-weight:500;margin-left:4px}
 .prog-bg{height:3px;background:var(--bd);border-radius:2px;margin-top:9px;overflow:hidden}
 .prog-fill{height:100%;border-radius:2px;background:var(--ac);transition:width .8s}
@@ -108,7 +109,7 @@ header{
 
 /* ravito block */
 .rav-blk{padding:9px 14px;border-bottom:1px solid var(--bd);flex-shrink:0;display:flex;align-items:center;gap:10px}
-.rav-icon{font-size:18px;flex-shrink:0}
+.rav-icon{font-size:24px;flex-shrink:0}
 .rav-info{flex:1;min-width:0}
 .rav-name{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rav-sub{font-size:10px;color:var(--mu);margin-top:1px}
@@ -118,8 +119,8 @@ header{
 .km-hist{flex:1;overflow-y:auto}
 .km-hist::-webkit-scrollbar{width:3px}
 .km-hist::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
-.km-head{display:grid;grid-template-columns:22px 42px 34px 32px 1fr;padding:4px 14px;font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);border-bottom:1px solid var(--bd);background:var(--bg);position:sticky;top:0}
-.km-row{display:grid;grid-template-columns:22px 42px 34px 32px 1fr;align-items:center;padding:5px 14px;border-bottom:1px solid rgba(26,37,64,.6);font-size:11px;gap:4px;transition:background .3s}
+.km-head{display:grid;grid-template-columns:22px 42px 34px 32px 1fr;padding:4px 14px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);border-bottom:1px solid var(--bd);background:var(--bg);position:sticky;top:0}
+.km-row{display:grid;grid-template-columns:22px 42px 34px 32px 1fr;align-items:center;padding:5px 14px;border-bottom:1px solid rgba(26,37,64,.6);font-size:13px;gap:4px;transition:background .3s}
 .km-row.new{animation:kf .6s ease-out}
 @keyframes kf{0%{background:rgba(255,107,43,.22)}100%{background:transparent}}
 .km-row:first-child{border-top:1px solid var(--ac);background:rgba(255,107,43,.04)}
@@ -147,13 +148,13 @@ header{
 .chat-form input:focus{border-color:var(--ac)}
 .cbtns{display:flex;gap:5px}
 .btn{border:none;border-radius:6px;padding:7px 10px;font-family:var(--fn);font-weight:700;font-size:12px;cursor:pointer;transition:background .2s;letter-spacing:.04em}
-.bcheer{background:rgba(255,107,43,.2);color:var(--ac);flex-shrink:0}
-.bcheer:hover{background:rgba(255,107,43,.35)}
+.bcheer{background:rgba(255,107,43,.2);color:var(--ac);flex:1;border:1px solid rgba(255,107,43,.35)}
+.bcheer:hover{background:rgba(255,107,43,.38)}
 .bsend{background:var(--ac);color:#fff;flex:1}
 .bsend:hover{background:#e5602a}
 
 /* ── ELEVATION STRIP ──────────────────────────────────────── */
-.elev-strip{flex-shrink:0;height:110px;background:var(--s1);border-top:1px solid var(--bd);position:relative}
+.elev-strip{flex-shrink:0;height:190px;background:var(--s1);border-top:1px solid var(--bd);position:relative}
 .elev-strip svg{width:100%;height:100%;display:block}
 .elev-hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);pointer-events:none;transition:opacity .3s}
 .elev-strip.hgpx .elev-hint{opacity:0}
@@ -171,7 +172,7 @@ header{
 #elevTip .tip-row{display:flex;justify-content:space-between;gap:12px;color:var(--mu)}
 #elevTip .tip-row span:last-child{color:var(--tx);font-family:var(--fm);font-weight:500;text-align:right}
 #elevTip .tip-passed{color:var(--mu);font-style:italic}
-.sbar{flex-shrink:0;height:30px;padding:0 14px;background:var(--bg);border-top:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mu)}
+.sbar{flex-shrink:0;height:32px;padding:0 14px;background:var(--bg);border-top:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--mu)}
 
 /* ── OVERLAYS ────────────────────────────────────────────── */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
@@ -210,8 +211,8 @@ header{
   <div class="sbadge wait" id="sbadge">⏳ EN ATTENTE</div>
   <div class="h-meta">
     <div class="hstat"><div class="hstat-v" id="hEta">—</div><div class="hstat-l">Arrivée</div></div>
-    <div class="hstat"><div class="hstat-v" id="hDp">—</div><div class="hstat-l">D+↑ rest.</div></div>
-    <div class="hstat"><div class="hstat-v" id="hDm">—</div><div class="hstat-l">D-↓ rest.</div></div>
+    <div class="hstat"><div class="hstat-v" id="hDp">—</div><div class="hstat-l">Montée rest.</div></div>
+    <div class="hstat"><div class="hstat-v" id="hDm">—</div><div class="hstat-l">Descente rest.</div></div>
     <div class="breach" id="breach"></div>
     <div class="h-pill wait" id="lPill"><span class="h-dot"></span><span id="lLbl">—</span></div>
   </div>
@@ -225,12 +226,12 @@ header{
   <div class="dpanel">
 
     <div class="blk">
-      <div class="lbl">Phase en cours</div>
+      <div class="lbl">Segment en cours</div>
       <div class="ph-tag" id="phTitle" style="color:var(--mu)">
         <span class="ph-dot"></span><span id="phLbl">—</span>
       </div>
-      <div class="ph-sub">km <b id="phKm">—</b> &nbsp;·&nbsp; FC ≤ <b id="phFc">—</b></div>
-      <div class="ph-desc"  id="phDesc"></div>
+      <div class="ph-sub" id="phSub">—</div>
+      <div class="ph-desc" id="phDesc"></div>
     </div>
 
     <div class="blk">
@@ -238,7 +239,7 @@ header{
       <div class="hr-row">
         <div class="hr-num" id="hrN">—</div>
         <div class="hr-side">
-          <div style="display:flex;align-items:baseline;gap:8px">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <div class="hr-bpm">bpm</div>
             <div class="hr-delta" id="hrD">—</div>
           </div>
@@ -247,7 +248,7 @@ header{
             <div class="hr-g-tick"    id="hrTick"></div>
             <div class="hr-g-zone"    id="hrZone"></div>
           </div>
-          <div class="hr-ceil-lbl">Plafond <b id="hrCl">—</b></div>
+          <div class="hr-ceil-lbl">Seuil max <b id="hrCl">—</b></div>
         </div>
       </div>
     </div>
@@ -265,19 +266,19 @@ header{
         </div>
         <div>
           <div class="sv" id="sDp">—</div>
-          <div class="sl">D+↑ restant m</div>
+          <div class="sl">Montée restante</div>
         </div>
         <div>
           <div class="sv" id="sDm">—</div>
-          <div class="sl">D-↓ restant m</div>
+          <div class="sl">Descente restante</div>
         </div>
         <div>
           <div class="sv" id="sPc">—</div>
-          <div class="sl">pace <span class="sl-delta" id="sPcD"></span></div>
+          <div class="sl">Allure <span class="sl-delta" id="sPcD"></span></div>
         </div>
         <div>
           <div class="sv" id="sKT">—</div>
-          <div class="sl">km tracé</div>
+          <div class="sl">Distance totale</div>
         </div>
       </div>
       <div class="prog-bg"><div class="prog-fill" id="pFill" style="width:0"></div></div>
@@ -302,7 +303,7 @@ header{
       </div>
     </div>
     <div class="km-hist">
-      <div class="km-head"><span>km</span><span>pace</span><span>FC</span><span>D+</span><span></span></div>
+      <div class="km-head"><span>km</span><span>allure</span><span>FC</span><span>↑ m</span><span></span></div>
       <div id="kmH"></div>
     </div>
 
@@ -490,6 +491,10 @@ function ravitoIcon(services=""){
   if(s.includes("solide"))   return{icon:"🍽️",color:"#ffc532"};
   return                            {icon:"💧",color:"#4fa3ff"};
 }
+function labelEmoji(label){
+  // Prend le premier token avant l'espace (emoji en tête de label)
+  return label.split(" ")[0]||"•";
+}
 
 // ═══════════════════════════════════════════════════════════
 //  MAP
@@ -658,26 +663,42 @@ function renderElev(){
 
   // km labels
   for(let km=10;km<td;km+=10)
-    h+=`<text x="${xOf(km)}" y="${H}" fill="#3f5070" font-size="7" text-anchor="middle" font-family="DM Mono">${km}</text>`;
+    h+=`<text x="${xOf(km)}" y="${H}" fill="#6b82a8" font-size="8" text-anchor="middle" font-family="DM Mono">${km}</text>`;
 
-  // Ravito markers
+  // Ravito markers — icône sur le profil à l'altitude réelle
   for(const r of C.race.ravitos||[]){
     if(r.km>td) continue;
     const rx=xOf(r.km);
     const{icon,color}=ravitoIcon(r.services);
-    h+=`<line x1="${rx}" y1="14" x2="${rx}" y2="${H-8}" stroke="${color}" stroke-width="1" stroke-dasharray="3,2" vector-effect="non-scaling-stroke" opacity=".8" style="pointer-events:none"/>`;
-    h+=`<text x="${rx}" y="13" fill="${color}" font-size="8" text-anchor="middle" style="pointer-events:none">${icon}</text>`;
+    const rpt=GPX.pts.find(p=>p.cumDist>=r.km)||GPX.pts.at(-1);
+    const rcy=parseFloat(yOf(rpt.ele));
+    const rey=Math.max(9,rcy-10);
+    // Ligne verticale de repère (pleine hauteur, discrète)
+    h+=`<line x1="${rx}" y1="0" x2="${rx}" y2="${H}" stroke="${color}" stroke-width="1" stroke-dasharray="3,2" vector-effect="non-scaling-stroke" opacity=".35" style="pointer-events:none"/>`;
+    // Cercle sur le profil
+    h+=`<circle cx="${rx}" cy="${rcy}" r="4" fill="${color}" opacity=".9" style="pointer-events:none"/>`;
+    h+=`<circle cx="${rx}" cy="${rcy}" r="2.5" fill="white" opacity=".9" style="pointer-events:none"/>`;
+    // Icône au-dessus du cercle
+    h+=`<text x="${rx}" y="${rey}" fill="${color}" font-size="10" text-anchor="middle" opacity=".95" style="pointer-events:none">${icon}</text>`;
+    // Hit area
     h+=`<rect x="${(parseFloat(rx)-7).toFixed(1)}" y="0" width="14" height="${H}" fill="transparent"
       data-tipkm="${r.km}" data-tiplbl="${icon} ${r.name}" data-tipextra="${r.services||""}"/>`;
   }
 
-  // Waypoints
+  // Waypoints — cercle + emoji extrait du label
   for(const wp of C.race.waypoints||[]){
     if(wp.km>td) continue;
-    const px=GPX.pts.find(p=>p.cumDist>=wp.km)||GPX.pts.at(-1);
-    h+=`<circle cx="${xOf(wp.km)}" cy="${yOf(px.ele)}" r="3" fill="white" opacity=".6" style="pointer-events:none"/>`;
-    // Hit area transparente
-    h+=`<circle cx="${xOf(wp.km)}" cy="${yOf(px.ele)}" r="10" fill="transparent"
+    const wpx=xOf(wp.km);
+    const wpt=GPX.pts.find(p=>p.cumDist>=wp.km)||GPX.pts.at(-1);
+    const wcy=parseFloat(yOf(wpt.ele));
+    const wey=Math.max(9,wcy-7);
+    const emoji=labelEmoji(wp.label);
+    // Cercle d'ancrage
+    h+=`<circle cx="${wpx}" cy="${wcy}" r="2.5" fill="white" opacity=".75" style="pointer-events:none"/>`;
+    // Emoji au-dessus
+    h+=`<text x="${wpx}" y="${wey}" fill="white" font-size="9" text-anchor="middle" opacity=".85" style="pointer-events:none">${emoji}</text>`;
+    // Hit area
+    h+=`<circle cx="${wpx}" cy="${wcy}" r="10" fill="transparent"
       data-tipkm="${wp.km}" data-tiplbl="${wp.label}"/>`;
   }
 
@@ -687,9 +708,9 @@ function renderElev(){
     const cx=xOf(curKm),cp=GPX.pts.find(p=>p.cumDist>=curKm)||GPX.pts.at(-1);
     const cy=yOf(cp.ele);
     h+=`<line x1="${cx}" y1="0" x2="${cx}" y2="${H}" stroke="rgba(255,255,255,.6)" stroke-width="1.5" stroke-dasharray="3,3" vector-effect="non-scaling-stroke"/>`;
-    h+=`<circle cx="${cx}" cy="${cy}" r="5" fill="white" opacity=".9"/><circle cx="${cx}" cy="${cy}" r="3" fill="#ff6b2b"/>`;
-    const tx=Math.min(parseFloat(cx)+5,970),ty=Math.max(parseFloat(cy)-4,12);
-    h+=`<text x="${tx}" y="${ty}" fill="white" font-size="8" font-family="DM Mono" opacity=".8">${Math.round(cp.ele)}m</text>`;
+    h+=`<circle cx="${cx}" cy="${cy}" r="8" fill="#ff6b2b" opacity=".2"/><circle cx="${cx}" cy="${cy}" r="5" fill="white" opacity=".95"/><circle cx="${cx}" cy="${cy}" r="3" fill="#ff6b2b"/>`;
+    const tx=Math.min(parseFloat(cx)+6,970),ty=Math.max(parseFloat(cy)-6,12);
+    h+=`<text x="${tx}" y="${ty}" fill="white" font-size="9" font-family="DM Mono" opacity=".9">${Math.round(cp.ele)}m</text>`;
   }
   svg.innerHTML=h;
   attachElevTooltips();
@@ -698,6 +719,12 @@ function renderElev(){
 // ═══════════════════════════════════════════════════════════
 //  HR DIVERGING GAUGE
 // ═══════════════════════════════════════════════════════════
+function hrZoneLabel(hr,fcMax){
+  const p=hr/fcMax;
+  if(p<0.90) return{label:"Zone Endurance 💚",color:"var(--gn)"};
+  if(p<0.97) return{label:"Zone Seuil 🟡",color:"var(--ye)"};
+  return{label:"Zone Haute 🔴",color:"var(--rd)"};
+}
 function updateHrGauge(hr,fcMax){
   const REST=45,OVF=30,total=fcMax+OVF-REST;
   const tickPct=((fcMax-REST)/total*100).toFixed(1);
@@ -709,10 +736,10 @@ function updateHrGauge(hr,fcMax){
   fill.style.width=fillPct+"%";
   const col=hrCol(hr,fcMax);
   fill.style.background=`linear-gradient(to right,${col}88,${col})`;
-  const delta=hr-fcMax;
+  const zone=hrZoneLabel(hr,fcMax);
   const dEl=document.getElementById("hrD");
-  dEl.textContent=delta>=0?`+${delta} bpm`:`${delta} bpm`;
-  dEl.style.color=col;
+  dEl.textContent=zone.label;
+  dEl.style.color=zone.color;
   document.getElementById("hrN").textContent=hr;
   document.getElementById("hrN").style.color=col;
   document.getElementById("hrCl").textContent=fcMax+" bpm";
@@ -743,15 +770,15 @@ function renderKmHist(){
   document.getElementById("kmCnt").textContent=`${S.kmHist.length} km`;
   if(!h.length){el.innerHTML=`<div style="padding:14px;text-align:center;font-size:11px;color:var(--mu)">Les données apparaîtront km par km</div>`;return;}
   el.innerHTML=h.map((k,i)=>{
-    const col=hrCol(k.hr,getPhase(k.km).fcMax);
+    const col=hrCol(k.hr,getPhase(k.km+0.5).fcMax);
     const dp=k.dplus!==null?`+${k.dplus}`:"—";
-    const ico=k.ok?"✅":k.hr/getPhase(k.km).fcMax>1?"🔴":"⚠️";
+    const overCeil=k.hr/getPhase(k.km+0.5).fcMax>1;
     return `<div class="km-row ${i===0?"new":""}">
       <span class="km-n">${k.km}</span>
       <span class="km-p">${fmtPace(k.pace)}</span>
       <span class="km-h" style="color:${col}">${Math.round(k.hr)}</span>
       <span class="km-d">${dp}</span>
-      <span style="text-align:right;font-size:11px">${ico}</span>
+      <span style="text-align:right"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${overCeil?"var(--rd)":k.ok?"var(--gn)":"var(--ye)"}"></span></span>
     </div>`;
   }).join("");
 }
@@ -803,6 +830,15 @@ async function sendChat(name,msg,type="msg"){
 }
 function renderChat(){
   const el=document.getElementById("chatMs");
+  if(!S.chatMsgs.length){
+    el.innerHTML=`<div style="padding:28px 16px;text-align:center;color:var(--mu);font-size:12px;line-height:1.7">
+      <div style="font-size:32px;margin-bottom:10px">📣</div>
+      <div style="font-weight:700;font-size:14px;color:var(--tx);margin-bottom:4px">Envoie un encouragement !</div>
+      <div>Tes messages apparaissent ici en direct 🏃</div>
+    </div>`;
+    document.getElementById("chatCnt").textContent="0";
+    return;
+  }
   el.innerHTML=S.chatMsgs.slice(-80).map(m=>{
     if(m.type==="cheer") return `<div class="cmsg cheer"><div class="mt" style="font-size:18px">${m.msg}</div><div class="mts">${m.name} · ${msgAgo(m.ts)}</div></div>`;
     return `<div class="cmsg"><div class="mn">${m.name}</div><div class="mt">${m.msg}</div><div class="mts">${msgAgo(m.ts)}</div></div>`;
@@ -907,16 +943,22 @@ async function fetchData(){
 
     // Km history
     const km=S.projKm||S.distKm;
-    if(!S.kmStartTs){S.kmStartTs=new Date(pt.dateTime).getTime();S.kmCursor=Math.floor(km);}
+    // Toujours initialiser à 0 — évite de sauter le km 0 si les données arrivent en retard
+    if(!S.kmStartTs){S.kmStartTs=new Date(pt.dateTime).getTime();S.kmCursor=0;}
     S.kmStartHr.push(pt.heartRateBeatsPerMin);
     while(Math.floor(km)>S.kmCursor){
       const ck=S.kmCursor+1;
       const el=(new Date(pt.dateTime).getTime()-S.kmStartTs)/1000;
-      const hrA=S.kmStartHr.reduce((a,b)=>a+b,0)/S.kmStartHr.length;
+      // Fallback HR si le tableau est vide (multiple km franchis dans un même point)
+      const samples=S.kmStartHr.length?S.kmStartHr:[pt.heartRateBeatsPerMin];
+      const hrA=samples.reduce((a,b)=>a+b,0)/samples.length;
       const phs=getPhase(ck-0.5);
       const dp=gpxDpKm(ck-1,ck);
-      S.kmHist.push({km:ck,pace:el,hr:hrA,dplus:dp,phase:phs,ok:hrA<phs.fcMax});
-      S.kmCursor=ck; S.kmStartTs=new Date(pt.dateTime).getTime(); S.kmStartHr=[];
+      // Label 0-indexé : km 0 = segment 0→1, km 1 = segment 1→2, etc.
+      S.kmHist.push({km:ck-1,pace:el,hr:hrA,dplus:dp,phase:phs,ok:hrA<phs.fcMax});
+      S.kmCursor=ck;
+      S.kmStartTs=new Date(pt.dateTime).getTime();
+      S.kmStartHr=[pt.heartRateBeatsPerMin]; // conserver le point courant pour le km suivant
     }
     checkWp(km);
     S.pts.push(pt);
@@ -956,16 +998,16 @@ function render(){
   const pct=Math.min(100,km/td*100);
 
   // Phase
-  const phEl=document.getElementById("phTag");
+  const phEl=document.getElementById("phTitle");
   phEl.style.color=ph.color;
   phEl.querySelector(".ph-dot").style.background=ph.color;
   document.getElementById("phLbl").textContent=ph.label;
-  document.getElementById("phKm").textContent=`${ph.kmStart}–${ph.kmEnd}`;
-  document.getElementById("phFc").textContent=`${ph.fcMax} bpm`;
-  const titleEl=document.getElementById("phTitle");
-  titleEl.textContent=ph.title||"";
-  titleEl.style.color=ph.color;
-  document.getElementById("phDesc").textContent=ph.description||"";
+  const phIdx=C.race.phases.indexOf(ph)+1;
+  const phTotal=C.race.phases.length;
+  document.getElementById("phSub").innerHTML=`Segment ${phIdx} / ${phTotal} &nbsp;·&nbsp; km ${ph.kmStart}–${ph.kmEnd}`;
+  // title en italique avant la description
+  const desc=document.getElementById("phDesc");
+  desc.innerHTML=(ph.title?`<em style="color:var(--tx);font-style:italic;display:block;margin-bottom:3px">${ph.title}</em>`:"")+(ph.description||"");
   // Toast sur changement de phase
   if(S.lastPhaseLabel&&S.lastPhaseLabel!==ph.label){
     showToast(`${ph.label} — ${ph.title||""}`);
@@ -1011,12 +1053,17 @@ function render(){
   // Next ravito
   const nr=nextRav(km);
   if(nr){
-    const rkm=(nr.km-km).toFixed(1);
-    const ravPace=avgPaceS||6*60;
-    const etaRav=new Date(Date.now()+(nr.km-km)*ravPace*1000);
+    const dist=nr.km-km;
+    const{base,slope}=paceDriftModel();
+    const basePace=base||avgPaceS||360;
+    const raw=basePace*dist+0.5*slope*dist*dist;
+    const totalSec=Math.max(dist*basePace*0.5,Math.min(dist*basePace*2.5,raw));
+    const etaRav=new Date(Date.now()+totalSec*1000);
+    const ravH=Math.floor(totalSec/3600),ravM=Math.floor((totalSec%3600)/60);
+    const ravDur=ravH>0?`dans ${ravH}h${String(ravM).padStart(2,"0")}`:`dans ${ravM} min`;
     document.getElementById("ravBlk").style.display="flex";
     document.getElementById("ravName").textContent=nr.name;
-    document.getElementById("ravSub").textContent=`km ${nr.km} · dans ${rkm} km${nr.services?" · "+nr.services:""}`;
+    document.getElementById("ravSub").textContent=`km ${nr.km} · ${ravDur}${nr.services?" · "+nr.services:""}`;
     document.getElementById("ravEta").textContent=`~${fmtTime(etaRav)}`;
   } else {
     document.getElementById("ravBlk").style.display="none";
@@ -1024,7 +1071,7 @@ function render(){
 
   // Signal (sbar seulement — pill gérée dans renderClock)
   const age=S.lastReceived?(Date.now()-S.lastReceived)/1000:null;
-  document.getElementById("sR").textContent=age?`● ${Math.round(age)}s`:"—";
+  document.getElementById("sR").textContent="";
 
   // Map
   const ll=[last.position.lat,last.position.lon];
@@ -1037,7 +1084,7 @@ function render(){
 function renderClock(){
   document.getElementById("sTm").textContent=fmtEl(S.sessionStart);
   const age=S.lastReceived?(Date.now()-S.lastReceived)/1000:null;
-  if(age!==null) document.getElementById("sL").textContent=`Mis à jour il y a ${age<60?Math.round(age)+"s":Math.floor(age/60)+"min"}`;
+  if(age!==null) document.getElementById("sL").textContent=`En direct · actualisé il y a ${age<60?Math.round(age)+"s":Math.floor(age/60)+" min"}`;
   // Pill : durée depuis dernière mise à jour track uniquement
   const pill=document.getElementById("lPill");
   if(!age){
