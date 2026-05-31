@@ -315,13 +315,17 @@ const GPX = { pts:[], totalDist:0, totalDplus:0, loaded:false };
 
 function parseGpx(text) {
   const xml = new DOMParser().parseFromString(text, "text/xml");
-  const trkpts = [...xml.querySelectorAll("trkpt")];
+  const trkpts = [...xml.getElementsByTagName("trkpt")];
+  if (!trkpts.length) {
+    console.error("GPX: aucun trkpt trouvé — format incorrect ou namespace non géré");
+    return;
+  }
   let cDist=0, cDplus=0;
   const pts = [];
   trkpts.forEach((n,i) => {
     const lat = parseFloat(n.getAttribute("lat"));
     const lon = parseFloat(n.getAttribute("lon"));
-    const ele = parseFloat(n.querySelector("ele")?.textContent || 0);
+    const ele = parseFloat(n.getElementsByTagName("ele")[0]?.textContent || 0);
     if (i>0) {
       const p = pts[i-1];
       cDist += haversineKm(p.lat,p.lon,lat,lon);
@@ -330,11 +334,13 @@ function parseGpx(text) {
     }
     pts.push({ lat,lon,ele,cumDist:cDist,cumDplus:cDplus });
   });
+  if (!pts.length) return;
   GPX.pts = pts;
   GPX.totalDist  = pts.at(-1)?.cumDist  || C.race.distKm;
   GPX.totalDplus = pts.at(-1)?.cumDplus || C.race.totalDplus;
   GPX.loaded = true;
   elevStrip.classList.add("has-gpx");
+  console.log(`GPX chargé : ${pts.length} points, ${GPX.totalDist.toFixed(1)} km, D+ ${Math.round(GPX.totalDplus)}m`);
   renderElev();
 }
 
