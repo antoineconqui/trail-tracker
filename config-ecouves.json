@@ -3,7 +3,7 @@
   "distKm":      61,
   "totalDplus":  1950,
   "totalDminus": 1950,
-  "gpxUrl":      "https://raw.githubusercontent.com/antoineconqui/trail-tracker/main/Ecouves%202025%20off.gpx",
+  "gpxUrl":      "$GPX_URL",
 
   "phases": [
     {
@@ -91,12 +91,11 @@
     { "km": 46.95, "lat": 48.500078, "lon": 0.015745, "label": "🕳️ Creux du dernier tiers" },
     { "km": 49.98, "lat": 48.504319, "lon": 0.025678, "label": "⛰️ Remontée inattendue" },
     { "km": 52.52, "lat": 48.510920, "lon": 0.052691, "label": "📉 Descente longue — 1.1km" },
-    { "km": 54.42, "lat": 48.509673, "lon": 0.066679, "label": "🕳️ Avant-dernier creux" },
-    { "km": 54.58, "lat": 48.509014, "lon": 0.068305, "label": "💀 Double mur — partie 1" },
-    { "km": 57.12, "lat": 48.497827, "lon": 0.070940, "label": "🫁 Entre les deux murs" },
-    { "km": 57.20, "lat": 48.497729, "lon": 0.071970, "label": "💀 Double mur — partie 2 (15%)" },
+    { "km": 54.42, "lat": 48.509673, "lon": 0.066679, "label": "💀 Double mur — partie 1" },
+    { "km": 57.12, "lat": 48.497827, "lon": 0.070940, "label": "💀 Double mur — partie 2 (15%)" },
     { "km": 59.08, "lat": 48.506274, "lon": 0.086389, "label": "⚠️ Descente finale — la plus raide" },
-    { "km": 60.20, "lat": 48.506945, "lon": 0.092270, "label": "🏁 Dernière descente — 1.3km" }
+    { "km": 60.20, "lat": 48.506945, "lon": 0.092270, "label": "🏁 Dernière descente — 1.3km" },
+    { "km": 61.00, "lat": 48.506173, "lon": 0.099558, "label": "🎉 Arrivée" }
   ],
 
   "ravitos": [
