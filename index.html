@@ -88,8 +88,8 @@ header{
 .leaflet-control-attribution{font-size:8px!important;opacity:.4}
 .leaflet-popup-content-wrapper{background:var(--s1);color:var(--tx);border:1px solid var(--bd);border-radius:8px;font-family:var(--fn)}
 .leaflet-popup-tip{background:var(--s1)}
-.live-pin{position:relative;width:20px;height:20px}
-.live-pin-core{position:absolute;inset:0;margin:auto;width:10px;height:10px;border-radius:50%;background:var(--ac);border:2px solid #fff;z-index:2}
+.live-pin{position:relative;width:28px;height:28px}
+.live-pin-core{position:absolute;inset:0;margin:auto;width:22px;height:22px;border-radius:50%;background:var(--ac) center/cover;border:2px solid #fff;z-index:2;overflow:hidden}
 .live-pin-ring{position:absolute;inset:0;border-radius:50%;border:2px solid var(--ac);opacity:0;animation:ping 2s ease-out infinite}
 @keyframes ping{0%{transform:scale(.5);opacity:.8}100%{transform:scale(2.4);opacity:0}}
 
@@ -154,6 +154,28 @@ header{
 .km-p{font-family:var(--fm);font-weight:500}
 .km-h{font-family:var(--fm);font-weight:500;font-size:10px}
 .km-d{font-size:10px;color:var(--mu)}
+
+/* phase brief above chat */
+.phase-brief{flex-shrink:0;padding:10px 14px;background:var(--s1);border-bottom:2px solid var(--bd)}
+.phase-brief-lbl{font-size:11px;font-weight:700;letter-spacing:.04em;margin-bottom:4px}
+.phase-brief-desc{font-size:11px;color:var(--tx);line-height:1.5}
+
+/* viewer count */
+.viewer-cnt{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--mu);font-family:var(--fm)}
+.viewer-dot{width:6px;height:6px;border-radius:50%;background:var(--gn);animation:blink 1.5s infinite;flex-shrink:0}
+
+/* events in km-overlay */
+.km-overlay .events-blk{border-top:2px solid var(--bd);flex-shrink:0}
+.km-overlay .ev-row{display:flex;align-items:center;gap:6px;padding:5px 8px;border-top:1px solid rgba(26,37,64,.4)}
+.km-overlay .ev-row:first-child{border-top:2px solid var(--gn);background:rgba(0,212,160,.05)}
+.km-overlay .ev-icon{font-size:14px;flex-shrink:0;width:18px;text-align:center}
+.km-overlay .ev-info{flex:1;min-width:0}
+.km-overlay .ev-name{font-size:10px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.km-overlay .ev-sub{font-size:9px;color:var(--mu);margin-top:1px}
+.km-overlay .ev-right{text-align:right;flex-shrink:0}
+.km-overlay .ev-dur{font-family:var(--fm);font-size:13px;font-weight:700;color:var(--gn);line-height:1}
+.km-overlay .ev-row:first-child .ev-dur{font-size:16px}
+.km-overlay .ev-eta{font-size:9px;color:var(--mu);margin-top:1px}
 
 /* ── CHAT ────────────────────────────────────────────────── */
 .cpanel{background:var(--s2);border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden}
@@ -264,6 +286,7 @@ header{
       </div>
       <div class="km-head"><span>km</span><span>allure</span><span>FC</span><span title="Dénivelé positif">↑ m</span><span>état</span></div>
       <div class="km-overlay-body"><div id="kmH"></div></div>
+      <div class="events-blk" id="eventsBlk"></div>
     </div>
     <!-- minimap -->
     <div id="minimap"></div>
@@ -342,16 +365,18 @@ header{
       <div class="pb-wrap" id="pbWrap"></div>
     </div>
 
-    <!-- Prochains événements -->
-    <div class="events-blk" id="eventsBlk"></div>
 
   </div>
 
   <!-- CHAT -->
   <div class="cpanel">
+    <div class="phase-brief" id="phaseBrief">
+      <div class="phase-brief-lbl" id="phaseBriefLbl" style="color:var(--mu)">—</div>
+      <div class="phase-brief-desc" id="phaseBriefDesc"></div>
+    </div>
     <div class="chat-hd">
       <span class="chat-ttl">Live Chat</span>
-      <span class="chat-cnt" id="chatCnt">0</span>
+      <div class="viewer-cnt"><span class="viewer-dot"></span><span id="viewerCnt">—</span></div>
     </div>
     <div class="chat-ms" id="chatMs"></div>
     <div class="chat-form">
@@ -399,7 +424,7 @@ const C = {
   proxy:     "https://aged-frog-1690.antoineconqui.workers.dev",
   sessionId: "",    // auto-détecté depuis /current
   configUrl: "https://raw.githubusercontent.com/antoineconqui/trail-tracker/main/config-ecouves.json",
-  race: { name:"LiveTrack", distKm:0, totalDplus:0, totalDminus:0, phases:[], waypoints:[], ravitos:[] },
+  race: { name:"LiveTrack", distKm:0, totalDplus:0, totalDminus:0, phases:[], waypoints:[], ravitos:[], avatarUrl:"" },
   pollMs:30_000, chatMs:15_000,
 };
 
@@ -543,15 +568,34 @@ function labelEmoji(label){
 }
 
 // ═══════════════════════════════════════════════════════════
+//  VIEWER PING
+// ═══════════════════════════════════════════════════════════
+const _vid=(()=>{let v=sessionStorage.getItem('vid');if(!v){v=Math.random().toString(36).slice(2,8);sessionStorage.setItem('vid',v);}return v;})();
+async function pingViewer(){
+  if(!C.sessionId) return;
+  try{
+    const r=await fetch(`${C.proxy}/viewers`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sid:C.sessionId,vid:_vid})});
+    if(r.ok){const{count}=await r.json();document.getElementById("viewerCnt").textContent=count+" 👁";}
+  }catch(e){}
+}
+
+// ═══════════════════════════════════════════════════════════
 //  MAP
 // ═══════════════════════════════════════════════════════════
+function makePinIcon(){
+  const av=C.race.avatarUrl;
+  const inner=av
+    ?`<div class="live-pin-core" style="background-image:url('${av}');background-size:cover;background-position:center"></div>`
+    :`<div class="live-pin-core"></div>`;
+  return L.divIcon({className:"",iconSize:[28,28],iconAnchor:[14,14],
+    html:`<div class="live-pin"><div class="live-pin-ring"></div>${inner}</div>`});
+}
 const map=L.map("map",{zoomControl:true}).setView([48.45,0.05],11);
 L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{
   attribution:"&copy; CARTO",subdomains:"abcd",maxZoom:19}).addTo(map);
 const courseL=L.polyline([],{color:"#2a3a60",weight:3,opacity:.7,dashArray:"5 7"}).addTo(map);
 const trailL =L.polyline([],{color:"#ff6b2b",weight:3.5,opacity:.95}).addTo(map);
-const pinIcon=L.divIcon({className:"",iconSize:[20,20],iconAnchor:[10,10],
-  html:'<div class="live-pin"><div class="live-pin-ring"></div><div class="live-pin-core"></div></div>'});
+// pinIcon dynamique → makePinIcon() utilise C.race.avatarUrl au moment de la création
 let pinMarker=null;
 
 function addRavitoMarkers(){
@@ -714,6 +758,11 @@ function renderElev(){
     h+=`<rect x="${x1.toFixed(1)}" y="${(H-14).toFixed(1)}" width="${(x2-x1).toFixed(1)}" height="14" fill="rgba(6,8,15,.7)"/>`;
     h+=`<text x="${mx.toFixed(1)}" y="${(H-3).toFixed(1)}" fill="${ph.color}" font-size="10" font-family="Barlow Condensed" font-weight="700" text-anchor="middle">${phShort}</text>`;
     h+=`</g>`;
+    // Séparateur visible entre phases (sauf après la dernière)
+    if(i<C.race.phases.length-1){
+      const sx=xOf(ph.kmEnd);
+      h+=`<line x1="${sx}" y1="0" x2="${sx}" y2="${H}" stroke="rgba(255,255,255,.25)" stroke-width="2" vector-effect="non-scaling-stroke"/>`;
+    }
     prevKm=ph.kmEnd;
   }
 
@@ -784,18 +833,24 @@ function renderElev(){
       data-tipkm="${wp.km}" data-tiplbl="${wp.label}"/>`;
   }
 
-  // Live cursor — icône coureur avec pulse
+  // Live cursor — avatar rond avec pulse
   if(curKm>0){
-    const cx=xOf(curKm),cp=GPX.pts.find(p=>p.cumDist>=curKm)||GPX.pts.at(-1);
-    const cy=yOf(cp.ele);
+    const cx=parseFloat(xOf(curKm)),cp=GPX.pts.find(p=>p.cumDist>=curKm)||GPX.pts.at(-1);
+    const cy=parseFloat(yOf(cp.ele));
     h+=`<line x1="${cx}" y1="0" x2="${cx}" y2="${H}" stroke="rgba(255,255,255,.5)" stroke-width="1.5" stroke-dasharray="3,3" vector-effect="non-scaling-stroke"/>`;
     // Pulse ring
-    h+=`<circle cx="${cx}" cy="${cy}" r="6" fill="#ff6b2b" opacity=".4"><animate attributeName="r" values="6;14;6" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" values=".4;0;.4" dur="1.8s" repeatCount="indefinite"/></circle>`;
-    // Runner emoji — retourné vers la droite via matrix mirror centré sur cx
-    const cxN=parseFloat(cx);
-    h+=`<text x="${cx}" y="${(parseFloat(cy)+6).toFixed(1)}" font-size="14" text-anchor="middle" transform="matrix(-1,0,0,1,${(2*cxN).toFixed(1)},0)" style="pointer-events:none">🏃</text>`;
+    h+=`<circle cx="${cx}" cy="${cy}" r="8" fill="#ff6b2b" opacity=".35"><animate attributeName="r" values="8;16;8" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" values=".35;0;.35" dur="1.8s" repeatCount="indefinite"/></circle>`;
+    // Profile picture — avatar rond
+    if(C.race.avatarUrl){
+      h+=`<defs><clipPath id="avatarClip"><circle cx="${cx}" cy="${cy}" r="9"/></clipPath></defs>`;
+      h+=`<circle cx="${cx}" cy="${cy}" r="9" fill="#ff6b2b" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke"/>`;
+      h+=`<image href="${C.race.avatarUrl}" x="${(cx-9).toFixed(1)}" y="${(cy-9).toFixed(1)}" width="18" height="18" clip-path="url(#avatarClip)" preserveAspectRatio="xMidYMid slice" style="pointer-events:none"/>`;
+    } else {
+      h+=`<circle cx="${cx}" cy="${cy}" r="9" fill="#ff6b2b" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke"/>`;
+      h+=`<text x="${cx}" y="${(cy+3.5).toFixed(1)}" font-size="9" text-anchor="middle" fill="white" font-weight="bold" style="pointer-events:none">A</text>`;
+    }
     // Altitude label
-    const tx=Math.min(parseFloat(cx)+8,970),ty=Math.max(parseFloat(cy)-8,12);
+    const tx=Math.min(cx+12,970),ty=Math.max(cy-12,10);
     h+=`<text x="${tx}" y="${ty}" fill="white" font-size="8" font-family="DM Mono" opacity=".85">${Math.round(cp.ele)}m</text>`;
   }
   svg.innerHTML=h;
@@ -834,9 +889,16 @@ function renderMinimap(){
   if(doneSp.length>1) svg+=`<path d="${path(doneSp)}" fill="none" stroke="#ff6b2b" stroke-width="2.5" stroke-linecap="round"/>`;
   if(curKm>0){
     const cur=pts.find(p=>p.cumDist>=curKm)||pts.at(-1);
-    svg+=`<circle cx="${xOf(cur.lon)}" cy="${yOf(cur.lat)}" r="5" fill="#ff6b2b" opacity=".25"><animate attributeName="r" values="5;10;5" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values=".25;0;.25" dur="2s" repeatCount="indefinite"/></circle>`;
-    const mxN=parseFloat(xOf(cur.lon));
-    svg+=`<text x="${xOf(cur.lon)}" y="${(parseFloat(yOf(cur.lat))+5).toFixed(1)}" font-size="12" text-anchor="middle" transform="matrix(-1,0,0,1,${(2*mxN).toFixed(1)},0)">🏃</text>`;
+    const mxN=parseFloat(xOf(cur.lon)),myN=parseFloat(yOf(cur.lat));
+    svg+=`<circle cx="${mxN}" cy="${myN}" r="7" fill="#ff6b2b" opacity=".25"><animate attributeName="r" values="7;14;7" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values=".25;0;.25" dur="2s" repeatCount="indefinite"/></circle>`;
+    if(C.race.avatarUrl){
+      svg+=`<defs><clipPath id="mac"><circle cx="${mxN}" cy="${myN}" r="8"/></clipPath></defs>`;
+      svg+=`<circle cx="${mxN}" cy="${myN}" r="8" fill="#ff6b2b" stroke="white" stroke-width="2"/>`;
+      svg+=`<image href="${C.race.avatarUrl}" x="${(mxN-8).toFixed(1)}" y="${(myN-8).toFixed(1)}" width="16" height="16" clip-path="url(#mac)" preserveAspectRatio="xMidYMid slice"/>`;
+    } else {
+      svg+=`<circle cx="${mxN}" cy="${myN}" r="8" fill="#ff6b2b" stroke="white" stroke-width="2"/>`;
+      svg+=`<text x="${mxN}" y="${(myN+3.5).toFixed(1)}" font-size="8" text-anchor="middle" fill="white" font-weight="bold">A</text>`;
+    }
   }
   svg+=`</svg>`;
   el.innerHTML=svg;
@@ -1050,6 +1112,7 @@ async function loadConfig(){
     if(cfg.waypoints)  C.race.waypoints=cfg.waypoints;
     if(cfg.ravitos)    C.race.ravitos=cfg.ravitos;
     if(cfg.gpxUrl)     C.gpxUrl=cfg.gpxUrl;
+    if(cfg.avatarUrl)  C.race.avatarUrl=cfg.avatarUrl;
     document.getElementById("hTitle").textContent=cfg.name;
     document.getElementById("pageTitle").textContent=cfg.name;
     document.getElementById("phStrip").innerHTML=""; buildStrip();
@@ -1203,6 +1266,10 @@ function render(){
   const phTotal=C.race.phases.length;
   document.getElementById("phSub").innerHTML=`Segment ${phIdx} / ${phTotal} &nbsp;·&nbsp; km ${ph.kmStart}–${ph.kmEnd}`;
   document.getElementById("phDesc").textContent=ph.description||"";
+  // Phase brief au-dessus du chat
+  document.getElementById("phaseBriefLbl").textContent=ph.title||ph.label;
+  document.getElementById("phaseBriefLbl").style.color=ph.color;
+  document.getElementById("phaseBriefDesc").textContent=ph.description||"";
   // Toast sur changement de phase
   if(S.lastPhaseLabel&&S.lastPhaseLabel!==ph.label){
     showToast(`${ph.label} — ${ph.title||""}`);
@@ -1265,7 +1332,7 @@ function render(){
 
   // Map
   const ll=[last.position.lat,last.position.lon];
-  if(!pinMarker){pinMarker=L.marker(ll,{icon:pinIcon}).addTo(map);map.setView(ll,15);startAnim();}
+  if(!pinMarker){pinMarker=L.marker(ll,{icon:makePinIcon()}).addTo(map);map.setView(ll,15);startAnim();}
 
   // Charts
   renderPaceBars();
@@ -1344,6 +1411,7 @@ async function init(){
   addRavitoMarkers();
   setInterval(renderClock,1000); setInterval(fetchChat,C.chatMs);
   await poll(); setInterval(poll,C.pollMs);
+  pingViewer(); setInterval(pingViewer,30000);
 }
 init();
 </script>
