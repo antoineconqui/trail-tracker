@@ -3,7 +3,7 @@
   "distKm":      61,
   "totalDplus":  1950,
   "totalDminus": 1950,
-  "gpxUrl":      "$GPX_URL",
+  "gpxUrl":      "https://raw.githubusercontent.com/antoineconqui/trail-tracker/main/Ecouves%202025%20off.gpx",
 
   "phases": [
     {
@@ -77,7 +77,7 @@
     { "km": 7.03,  "lat": 48.534901, "lon": 0.108597, "label": "🌊 Le petit lac" },
     { "km": 9.47,  "lat": 48.547748, "lon": 0.123301, "label": "💧 Premier ruisseau" },
     { "km": 13.20, "lat": 48.567298, "lon": 0.136913, "label": "⬇️ Point le plus bas — km 13" },
-    { "km": 17.70, "lat": 48.550951, "lon": 0.107415, "label": "⛰️ La montée qui pique" },
+    { "km": 17.70, "lat": 48.550951, "lon": 0.107415, "label": "⛰️ La montée de salopard" },
     { "km": 19.05, "lat": 48.547939, "lon": 0.096355, "label": "😮‍💨 Sommet — 1ère montagne" },
     { "km": 23.27, "lat": 48.544266, "lon": 0.067289, "label": "🌉 Les deux petits ponts" },
     { "km": 24.02, "lat": 48.547473, "lon": 0.064225, "label": "⛰️ Montée clé — 1km à 7%" },
