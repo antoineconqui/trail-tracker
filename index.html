@@ -11,7 +11,7 @@
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{
   --bg:#06080f;--s1:#0c1020;--s2:#111828;--bd:#1a2540;
-  --tx:#ccd6f0;--mu:#6b82a8;--ac:#ff6b2b;
+  --tx:#ccd6f0;--mu:#6b82a8;--mu-strong:#9aaac8;--ac:#ff6b2b;
   --gn:#00d4a0;--ye:#ffc532;--rd:#ff3d5a;--bl:#4fa3ff;
   --fn:'Barlow Condensed',sans-serif;--fm:'DM Mono',monospace;
 }
@@ -80,11 +80,11 @@ header{
 .ev-icon{font-size:18px;flex-shrink:0;width:22px;text-align:center}
 .ev-info{flex:1;min-width:0}
 .ev-name{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ev-sub{font-size:11px;color:var(--mu);margin-top:2px}
+.ev-sub{font-size:11px;color:var(--mu-strong);margin-top:2px}
 .ev-right{text-align:right;flex-shrink:0}
 .ev-dur{font-family:var(--fm);font-size:17px;font-weight:700;color:var(--gn);line-height:1}
 .ev-row:first-child .ev-dur{font-size:22px}
-.ev-eta{font-size:11px;color:var(--mu);margin-top:2px}
+.ev-eta{font-size:11px;color:var(--mu-strong);margin-top:2px}
 .leaflet-control-attribution{font-size:8px!important;opacity:.4}
 .leaflet-popup-content-wrapper{background:var(--s1);color:var(--tx);border:1px solid var(--bd);border-radius:8px;font-family:var(--fn)}
 .leaflet-popup-tip{background:var(--s1)}
@@ -189,11 +189,11 @@ header{
 .km-overlay .ev-icon{font-size:14px;flex-shrink:0;width:18px;text-align:center}
 .km-overlay .ev-info{flex:1;min-width:0}
 .km-overlay .ev-name{font-size:10px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.km-overlay .ev-sub{font-size:9px;color:var(--mu);margin-top:1px}
+.km-overlay .ev-sub{font-size:9px;color:var(--mu-strong);margin-top:1px}
 .km-overlay .ev-right{text-align:right;flex-shrink:0}
 .km-overlay .ev-dur{font-family:var(--fm);font-size:13px;font-weight:700;color:var(--gn);line-height:1}
 .km-overlay .ev-row:first-child .ev-dur{font-size:16px}
-.km-overlay .ev-eta{font-size:9px;color:var(--mu);margin-top:1px}
+.km-overlay .ev-eta{font-size:9px;color:var(--mu-strong);margin-top:1px}
 
 /* ── CHAT ────────────────────────────────────────────────── */
 .cpanel{background:var(--s2);border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden}
@@ -1302,7 +1302,7 @@ function getNextEvents(km){
   for(const r of C.race.ravitos||[])
     if(r.km>km) evs.push({km:r.km,label:r.name,icon:ravitoIcon(r.services).icon,sub:r.services||"",color:"var(--gn)"});
   for(const wp of C.race.waypoints||[])
-    if(wp.km>km) evs.push({km:wp.km,label:wp.label,icon:labelEmoji(wp.label),sub:`km ${wp.km}`,color:"var(--mu)"});
+    if(wp.km>km){const icon=labelEmoji(wp.label);const label=wp.label.split(" ").slice(1).join(" ")||wp.label;evs.push({km:wp.km,label,icon,sub:`km ${wp.km}`,color:"var(--mu)"}); }
   for(const ph of C.race.phases)
     if(ph.kmStart>km) evs.push({km:ph.kmStart,label:ph.title||ph.label,icon:"🏁",sub:`Segment · FC≤${ph.fcMax} bpm`,color:ph.color});
   return evs.sort((a,b)=>a.km-b.km).slice(0,3);
@@ -1328,7 +1328,7 @@ function renderNextEvents(km){
         <div class="ev-sub">km ${ev.km}${ev.sub&&ev.sub!==`km ${ev.km}`?` · ${ev.sub}`:""}</div>
       </div>
       <div class="ev-right">
-        <div class="ev-dur" style="color:${ev.color}">${durStr}</div>
+        <div class="ev-dur">${durStr}</div>
         <div class="ev-eta">${etaStr}</div>
       </div>
     </div>`;
