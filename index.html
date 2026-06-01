@@ -510,6 +510,7 @@ function parseGpx(text){
   document.getElementById("elevS").classList.add("hgpx");
   renderElev();
   renderMinimap();
+  addWaypointMarkers();
 }
 
 function projectFwd(lat,lon){
@@ -661,6 +662,24 @@ function addRavitoMarkers(){
       html:`<div style="width:26px;height:26px;border-radius:6px;background:${color};border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.5)">${icon}</div>`});
     L.marker([r.lat,r.lon],{icon:ic}).addTo(map)
       .bindPopup(`<b>${r.name}</b><br>km ${r.km}${r.services?`<br><small>${r.services}</small>`:""}`);
+  }
+}
+
+let _wpMarkers=[];
+function addWaypointMarkers(){
+  _wpMarkers.forEach(m=>m.remove());
+  _wpMarkers=[];
+  if(!GPX.loaded||!GPX.pts.length) return;
+  for(const wp of C.race.waypoints||[]){
+    const pt=GPX.pts.find(p=>p.cumDist>=wp.km)||GPX.pts.at(-1);
+    if(!pt) continue;
+    const emoji=labelEmoji(wp.label);
+    const name=wp.label.split(" ").slice(1).join(" ")||wp.label;
+    const ic=L.divIcon({className:"",iconSize:[28,28],iconAnchor:[14,14],
+      html:`<div style="width:28px;height:28px;border-radius:50%;background:rgba(10,14,26,.82);border:1.5px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;font-size:15px;backdrop-filter:blur(4px);box-shadow:0 2px 6px rgba(0,0,0,.6)">${emoji}</div>`});
+    const marker=L.marker([pt.lat,pt.lon],{icon:ic,zIndexOffset:-10}).addTo(map)
+      .bindPopup(`<b>${name}</b><br><small>km ${wp.km}</small>`);
+    _wpMarkers.push(marker);
   }
 }
 
@@ -1224,6 +1243,12 @@ async function fetchData(){
     S.sessionStart=meta.start;
     document.getElementById("hAth").textContent=meta.userDisplayName||"";
     document.getElementById("hTitle").textContent=C.race.name;
+    // Auto-détection de la photo de profil depuis les données Garmin
+    const garminAvatar=meta.userAvatarUrl||meta.avatarUrl||meta.profileImageUrl||meta.userThumbnailUrl;
+    if(garminAvatar&&!C.race.avatarUrl){
+      C.race.avatarUrl=garminAvatar;
+      if(pinMarker) pinMarker.setIcon(makePinIcon()); // met à jour le marker si déjà posé
+    }
   }
   if(!points?.length) return;
   let prev=S.pts.at(-1)||null;
