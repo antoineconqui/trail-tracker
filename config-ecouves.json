@@ -3,7 +3,7 @@
   "distKm":      61,
   "totalDplus":  1950,
   "totalDminus": 1950,
-  "gpxUrl":      "https://raw.githubusercontent.com/antoineconqui/trail-tracker/main/Ecouves%202025%20off.gpx",
+  "gpxUrl":      "https://raw.githubusercontent.com/antoineconqui/trail-tracker/main/ecouves-2026.gpx",
   "avatarUrl":   "",
 
   "phases": [
@@ -97,10 +97,11 @@
   ],
 
   "ravitos": [
-    { "name": "Parc Animalier d'Écouves", "km": 13.50, "lat": 48.567667, "lon": 0.132856, "services": "Eau" },
-    { "name": "Carrefour du Rendez-vous", "km": 19.90, "lat": 48.538931, "lon": 0.096126, "services": "Solide · Eau" },
-    { "name": "Verrerie du Gast",         "km": 26.50, "lat": 48.559053, "lon": 0.034663, "services": "Eau" },
-    { "name": "Le Verdier",               "km": 39.23, "lat": 48.513741, "lon": 0.035302, "services": "Solide · Eau · Fan Zone" },
-    { "name": "Réservoir d'Eau",          "km": 47.56, "lat": 48.504103, "lon": 0.024595, "services": "Eau" }
+    { "name": "Parc Animalier d'Écouves",       "km": 13.79, "lat": 48.567667, "lon": 0.132856, "services": "Eau" },
+    { "name": "Carrefour du Rendez-vous",       "km": 20.17, "lat": 48.538931, "lon": 0.096126, "services": "Complet" },
+    { "name": "Parcours Santé Verdier",         "km": 33.50, "lat": 48.513741, "lon": 0.035302, "services": "Complet" },
+    { "name": "Mairie de St Nicolas des Bois",  "km": 40.20, "lat": 48.495608, "lon": 0.015887, "services": "Complet · Fan Zone" },
+    { "name": "Réservoir d'Eau",                "km": 47.95, "lat": 48.504103, "lon": 0.024595, "services": "Eau" },
+    { "name": "Camping de Radon",               "km": 56,    "lat": 48.495776, "lon": 0.068488, "services": "Eau" }
   ]
 }
