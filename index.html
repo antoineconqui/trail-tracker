@@ -104,13 +104,18 @@ header{
 .lbl{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mu);margin-bottom:9px}
 
 /* Strava CTA */
-.strava-cta{display:flex;align-items:center;gap:13px;padding:14px 16px;margin:0;background:linear-gradient(135deg,rgba(252,76,2,.1),rgba(252,76,2,.05));border-top:1px solid rgba(252,76,2,.25);color:var(--tx);text-decoration:none;flex-shrink:0;transition:background .2s}
-.strava-cta:hover{background:rgba(252,76,2,.18)}
-.strava-ico{flex-shrink:0;width:32px;height:32px}
-.strava-info{flex:1;min-width:0}
-.strava-name{font-size:13px;font-weight:700;color:#FC4C02;letter-spacing:.04em}
-.strava-platform{font-size:11px;color:var(--mu);margin-top:2px}
-.strava-arr{font-size:15px;color:rgba(252,76,2,.6);flex-shrink:0}
+.strava-cta{display:flex;align-items:center;gap:14px;padding:16px 18px;margin:0;background:linear-gradient(135deg,#FC4C02,#d43c00);color:#fff;text-decoration:none;flex-shrink:0;position:relative;overflow:hidden;transition:transform .15s,filter .15s;animation:strava-glow 2.8s ease-in-out infinite}
+.strava-cta:hover{transform:scale(1.015);filter:brightness(1.1)}
+.strava-cta::before{content:'🏃';position:absolute;right:-4px;bottom:-8px;font-size:62px;opacity:.13;transform:scaleX(-1);pointer-events:none}
+@keyframes strava-glow{0%,100%{box-shadow:0 4px 18px rgba(252,76,2,.35)}50%{box-shadow:0 8px 32px rgba(252,76,2,.65)}}
+.strava-ico{flex-shrink:0;width:28px;height:28px}
+.strava-info{flex:1;min-width:0;position:relative;z-index:1}
+.strava-eyebrow{font-size:9px;letter-spacing:.18em;text-transform:uppercase;opacity:.75;margin-bottom:2px}
+.strava-wordmark{font-size:20px;font-weight:900;letter-spacing:.12em;line-height:1}
+.strava-sub{font-size:10px;opacity:.72;margin-top:3px;letter-spacing:.04em}
+.strava-arr{font-size:18px;opacity:.85;flex-shrink:0;position:relative;z-index:1}
+/* Reactions */
+.react-row{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;flex-shrink:0}
 
 /* phase */
 .ph-tag{font-size:20px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
@@ -226,7 +231,7 @@ header{
 .cmsg.cheer .mt{font-size:28px;line-height:1.2}
 .cmsg.cheer .mts{font-size:11px;color:rgba(255,107,43,.7)}
 .react-row{display:flex;gap:8px;flex-shrink:0}
-.breact{flex:1;height:36px;font-size:18px;background:var(--bd);border:1px solid #2a3a5c;border-radius:8px;cursor:pointer;transition:transform .1s,background .15s}
+.breact{height:38px;font-size:20px;background:var(--bd);border:1px solid #2a3a5c;border-radius:8px;cursor:pointer;transition:transform .1s,background .15s}
 .breact:hover{background:#2a3a5c;transform:scale(1.1)}
 .breact:active{transform:scale(.95)}
 .chat-empty{text-align:center;color:var(--mu);font-size:13px;padding:24px 12px;line-height:1.5;font-style:italic}
@@ -467,13 +472,14 @@ header{
 
     <!-- Strava CTA -->
     <a class="strava-cta" id="stravaCta" href="#" target="_blank" rel="noopener noreferrer">
-      <svg class="strava-ico" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M21 4 L13 16 L18 16 L10 28" stroke="#FC4C02" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M25 4 L17 16 L22 16 L14 28" stroke="#FC4C02" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" opacity=".4"/>
+      <svg class="strava-ico" viewBox="0 0 32 32" fill="none">
+        <path d="M20 4 L12 16 L17 16 L9 28" stroke="white" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M25 4 L17 16 L22 16 L14 28" stroke="white" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" opacity=".45"/>
       </svg>
       <div class="strava-info">
-        <div class="strava-name">Antoine Conqui</div>
-        <div class="strava-platform">Suivre sur Strava</div>
+        <div class="strava-eyebrow">Retrouve-moi sur</div>
+        <div class="strava-wordmark">STRAVA</div>
+        <div class="strava-sub">Antoine Conqui · segments &amp; activités</div>
       </div>
       <span class="strava-arr">↗</span>
     </a>
@@ -493,15 +499,20 @@ header{
     <div class="chat-form">
       <div class="chat-sec-lbl">Réactions rapides</div>
       <div class="react-row">
+        <button class="breact" data-emoji="🔥">🔥</button>
         <button class="breact" data-emoji="❤️">❤️</button>
         <button class="breact" data-emoji="💪">💪</button>
         <button class="breact" data-emoji="😤">😤</button>
         <button class="breact" data-emoji="🎉">🎉</button>
+        <button class="breact" data-emoji="👏">👏</button>
+        <button class="breact" data-emoji="🥵">🥵</button>
+        <button class="breact" data-emoji="😍">😍</button>
+        <button class="breact" data-emoji="💯">💯</button>
+        <button class="breact" data-emoji="🏃">🏃</button>
       </div>
       <div class="chat-sec-lbl">Envoyer un message</div>
       <input id="cMsg"  placeholder="Encourage Antoine ! 💪" maxlength="280">
       <div class="cbtns">
-        <button class="btn bcheer" id="bCheer">🔥 Allez !</button>
         <button class="btn bsend"  id="bSend">Envoyer →</button>
       </div>
     </div>
@@ -527,7 +538,7 @@ header{
   <div class="cdin">
     <span class="cd-flag">🏁</span>
     <div class="cd-race">Trail d'Écouves 2026</div>
-    <div class="cd-ath">Antoine Conqui · 61 km · D+2200 m</div>
+    <div class="cd-ath">Antoine Conqui · 61 km · 2200 D+</div>
     <div class="cd-date">Samedi 6 juin · Départ 12h00</div>
     <div class="cdtimer">
       <div class="ct-blk"><span class="ct-num" id="cdD">--</span><span class="ct-lbl">jours</span></div>
@@ -1365,17 +1376,19 @@ function renderChat(){
     document.getElementById("viewerCnt").textContent="—";
     return;
   }
-  // Grouper les messages consécutifs du même auteur (comme Slack)
-  const list=S.chatMsgs.slice(-80);
+  // Filtrer les cheers hors du feed — les reacts n'apparaissent pas dans le chat
+  const list=S.chatMsgs.slice(-80).filter(m=>m.type!=="cheer");
+  if(!list.length){
+    el.innerHTML=`<div style="flex:1"></div><div class="chat-empty">💬<br><br>Sois le premier à encourager Antoine !</div>`;
+    document.getElementById("viewerCnt").textContent="—";
+    return;
+  }
   let html="";
   for(let i=0;i<list.length;i++){
     const m=list[i],prev=list[i-1];
     const ctx=msgRaceContext(m.ts);
-    const sameAuthor=prev&&prev.name===m.name&&prev.type===m.type&&m.type!=="cheer";
-    if(m.type==="cheer"){
-      html+=`<div class="cmsg cheer"><div class="mt">${m.msg}</div><div class="mts">${m.name} · ${ctx}</div></div>`;
-    } else if(sameAuthor){
-      // Continuation : pas de nom répété, léger retrait
+    const sameAuthor=prev&&prev.name===m.name;
+    if(sameAuthor){
       html+=`<div class="cmsg cmsg-cont"><div class="mt">${m.msg}</div><div class="mts">${ctx}</div></div>`;
     } else {
       html+=`<div class="cmsg"><div class="mn">${m.name}</div><div class="mt">${m.msg}</div><div class="mts">${ctx}</div></div>`;
@@ -1407,11 +1420,6 @@ function initChat(){
     if(!n||!m)return;
     await sendChat(n,m,"msg");
     document.getElementById("cMsg").value="";
-    await fetchChat();
-  };
-  document.getElementById("bCheer").onclick=async()=>{
-    const n=getName(); if(!n)return;
-    await sendChat(n,"🔥🔥🔥","cheer");
     await fetchChat();
   };
   document.querySelectorAll(".breact").forEach(btn=>{
