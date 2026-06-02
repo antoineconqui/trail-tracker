@@ -1,2 +1,8 @@
 les messages ou react envoyés avant identification sont marqués anonyme - attendre le pseudo pour post le message
-le pseudo doit être défini au départ (pas modifiable dans le chat)
+le pseudo doit être défini dans la modale puis stockée en cookie et pas modifiable dans le chat
+Les reacts doivent etre dans le chat + créer un moving icon sur la page complete pendant 10 secondes
+profil alti : 
+- le tooltip de phase et de zones doivent contenir la distance totale, pas le km start end
+- le tooltip des zones doivent contenir le denivelé de la zone, pas le dénivelé total de la course jusqu'à la zone
+- le fond de la barre d'affichage des titres de phases doit etre plein (pas transparent)
+- bug : les pointillés délimitant les zones dépassent parfois au dessus de la courbe  
