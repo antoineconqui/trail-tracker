@@ -250,16 +250,24 @@ header{
 .cd-badge{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--gn);letter-spacing:.08em;text-transform:uppercase;background:rgba(0,212,160,.1);border:1px solid rgba(0,212,160,.28);border-radius:20px;padding:5px 14px}
 
 /* ── FINISH OVERLAY ──────────────────────────────────────── */
-.finish-ov{position:fixed;inset:0;z-index:5000;background:rgba(6,8,15,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;animation:fin-in .5s ease-out;cursor:pointer;text-align:center;padding:20px}
+.finish-ov{position:fixed;inset:0;z-index:5000;background:rgba(6,8,15,.92);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;animation:fin-in .5s ease-out;text-align:center;padding:48px 20px 32px;overflow-y:auto}
 .finish-ov.closing{animation:fin-out .8s ease-out forwards;pointer-events:none}
 @keyframes fin-in{from{opacity:0}to{opacity:1}}
 @keyframes fin-out{to{opacity:0;transform:scale(1.04)}}
-.fin-emoji{font-size:90px;animation:fin-pop .7s cubic-bezier(.3,1.4,.5,1) both}
+.fin-close{position:fixed;top:16px;right:18px;background:var(--s1);border:1px solid var(--bd);border-radius:8px;color:var(--mu);font-size:18px;line-height:1;padding:5px 11px;cursor:pointer;z-index:5001;transition:color .15s,border-color .15s}
+.fin-close:hover{color:var(--tx);border-color:var(--mu)}
+.fin-emoji{font-size:82px;animation:fin-pop .7s cubic-bezier(.3,1.4,.5,1) both}
 @keyframes fin-pop{from{transform:scale(0) rotate(-20deg)}to{transform:scale(1) rotate(0)}}
-.fin-title{font-size:56px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--tx);margin:12px 0 6px;animation:fin-slide .5s .2s ease-out both}
-.fin-sub{font-size:16px;color:var(--mu);animation:fin-slide .5s .35s ease-out both}
-.fin-hint{font-size:11px;color:var(--bd);letter-spacing:.08em;text-transform:uppercase;margin-top:28px;animation:fin-slide .5s .5s ease-out both}
+.fin-title{font-size:52px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--tx);margin:10px 0 4px;animation:fin-slide .5s .2s ease-out both}
+.fin-sub{font-size:15px;color:var(--mu);margin-bottom:28px;animation:fin-slide .5s .35s ease-out both}
 @keyframes fin-slide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.fin-recap{width:100%;max-width:400px;background:var(--s1);border:1px solid var(--bd);border-radius:14px;overflow:hidden;animation:fin-slide .5s .5s ease-out both}
+.fin-recap-title{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mu);padding:10px 16px 8px;border-bottom:1px solid var(--bd);text-align:left}
+.fin-row{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid rgba(26,37,64,.5)}
+.fin-row:last-child{border-bottom:none}
+.fin-row-icon{font-size:15px;flex-shrink:0;width:20px;text-align:center}
+.fin-row-lbl{flex:1;font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.06em}
+.fin-row-val{font-family:var(--fm);font-size:15px;font-weight:700;color:var(--tx)}
 
 /* ── ELEVATION STRIP ──────────────────────────────────────── */
 .elev-strip{flex-shrink:0;height:190px;background:var(--s1);border-top:1px solid var(--bd);position:relative}
@@ -1785,21 +1793,60 @@ function triggerFinishConfetti(){
   }
 }
 
+function buildFinishRecap(){
+  const rows=[];
+  // Temps de course
+  if(S.sessionStart){
+    const ms=Date.now()-new Date(S.sessionStart).getTime();
+    const th=Math.floor(ms/3600000),tm=Math.floor((ms%3600000)/60000),ts=Math.floor((ms%60000)/1000);
+    rows.push({icon:'⏱',lbl:'Temps de course',val:`${th}h${String(tm).padStart(2,'0')}'${String(ts).padStart(2,'0')}"` });
+  }
+  // Distance
+  rows.push({icon:'📏',lbl:'Distance parcourue',val:`${S.distKm.toFixed(1)} km`});
+  // D+ / D-
+  if(S.elevGain>10) rows.push({icon:'⬆️',lbl:'Dénivelé positif',val:`${Math.round(S.elevGain)} m`});
+  if(S.elevLoss>10) rows.push({icon:'⬇️',lbl:'Dénivelé négatif',val:`${Math.round(S.elevLoss)} m`});
+  // Stats depuis l'historique km
+  if(S.kmHist.length>0){
+    const paces=S.kmHist.map(k=>k.pace);
+    const avgPace=paces.reduce((a,b)=>a+b,0)/paces.length;
+    rows.push({icon:'🏃',lbl:'Allure moyenne',val:fmtPace(avgPace)+' /km'});
+    const hrs=S.kmHist.map(k=>k.hr).filter(h=>h>0);
+    if(hrs.length>0){
+      rows.push({icon:'💓',lbl:'FC moyenne',val:`${Math.round(hrs.reduce((a,b)=>a+b,0)/hrs.length)} bpm`});
+      rows.push({icon:'🔺',lbl:'FC max',val:`${Math.round(Math.max(...hrs))} bpm`});
+    }
+    // Meilleur km (allure la plus basse)
+    const best=S.kmHist.reduce((a,b)=>b.pace<a.pace?b:a);
+    rows.push({icon:'⚡',lbl:`Meilleur km (km ${best.km})`,val:fmtPace(best.pace)+' /km'});
+    rows.push({icon:'📍',lbl:'Km suivis',val:`${S.kmHist.length} km`});
+  }
+  const rowsHtml=rows.map(r=>`<div class="fin-row">
+    <span class="fin-row-icon">${r.icon}</span>
+    <span class="fin-row-lbl">${r.lbl}</span>
+    <span class="fin-row-val">${r.val}</span>
+  </div>`).join('');
+  return `<div class="fin-recap">
+    <div class="fin-recap-title">Récapitulatif de course</div>
+    ${rowsHtml}
+  </div>`;
+}
+
 function triggerFinishAnimation(){
   if(S._finishTriggered) return;
   S._finishTriggered=true;
   const ov=document.createElement('div');
   ov.className='finish-ov';
   ov.innerHTML=`
+    <button class="fin-close" aria-label="Fermer">✕</button>
     <div class="fin-emoji">🏅</div>
     <div class="fin-title">ARRIVÉE !</div>
-    <div class="fin-sub">Antoine a terminé le Trail d'Écouves</div>
-    <div class="fin-hint">Toucher pour fermer</div>`;
+    <div class="fin-sub">${C.race.name||'Trail'} · ${C.race.distKm} km</div>
+    ${buildFinishRecap()}`;
   document.body.appendChild(ov);
   triggerFinishConfetti();
   const close=()=>{ov.classList.add('closing');setTimeout(()=>ov.remove(),850);};
-  ov.addEventListener('click',close);
-  setTimeout(close,14000);
+  ov.querySelector('.fin-close').addEventListener('click',close);
 }
 
 // Console : window.testDepart()  window.skipCountdown()  window.testArrivee()
