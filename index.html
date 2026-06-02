@@ -992,16 +992,13 @@ function renderElev(){
     // Zone rect + label en bas centré (group clippé pour éviter débordement latéral)
     h+=`<g clip-path="url(#phclip${i})">`;
     h+=`<rect x="${x1.toFixed(2)}" y="0" width="${(x2-x1).toFixed(2)}" height="${H}" fill="${ph.color}28"/>`;
-    h+=`<rect x="${x1.toFixed(1)}" y="${(H-14).toFixed(1)}" width="${(x2-x1).toFixed(1)}" height="14" fill="#06080f"/>`;
-    // Titre centré dans la zone, clippé (ne déborde jamais hors des bornes)
-    h+=`<text x="${mx.toFixed(1)}" y="${(H-3).toFixed(1)}" fill="${ph.color}" font-size="10" font-family="Barlow Condensed" font-weight="700" text-anchor="middle">${ph.title||ph.label}</text>`;
     // Hit area à l'intérieur du clip (reste dans les bornes de la zone)
     h+=`<rect x="${x1.toFixed(1)}" y="0" width="${(x2-x1).toFixed(1)}" height="${(H-16).toFixed(1)}" fill="transparent" data-tipph="${i}" style="pointer-events:all"/>`;
     h+=`</g>`;
-    // Séparateur visible entre phases (sauf après la dernière)
+    // Séparateur limité à la partie graphique (s'arrête avant la barre des labels)
     if(i<C.race.phases.length-1){
       const sx=xOf(ph.kmEnd);
-      h+=`<line x1="${sx}" y1="0" x2="${sx}" y2="${H}" stroke="rgba(255,255,255,.25)" stroke-width="2" vector-effect="non-scaling-stroke"/>`;
+      h+=`<line x1="${sx}" y1="0" x2="${sx}" y2="${(H-14).toFixed(1)}" stroke="rgba(255,255,255,.25)" stroke-width="2" vector-effect="non-scaling-stroke"/>`;
     }
     prevKm=ph.kmEnd;
   }
@@ -1028,10 +1025,6 @@ function renderElev(){
     h+=`<path d="${pd} L${xOf(sp.at(-1).cumDist)},${H} L0,${H} Z" fill="url(#eg)" style="pointer-events:none"/>`;
     h+=`<path d="${pd}" fill="none" stroke="#ff6b2b" stroke-width="1.5" vector-effect="non-scaling-stroke" style="pointer-events:none"/>`;
   }
-
-  // km labels
-  for(let km=10;km<td;km+=10)
-    h+=`<text x="${xOf(km)}" y="${H}" fill="#6b82a8" font-size="8" text-anchor="middle" font-family="DM Mono">${km}</text>`;
 
   // ── PASS 1 : fonds de zones (pointer-events:none, avant les ravitos) ──
   for(const wp of C.race.waypoints||[]){
@@ -1069,8 +1062,8 @@ function renderElev(){
     const mid=(x1+x2)/2;
     const midPt=GPX.pts.find(p=>p.cumDist>=w.kmMid)||GPX.pts.at(-1);
     const mcy=parseFloat(yOf(midPt.ele));
-    // Position sous la courbe : entre la courbe et le bas
-    const ey=Math.min(H-5, mcy+(H-mcy)*0.55);
+    // Position sous la courbe, au-dessus de la barre des labels
+    const ey=Math.min(H-17, mcy+(H-mcy)*0.5);
     const emoji=labelEmoji(w.label);
     h+=`<text x="${mid.toFixed(1)}" y="${ey.toFixed(1)}" fill="white" font-size="11" text-anchor="middle" opacity=".8" style="pointer-events:none">${emoji}</text>`;
     // Hit area centrée sur l'emoji — data-tipzone pour le tooltip de zone
@@ -1112,6 +1105,23 @@ function renderElev(){
     const tx=Math.min(cx+12,970),ty=Math.max(cy-12,10);
     h+=`<text x="${tx}" y="${ty}" fill="white" font-size="8" font-family="DM Mono" opacity=".85">${Math.round(cp.ele)}m</text>`;
   }
+  // ── BARRE DES PHASES — dernier plan (toujours au premier plan visuel) ──
+  // Fond opaque pleine largeur couvrant tout ce qui a été dessiné avant
+  h+=`<rect x="0" y="${(H-14).toFixed(1)}" width="1000" height="14" fill="#06080f" style="pointer-events:none"/>`;
+  // Labels km au-dessus du fond (toujours lisibles)
+  for(let km=10;km<td;km+=10)
+    h+=`<text x="${xOf(km)}" y="${H}" fill="#6b82a8" font-size="8" text-anchor="middle" font-family="DM Mono" style="pointer-events:none">${km}</text>`;
+  // Titres de phases clippés par zone
+  let lblKm=0;
+  for(let i=0;i<C.race.phases.length;i++){
+    const ph=C.race.phases[i];
+    const x1=parseFloat(xOf(lblKm)),x2=parseFloat(xOf(ph.kmEnd)),mx=(x1+x2)/2;
+    h+=`<g clip-path="url(#phclip${i})" style="pointer-events:none">`;
+    h+=`<text x="${mx.toFixed(1)}" y="${(H-3).toFixed(1)}" fill="${ph.color}" font-size="10" font-family="Barlow Condensed" font-weight="700" text-anchor="middle">${ph.title||ph.label}</text>`;
+    h+=`</g>`;
+    lblKm=ph.kmEnd;
+  }
+
   svg.innerHTML=h;
   attachElevTooltips();
 }
