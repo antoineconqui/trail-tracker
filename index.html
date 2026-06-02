@@ -508,6 +508,10 @@ function parseGpx(text){
   GPX.totalDplus=pts.at(-1)?.cumDplus||C.race.totalDplus;
   GPX.loaded=true;
   document.getElementById("elevS").classList.add("hgpx");
+  // Trace GPX complète sur la carte Leaflet
+  const step=Math.max(1,Math.floor(pts.length/600));
+  courseL.setLatLngs(pts.filter((_,i)=>i%step===0||i===pts.length-1).map(p=>[p.lat,p.lon]));
+  if(!S.pts.length) map.fitBounds(courseL.getBounds(),{padding:[40,40]});
   renderElev();
   renderMinimap();
   addWaypointMarkers();
@@ -665,20 +669,42 @@ function addRavitoMarkers(){
   }
 }
 
+// Helper : normalise un waypoint ponctuel ou zone
+function wpNorm(wp){
+  const isZone=wp.type==='zone'||(wp.kmStart!==undefined&&wp.type!=='ponctuel');
+  const km=isZone?wp.kmStart:(wp.km??wp.kmStart);
+  const kmMid=isZone?(wp.kmStart+wp.kmEnd)/2:km;
+  return{isZone,km,kmMid,kmEnd:isZone?wp.kmEnd:km,
+    lat:wp.lat,lon:wp.lon,label:wp.label};
+}
+
 let _wpMarkers=[];
 function addWaypointMarkers(){
   _wpMarkers.forEach(m=>m.remove());
   _wpMarkers=[];
-  if(!GPX.loaded||!GPX.pts.length) return;
   for(const wp of C.race.waypoints||[]){
-    const pt=GPX.pts.find(p=>p.cumDist>=wp.km)||GPX.pts.at(-1);
-    if(!pt) continue;
-    const emoji=labelEmoji(wp.label);
-    const name=wp.label.split(" ").slice(1).join(" ")||wp.label;
-    const ic=L.divIcon({className:"",iconSize:[28,28],iconAnchor:[14,14],
-      html:`<div style="width:28px;height:28px;border-radius:50%;background:rgba(10,14,26,.82);border:1.5px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;font-size:15px;backdrop-filter:blur(4px);box-shadow:0 2px 6px rgba(0,0,0,.6)">${emoji}</div>`});
-    const marker=L.marker([pt.lat,pt.lon],{icon:ic,zIndexOffset:-10}).addTo(map)
-      .bindPopup(`<b>${name}</b><br><small>km ${wp.km}</small>`);
+    const w=wpNorm(wp);
+    let lat=w.lat,lon=w.lon;
+    // Fallback GPX si pas de coords dans le config
+    if((!lat||!lon)&&GPX.loaded&&GPX.pts.length){
+      const pt=GPX.pts.find(p=>p.cumDist>=w.kmMid)||GPX.pts.at(-1);
+      if(!pt) continue;
+      lat=pt.lat; lon=pt.lon;
+    }
+    if(!lat||!lon) continue;
+    const emoji=labelEmoji(w.label);
+    const name=w.label.split(" ").slice(1).join(" ")||w.label;
+    const kmLbl=w.isZone?`km ${w.km}–${w.kmEnd}`:`km ${w.km}`;
+    // Forme différente : rond pour ponctuel, pilule pour zone
+    const style=w.isZone
+      ?`width:32px;height:20px;border-radius:5px;background:rgba(10,14,26,.85);border:1.5px dashed rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 2px 6px rgba(0,0,0,.6)`
+      :`width:28px;height:28px;border-radius:50%;background:rgba(10,14,26,.82);border:1.5px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;font-size:15px;backdrop-filter:blur(4px);box-shadow:0 2px 6px rgba(0,0,0,.6)`;
+    const sz=w.isZone?[32,20]:[28,28];
+    const anchor=w.isZone?[16,10]:[14,14];
+    const ic=L.divIcon({className:"",iconSize:sz,iconAnchor:anchor,
+      html:`<div style="${style}">${emoji}</div>`});
+    const marker=L.marker([lat,lon],{icon:ic,zIndexOffset:-10}).addTo(map)
+      .bindPopup(`<b>${name}</b><br><small>${kmLbl}</small>`);
     _wpMarkers.push(marker);
   }
 }
@@ -890,21 +916,35 @@ function renderElev(){
       data-tipkm="${r.km}" data-tiplbl="${icon} ${r.name}" data-tipextra="${r.services||""}"/>`;
   }
 
-  // Waypoints — cercle + emoji extrait du label
+  // Waypoints — ponctuel ou zone
   for(const wp of C.race.waypoints||[]){
-    if(wp.km>td) continue;
-    const wpx=xOf(wp.km);
-    const wpt=GPX.pts.find(p=>p.cumDist>=wp.km)||GPX.pts.at(-1);
-    const wcy=parseFloat(yOf(wpt.ele));
-    const wey=Math.max(9,wcy-7);
-    const emoji=labelEmoji(wp.label);
-    // Cercle d'ancrage
-    h+=`<circle cx="${wpx}" cy="${wcy}" r="2.5" fill="white" opacity=".75" style="pointer-events:none"/>`;
-    // Emoji au-dessus
-    h+=`<text x="${wpx}" y="${wey}" fill="white" font-size="12" text-anchor="middle" opacity=".85" style="pointer-events:none">${emoji}</text>`;
-    // Hit area
-    h+=`<circle cx="${wpx}" cy="${wcy}" r="10" fill="transparent"
-      data-tipkm="${wp.km}" data-tiplbl="${wp.label}"/>`;
+    const w=wpNorm(wp);
+    if(w.km>td) continue;
+    const emoji=labelEmoji(w.label);
+    if(w.isZone){
+      const x1=parseFloat(xOf(w.km)),x2=parseFloat(xOf(Math.min(w.kmEnd,td)));
+      const mid=(x1+x2)/2;
+      const midPt=GPX.pts.find(p=>p.cumDist>=w.kmMid)||GPX.pts.at(-1);
+      const mcy=parseFloat(yOf(midPt.ele)),mey=Math.max(9,mcy-7);
+      // Bande de zone semi-transparente
+      h+=`<rect x="${x1.toFixed(1)}" y="0" width="${(x2-x1).toFixed(1)}" height="${H}" fill="rgba(255,255,255,.05)" style="pointer-events:none"/>`;
+      // Bordures pointillées de zone
+      h+=`<line x1="${x1.toFixed(1)}" y1="0" x2="${x1.toFixed(1)}" y2="${H}" stroke="rgba(255,255,255,.22)" stroke-width="1" stroke-dasharray="3,2" vector-effect="non-scaling-stroke" style="pointer-events:none"/>`;
+      h+=`<line x1="${x2.toFixed(1)}" y1="0" x2="${x2.toFixed(1)}" y2="${H}" stroke="rgba(255,255,255,.22)" stroke-width="1" stroke-dasharray="3,2" vector-effect="non-scaling-stroke" style="pointer-events:none"/>`;
+      // Emoji centré au milieu de la zone
+      h+=`<text x="${mid.toFixed(1)}" y="${mey}" fill="white" font-size="12" text-anchor="middle" opacity=".85" style="pointer-events:none">${emoji}</text>`;
+      // Hit area couvrant toute la zone
+      h+=`<rect x="${x1.toFixed(1)}" y="0" width="${(x2-x1).toFixed(1)}" height="${H}" fill="transparent"
+        data-tipkm="${w.km}" data-tiplbl="${w.label}" data-tipextra="Zone km ${w.km}–${w.kmEnd}"/>`;
+    } else {
+      const wpx=xOf(w.km);
+      const wpt=GPX.pts.find(p=>p.cumDist>=w.km)||GPX.pts.at(-1);
+      const wcy=parseFloat(yOf(wpt.ele)),wey=Math.max(9,wcy-7);
+      h+=`<circle cx="${wpx}" cy="${wcy}" r="2.5" fill="white" opacity=".75" style="pointer-events:none"/>`;
+      h+=`<text x="${wpx}" y="${wey}" fill="white" font-size="12" text-anchor="middle" opacity=".85" style="pointer-events:none">${emoji}</text>`;
+      h+=`<circle cx="${wpx}" cy="${wcy}" r="10" fill="transparent"
+        data-tipkm="${w.km}" data-tiplbl="${w.label}"/>`;
+    }
   }
 
   // Live cursor — avatar rond avec pulse
@@ -1054,8 +1094,10 @@ function renderKmHist(){
 let toastTm=null;
 function checkWp(km){
   for(const wp of C.race.waypoints||[]){
-    const k=`wp${wp.km}`;
-    if(!S.triggeredWp.has(k)&&Math.abs(km-wp.km)<0.4){
+    const w=wpNorm(wp);
+    const k=`wp${w.km}`;
+    const triggered=w.isZone?(km>=w.km&&km<=w.kmEnd+0.3):Math.abs(km-w.km)<0.4;
+    if(!S.triggeredWp.has(k)&&triggered){
       S.triggeredWp.add(k);
       localStorage.setItem("twp",JSON.stringify([...S.triggeredWp]));
       showToast(wp.label);
@@ -1326,8 +1368,15 @@ function getNextEvents(km){
   const evs=[];
   for(const r of C.race.ravitos||[])
     if(r.km>km) evs.push({km:r.km,label:r.name,icon:ravitoIcon(r.services).icon,sub:r.services||"",color:"var(--gn)"});
-  for(const wp of C.race.waypoints||[])
-    if(wp.km>km){const icon=labelEmoji(wp.label);const label=wp.label.split(" ").slice(1).join(" ")||wp.label;evs.push({km:wp.km,label,icon,sub:`km ${wp.km}`,color:"var(--mu)"}); }
+  for(const wp of C.race.waypoints||[]){
+    const w=wpNorm(wp);
+    if(w.km>km){
+      const icon=labelEmoji(w.label);
+      const label=w.label.split(" ").slice(1).join(" ")||w.label;
+      const sub=w.isZone?`km ${w.km}–${w.kmEnd}`:`km ${w.km}`;
+      evs.push({km:w.km,label,icon,sub,color:"var(--mu)"});
+    }
+  }
   for(const ph of C.race.phases)
     if(ph.kmStart>km) evs.push({km:ph.kmStart,label:ph.title||ph.label,icon:"🏁",sub:`Segment · FC≤${ph.fcMax} bpm`,color:ph.color});
   return evs.sort((a,b)=>a.km-b.km).slice(0,3);
@@ -1460,6 +1509,12 @@ function render(){
   renderPaceBars();
   renderElev();
   renderMinimap();
+  // Mise à jour courseL : ne montrer que la portion restante (dashed) quand la course a commencé
+  if(GPX.loaded&&GPX.pts.length&&km>0.5){
+    const step=Math.max(1,Math.floor(GPX.pts.length/600));
+    const remPts=GPX.pts.filter((p,i)=>(i%step===0||i===GPX.pts.length-1)&&p.cumDist>=km);
+    courseL.setLatLngs(remPts.map(p=>[p.lat,p.lon]));
+  }
 }
 function renderClock(){
   document.getElementById("sTm").textContent=fmtEl(S.sessionStart);
