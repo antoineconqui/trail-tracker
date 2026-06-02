@@ -1,8 +1,8 @@
 {
   "name":        "Trail d'Écouves",
   "distKm":      61,
-  "totalDplus":  2100,
-  "totalDminus": 2100,
+  "totalDplus":  2200,
+  "totalDminus": 2200,
   "gpxUrl":      "https://raw.githubusercontent.com/antoineconqui/trail-tracker/main/ecouves-2026.gpx",
 
   "phases": [
@@ -10,14 +10,14 @@
       "label":       "PH 1",
       "title":       "Secteur dentelé",
       "description": "Quatre montées à 7–12% en 13 km. Le profil en dents de scie ne laisse pas trouver de rythme. Fond de vallée km 13.38. Premier ravito eau 400 m après.",
-      "kmStart": 0,     "kmEnd": 13.38,
+      "kmStart": 0,     "kmEnd": 13.79,
       "fcMax":   148,   "color": "#00d4a0"
     },
     {
       "label":       "PH 2",
       "title":       "Première montagne",
       "description": "Premier effort montagne soutenu. Ascension jusqu'à +179 m au km 18.85. Descente immédiate vers le ravito complet km 20.17. Antoine a parcouru un tiers de la course.",
-      "kmStart": 13.38, "kmEnd": 20.17,
+      "kmStart": 13.79, "kmEnd": 20.17,
       "fcMax":   155,   "color": "#3dc4b0"
     },
     {
@@ -130,7 +130,7 @@
     },
     {
       "type": "zone",
-      "kmStart": 36.35, "kmEnd": 37.50,
+      "kmStart": 36.35, "kmEnd": 37.58,
       "lat": 48.513567, "lon": 0.017543,
       "label": "📉 Descente post-sommet — 1.15km / max -15%"
     },
@@ -147,13 +147,13 @@
     },
     {
       "type": "zone",
-      "kmStart": 46.38, "kmEnd": 47.15,
+      "kmStart": 46.38, "kmEnd": 48.53,
       "lat": 48.496783, "lon": 0.025814,
       "label": "⛰️ Montée avant ravito 5"
     },
     {
       "type": "ponctuel",
-      "km": 48.45, "lat": 48.506032, "lon": 0.028206,
+      "km": 48.53, "lat": 48.506032, "lon": 0.028206,
       "label": "🏔️ Sommet km 48 — +114m"
     },
     {
@@ -176,7 +176,7 @@
     },
     {
       "type": "ponctuel",
-      "km": 54.70, "lat": 48.504060, "lon": 0.072872,
+      "km": 54.89, "lat": 48.504060, "lon": 0.072872,
       "label": "🏔️ Sommet km 54 — +126m"
     },
     {
@@ -218,9 +218,9 @@
 
   "ravitos": [
     { "name": "Parc Animalier d'Écouves",      "km": 13.79, "lat": 48.567667, "lon": 0.132856, "services": "Eau" },
-    { "name": "Carrefour du Rendez-vous",      "km": 20.17, "lat": 48.538931, "lon": 0.096126, "services": "Complet" },
-    { "name": "Parcours Santé Verdier",        "km": 33.50, "lat": 48.513741, "lon": 0.035302, "services": "Complet" },
-    { "name": "Mairie de St Nicolas des Bois", "km": 40.20, "lat": 48.495608, "lon": 0.015887, "services": "Complet · Fan Zone" },
+    { "name": "Carrefour du Rendez-vous",      "km": 20.17, "lat": 48.538931, "lon": 0.096126, "services": "Solide" },
+    { "name": "Parcours Santé Verdier",        "km": 33.50, "lat": 48.513741, "lon": 0.035302, "services": "Solide" },
+    { "name": "Mairie de St Nicolas des Bois", "km": 40.20, "lat": 48.495608, "lon": 0.015887, "services": "Fan Zone" },
     { "name": "Réservoir d'Eau",               "km": 47.95, "lat": 48.504103, "lon": 0.024595, "services": "Eau" },
     { "name": "Camping de Radon",              "km": 56.00, "lat": 48.495776, "lon": 0.068488, "services": "Eau" }
   ]

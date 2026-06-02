@@ -506,7 +506,7 @@ header{
   <div class="cdin">
     <span class="cd-flag">🏁</span>
     <div class="cd-race">Trail d'Écouves 2026</div>
-    <div class="cd-ath">Antoine Conqui · 61 km · D+1950 m</div>
+    <div class="cd-ath">Antoine Conqui · 61 km · D+2200 m</div>
     <div class="cd-date">Samedi 6 juin · Départ 12h00</div>
     <div class="cdtimer">
       <div class="ct-blk"><span class="ct-num" id="cdD">--</span><span class="ct-lbl">jours</span></div>
@@ -517,7 +517,6 @@ header{
       <div class="ct-sep">:</div>
       <div class="ct-blk"><span class="ct-num" id="cdSc">--</span><span class="ct-lbl">sec</span></div>
     </div>
-    <p class="cd-msg">Tu es au bon endroit 👋<br>Reviens le <strong>6 juin à 12h00</strong> pour suivre Antoine en direct sur ce tracker GPS.</p>
     <div class="cd-badge"><span class="viewer-dot"></span>Live tracker actif dès le départ</div>
   </div>
 </div>
@@ -527,7 +526,7 @@ header{
   <div class="mbox">
     <h2>👋 Qui es-tu ?</h2>
     <p>Ton prénom apparaîtra dans le chat</p>
-    <input id="nmIn" placeholder="Prénom ou pseudo" maxlength="30" autofocus>
+    <input id="nmIn" placeholder="Prénom" maxlength="30" autofocus>
     <button class="btn bsend" style="width:100%" id="nmOk">Rejoindre 🔥</button>
   </div>
 </div>
@@ -1870,6 +1869,7 @@ async function init(){
   pingViewer(); setInterval(pingViewer,30000);
 }
 init();
+skipCountdown();
 </script>
 </body>
 </html>
