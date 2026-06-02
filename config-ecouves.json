@@ -1,107 +1,267 @@
 {
   "name":        "Trail d'Écouves",
   "distKm":      61,
-  "totalDplus":  1950,
-  "totalDminus": 1950,
+  "totalDplus":  2100,
+  "totalDminus": 2100,
   "gpxUrl":      "https://raw.githubusercontent.com/antoineconqui/trail-tracker/main/ecouves-2026.gpx",
-  "avatarUrl":   "",
 
   "phases": [
     {
       "label":       "PH 1",
       "title":       "Secteur dentelé",
-      "description": "Ouverture en terrain forestier varié. Quatre montées à 7–12% en 5 km — le profil en dents de scie ne permet pas de s'installer dans un rythme. Ça se calme ensuite jusqu'au point bas du parcours, km 13.",
-      "kmStart":     0,
-      "kmEnd":       13,
-      "fcMax":       148,
-      "color":       "#00d4a0"
+      "description": "Quatre montées à 7–12% en 13 km. Le profil en dents de scie ne laisse pas trouver de rythme. Fond de vallée km 13.38. Premier ravito eau 400 m après.",
+      "kmStart": 0,     "kmEnd": 13.38,
+      "fcMax":   148,   "color": "#00d4a0"
     },
     {
       "label":       "PH 2",
-      "title":       "Première ascension majeure",
-      "description": "Premier vrai effort de montagne. Montée soutenue sur 6 km avec deux ressauts à 7–9% km 17–19. Premier ravito solide km 22. Antoine est au tiers de la course.",
-      "kmStart":     13,
-      "kmEnd":       22.76,
-      "fcMax":       155,
-      "color":       "#5bc8d0"
+      "title":       "Première montagne",
+      "description": "Premier effort montagne soutenu. Ascension jusqu'à +179 m au km 18.85. Descente immédiate vers le ravito complet km 20.17. Antoine a parcouru un tiers de la course.",
+      "kmStart": 13.38, "kmEnd": 20.17,
+      "fcMax":   155,   "color": "#3dc4b0"
     },
     {
       "label":       "PH 3",
-      "title":       "Approche du point haut",
-      "description": "Montée vers le toit du parcours. La rampe km 24–25 (1 km à 7%) est la section ascendante la plus exigeante. Ravito eau km 27. Sommet au km 28.62, +228m — jamais aussi haut, jamais aussi loin.",
-      "kmStart":     22.76,
-      "kmEnd":       28.34,
-      "fcMax":       158,
-      "color":       "#ffc532"
+      "title":       "Plateau et plongeon",
+      "description": "Terrain ondulé jusqu'au km 24, puis un plongeon de 750 m à -9.4% (max -13.2%) vers km 25.95. Remontée partielle, encore une descente, avant de toucher le creux km 30.75 à +63 m. Section la plus imprévisible.",
+      "kmStart": 20.17, "kmEnd": 30.75,
+      "fcMax":   158,   "color": "#ffc532"
     },
     {
       "label":       "PH 4",
-      "title":       "Descente centrale",
-      "description": "La descente la plus longue du parcours — 1,6 km à -7,4% immédiatement après le sommet — enchaînée d'une remontée sèche. Bloc de transition physiologiquement coûteux. Se termine au point bas km 36.5.",
-      "kmStart":     28.34,
-      "kmEnd":       36.51,
-      "fcMax":       158,
-      "color":       "#ff9b3a"
+      "title":       "Ascension principale",
+      "description": "La montée décisive : depuis +63 m (km 30.75) jusqu'au sommet +226 m (km 36.35), soit +163 m en 5.6 km. Ravito complet km 33.50 à mi-pente. La descente post-sommet démarre immédiatement à -15.1%.",
+      "kmStart": 30.75, "kmEnd": 37.58,
+      "fcMax":   160,   "color": "#ff9b3a"
     },
     {
       "label":       "PH 5",
-      "title":       "Deuxième ascension — la plus longue",
-      "description": "5 km d'ascension quasi continue depuis le fond de vallée jusqu'à +223m — à 5 mètres d'altitude du vrai sommet. La plupart des coureurs ne voient pas venir cet effort. Ravito famille au Verdier km 41.",
-      "kmStart":     36.51,
-      "kmEnd":       41.90,
-      "fcMax":       160,
-      "color":       "#ff6b2b"
+      "title":       "Du sommet au point le plus bas",
+      "description": "Depuis le creux post-sommet km 37.58, descente vers la Fan Zone km 40.20, puis plongée jusqu'au point le plus bas du parcours km 43.08 — légèrement sous le niveau du départ. Remontée jusqu'au ravito eau km 47.95.",
+      "kmStart": 37.58, "kmEnd": 47.95,
+      "fcMax":   158,   "color": "#ff6b2b"
     },
     {
       "label":       "PH 6",
-      "title":       "Vallonnement technique",
-      "description": "Trois descentes à -7/-8/-10% en 5 km entrecoupées de remontées sèches. La répétition des impacts excentriques est le facteur limitant de ce secteur. Dernier ravito eau km 51. Point bas km 47.",
-      "kmStart":     41.90,
-      "kmEnd":       52.25,
-      "fcMax":       160,
-      "color":       "#e84848"
+      "title":       "Secteur technique aval",
+      "description": "Succession de montées et descentes courtes et raides : côte à 14% km 49, descente à -12% km 51, montée à 10% km 53. Les chocs excentriques s'accumulent. Dernier ravito eau km 56.",
+      "kmStart": 47.95, "kmEnd": 56.00,
+      "fcMax":   162,   "color": "#e84848"
     },
     {
       "label":       "PH 7",
       "title":       "Effort de rupture",
-      "description": "Deux ascensions finales — dont une à 15%, pente maximale du parcours — séparées par une descente à -8%. Descente terminale à -12.6% sur 600m après 7h d'effort. 7 km. Chaque mètre compte.",
-      "kmStart":     52.25,
-      "kmEnd":       61.0,
-      "fcMax":       170,
-      "color":       "#ff1f4a"
+      "description": "La montée la plus raide du parcours : 1 km à 9.7%, maximum 16.2%, après 56 km d'effort. Dernier sommet km 58.25 (+133 m). Deux descentes finales. 5 km. La tête prend le relais des jambes.",
+      "kmStart": 56.00, "kmEnd": 61.00,
+      "fcMax":   170,   "color": "#ff1f4a"
     }
   ],
 
   "waypoints": [
-    { "km": 0.57,  "lat": 48.508338, "lon": 0.098212, "label": "⛰️ Côte 1 — départ immédiat" },
-    { "km": 4.62,  "lat": 48.524477, "lon": 0.094903, "label": "😤 4ème côte en 5km" },
-    { "km": 7.03,  "lat": 48.534901, "lon": 0.108597, "label": "🌊 Le petit lac" },
-    { "km": 17.17, "lat": 48.551840, "lon": 0.108024, "label": "⛰️ Montée de salopard" },
-    { "km": 18.70, "lat": 48.548171, "lon": 0.095090, "label": "😮‍💨 Sommet — 1ère montagne" },
-    { "km": 22.90, "lat": 48.547473, "lon": 0.064225, "label": "⛰️ Montée clé — 2km à 7%" },
-    { "km": 28.34, "lat": 48.550232, "lon": 0.030334, "label": "🏔️ Sommet — jamais aussi haut" },
-    { "km": 30.90, "lat": 48.533662, "lon": 0.036709, "label": "🎢 Grande descente — 2km à -7%" },
-    { "km": 32.80, "lat": 48.527239, "lon": 0.050954, "label": "🕳️ Fond de vallée" },
-    { "km": 36.51, "lat": 48.512763, "lon": 0.054543, "label": "⛰️ 2ème ascension — 5km" },
-    { "km": 41.90, "lat": 48.517482, "lon": 0.027207, "label": "🏔️ Sommet n°2 — presque aussi haut" },
-    { "km": 43.02, "lat": 48.512901, "lon": 0.017407, "label": "📉 Premières plongées du dernier tiers" },
-    { "km": 46.08, "lat": 48.504079, "lon": 0.008610, "label": "📉 3ème plongée — -10%" },
-    { "km": 46.95, "lat": 48.500078, "lon": 0.015745, "label": "🕳️ Creux du dernier tiers" },
-    { "km": 49.98, "lat": 48.504319, "lon": 0.025678, "label": "⛰️ Remontée inattendue" },
-    { "km": 52.52, "lat": 48.510920, "lon": 0.052691, "label": "📉 Descente longue — 1.1km" },
-    { "km": 52.25, "lat": 48.509673, "lon": 0.066679, "label": "💀 Double mur — partie 1" },
-    { "km": 57.12, "lat": 48.497827, "lon": 0.070940, "label": "💀 Double mur — partie 2 (15%)" },
-    { "km": 59.08, "lat": 48.506274, "lon": 0.086389, "label": "⚠️ Descente finale — la plus raide" },
-    { "km": 60.20, "lat": 48.506945, "lon": 0.092270, "label": "🏁 Dernière descente — 1.3km" },
-    { "km": 61.00, "lat": 48.506173, "lon": 0.099558, "label": "🎉 Arrivée" }
+
+    {
+      "type": "ponctuel",
+      "km": 0.00, "lat": 48.506178, "lon": 0.099566,
+      "label": "🏁 Départ"
+    },
+    {
+      "type": "zone",
+      "kmStart": 0.25, "kmEnd": 1.45,
+      "lat": 48.508438, "lon": 0.098807,
+      "label": "⛰️ Côte d'ouverture — 1.2km à 8%"
+    },
+    {
+      "type": "zone",
+      "kmStart": 3.08, "kmEnd": 3.60,
+      "lat": 48.518950, "lon": 0.096485,
+      "label": "⛰️ Côte ravinée km 3"
+    },
+    {
+      "type": "zone",
+      "kmStart": 4.33, "kmEnd": 4.78,
+      "lat": 48.522500, "lon": 0.095200,
+      "label": "⛰️ 4ème côte — 9% max"
+    },
+    {
+      "type": "ponctuel",
+      "km": 9.00, "lat": 48.547748, "lon": 0.123301,
+      "label": "⬇️ Creux intermédiaire — +68m"
+    },
+    {
+      "type": "zone",
+      "kmStart": 9.07, "kmEnd": 9.78,
+      "lat": 48.547748, "lon": 0.123301,
+      "label": "⛰️ Montée technique km 9"
+    },
+    {
+      "type": "ponctuel",
+      "km": 13.38, "lat": 48.567544, "lon": 0.136682,
+      "label": "⬇️ Fond de vallée — ravito 400m"
+    },
+    {
+      "type": "zone",
+      "kmStart": 14.12, "kmEnd": 15.75,
+      "lat": 48.565973, "lon": 0.131686,
+      "label": "⛰️ Début 1ère grande montée"
+    },
+    {
+      "type": "ponctuel",
+      "km": 18.85, "lat": 48.547939, "lon": 0.096355,
+      "label": "🏔️ Sommet 1ère montagne — +178m"
+    },
+    {
+      "type": "ponctuel",
+      "km": 23.75, "lat": 48.538832, "lon": 0.068529,
+      "label": "⬇️ Creux km 24 — plongeon dans 1km"
+    },
+    {
+      "type": "zone",
+      "kmStart": 24.02, "kmEnd": 24.82,
+      "lat": 48.536898, "lon": 0.066444,
+      "label": "⛰️ Montée avant le plongeon"
+    },
+    {
+      "type": "zone",
+      "kmStart": 25.15, "kmEnd": 25.90,
+      "lat": 48.530997, "lon": 0.057347,
+      "label": "📉 Plongeon -9.4% — 750m / max -13%"
+    },
+    {
+      "type": "ponctuel",
+      "km": 25.95, "lat": 48.526921, "lon": 0.056410,
+      "label": "⬇️ Fond du plongeon — +71m"
+    },
+    {
+      "type": "zone",
+      "kmStart": 27.50, "kmEnd": 28.27,
+      "lat": 48.527316, "lon": 0.047894,
+      "label": "⛰️ Contre-pente km 27"
+    },
+    {
+      "type": "ponctuel",
+      "km": 30.75, "lat": 48.513196, "lon": 0.055147,
+      "label": "⬇️ Creux km 30 — ascension principale immédiate"
+    },
+    {
+      "type": "zone",
+      "kmStart": 30.75, "kmEnd": 36.35,
+      "lat": 48.513196, "lon": 0.055147,
+      "label": "⛰️⛰️ Ascension principale — 5.6km / +163m"
+    },
+    {
+      "type": "ponctuel",
+      "km": 36.35, "lat": 48.513567, "lon": 0.017543,
+      "label": "🏔️ SOMMET — +226m"
+    },
+    {
+      "type": "zone",
+      "kmStart": 36.35, "kmEnd": 37.50,
+      "lat": 48.513567, "lon": 0.017543,
+      "label": "📉 Descente post-sommet — 1.15km / max -15%"
+    },
+    {
+      "type": "ponctuel",
+      "km": 37.58, "lat": 48.506352, "lon": 0.022349,
+      "label": "⬇️ Creux post-sommet — +113m"
+    },
+    {
+      "type": "zone",
+      "kmStart": 38.70, "kmEnd": 39.48,
+      "lat": 48.502608, "lon": 0.012457,
+      "label": "📉 Descente vers la Fan Zone — -7.5%"
+    },
+    {
+      "type": "ponctuel",
+      "km": 43.08, "lat": 48.490036, "lon": 0.038433,
+      "label": "⬇️⬇️ POINT LE PLUS BAS — sous le niveau du départ"
+    },
+    {
+      "type": "zone",
+      "kmStart": 46.38, "kmEnd": 47.15,
+      "lat": 48.496783, "lon": 0.025814,
+      "label": "⛰️ Montée avant ravito 5"
+    },
+    {
+      "type": "ponctuel",
+      "km": 48.45, "lat": 48.506032, "lon": 0.028206,
+      "label": "🏔️ Sommet km 48 — +114m"
+    },
+    {
+      "type": "ponctuel",
+      "km": 49.02, "lat": 48.502394, "lon": 0.027294,
+      "label": "⬇️ Creux km 49"
+    },
+    {
+      "type": "zone",
+      "kmStart": 49.12, "kmEnd": 49.75,
+      "lat": 48.502675, "lon": 0.027619,
+      "label": "⛰️ Côte brutale — 9.6% moy / 14% max"
+    },
+    {
+      "type": "zone",
+      "kmStart": 51.58, "kmEnd": 52.20,
+      "lat": 48.510920, "lon": 0.052691,
+      "label": "📉 Descente technique — -9% / max -12%"
+    },
+    {
+      "type": "zone",
+      "kmStart": 53.55, "kmEnd": 54.62,
+      "lat": 48.509014, "lon": 0.068305,
+      "label": "⛰️ Montée pré-finale — 1km à 8%"
+    },
+    {
+      "type": "ponctuel",
+      "km": 54.70, "lat": 48.504060, "lon": 0.072872,
+      "label": "🏔️ Sommet km 54 — +126m"
+    },
+    {
+      "type": "zone",
+      "kmStart": 55.00, "kmEnd": 56.10,
+      "lat": 48.503125, "lon": 0.072701,
+      "label": "📉 Descente avant dernier ravito — -8.9% / max -13%"
+    },
+    {
+      "type": "ponctuel",
+      "km": 56.17, "lat": 48.496039, "lon": 0.070640,
+      "label": "⬇️ Dernier creux — +19m"
+    },
+    {
+      "type": "zone",
+      "kmStart": 56.35, "kmEnd": 57.35,
+      "lat": 48.496046, "lon": 0.072588,
+      "label": "💀 Montée finale — 1km / 9.7% moy / max 16%"
+    },
+    {
+      "type": "ponctuel",
+      "km": 58.25, "lat": 48.507533, "lon": 0.083730,
+      "label": "🏔️ Dernier sommet — +133m"
+    },
+    {
+      "type": "zone",
+      "kmStart": 58.38, "kmEnd": 59.02,
+      "lat": 48.506274, "lon": 0.086389,
+      "label": "📉 Descente km 58 — -8.4% / max -12.6%"
+    },
+    {
+      "type": "zone",
+      "kmStart": 59.60, "kmEnd": 60.17,
+      "lat": 48.507932, "lon": 0.093258,
+      "label": "📉 Dernière descente — -8.2%"
+    },
+    {
+      "type": "ponctuel",
+      "km": 61.00, "lat": 48.505696, "lon": 0.097969,
+      "label": "🎉 Arrivée"
+    }
+
   ],
 
   "ravitos": [
-    { "name": "Parc Animalier d'Écouves",       "km": 13.79, "lat": 48.567667, "lon": 0.132856, "services": "Eau" },
-    { "name": "Carrefour du Rendez-vous",       "km": 20.17, "lat": 48.538931, "lon": 0.096126, "services": "Complet" },
-    { "name": "Parcours Santé Verdier",         "km": 33.50, "lat": 48.513741, "lon": 0.035302, "services": "Complet" },
-    { "name": "Mairie de St Nicolas des Bois",  "km": 40.20, "lat": 48.495608, "lon": 0.015887, "services": "Complet · Fan Zone" },
-    { "name": "Réservoir d'Eau",                "km": 47.95, "lat": 48.504103, "lon": 0.024595, "services": "Eau" },
-    { "name": "Camping de Radon",               "km": 56,    "lat": 48.495776, "lon": 0.068488, "services": "Eau" }
+    { "name": "Parc Animalier d'Écouves",      "km": 13.79, "lat": 48.567667, "lon": 0.132856, "services": "Eau" },
+    { "name": "Carrefour du Rendez-vous",      "km": 20.17, "lat": 48.538931, "lon": 0.096126, "services": "Complet" },
+    { "name": "Parcours Santé Verdier",        "km": 33.50, "lat": 48.513741, "lon": 0.035302, "services": "Complet" },
+    { "name": "Mairie de St Nicolas des Bois", "km": 40.20, "lat": 48.495608, "lon": 0.015887, "services": "Complet · Fan Zone" },
+    { "name": "Réservoir d'Eau",               "km": 47.95, "lat": 48.504103, "lon": 0.024595, "services": "Eau" },
+    { "name": "Camping de Radon",              "km": 56.00, "lat": 48.495776, "lon": 0.068488, "services": "Eau" }
   ]
 }
