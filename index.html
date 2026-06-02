@@ -993,11 +993,11 @@ function renderElev(){
     h+=`<g clip-path="url(#phclip${i})">`;
     h+=`<rect x="${x1.toFixed(2)}" y="0" width="${(x2-x1).toFixed(2)}" height="${H}" fill="${ph.color}28"/>`;
     h+=`<rect x="${x1.toFixed(1)}" y="${(H-14).toFixed(1)}" width="${(x2-x1).toFixed(1)}" height="14" fill="#06080f"/>`;
+    // Titre centré dans la zone, clippé (ne déborde jamais hors des bornes)
+    h+=`<text x="${mx.toFixed(1)}" y="${(H-3).toFixed(1)}" fill="${ph.color}" font-size="10" font-family="Barlow Condensed" font-weight="700" text-anchor="middle">${ph.title||ph.label}</text>`;
     // Hit area à l'intérieur du clip (reste dans les bornes de la zone)
     h+=`<rect x="${x1.toFixed(1)}" y="0" width="${(x2-x1).toFixed(1)}" height="${(H-16).toFixed(1)}" fill="transparent" data-tipph="${i}" style="pointer-events:all"/>`;
     h+=`</g>`;
-    // Titre hors du clip → titre complet, taille naturelle, jamais rogné
-    h+=`<text x="${mx.toFixed(1)}" y="${(H-3).toFixed(1)}" fill="${ph.color}" font-size="10" font-family="Barlow Condensed" font-weight="700" text-anchor="middle">${ph.title||ph.label}</text>`;
     // Séparateur visible entre phases (sauf après la dernière)
     if(i<C.race.phases.length-1){
       const sx=xOf(ph.kmEnd);
