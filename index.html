@@ -249,6 +249,18 @@ header{
 .cd-msg{font-size:14px;color:var(--mu);line-height:1.65;max-width:380px;margin:0 auto 24px}
 .cd-badge{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--gn);letter-spacing:.08em;text-transform:uppercase;background:rgba(0,212,160,.1);border:1px solid rgba(0,212,160,.28);border-radius:20px;padding:5px 14px}
 
+/* ── FINISH OVERLAY ──────────────────────────────────────── */
+.finish-ov{position:fixed;inset:0;z-index:5000;background:rgba(6,8,15,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;animation:fin-in .5s ease-out;cursor:pointer;text-align:center;padding:20px}
+.finish-ov.closing{animation:fin-out .8s ease-out forwards;pointer-events:none}
+@keyframes fin-in{from{opacity:0}to{opacity:1}}
+@keyframes fin-out{to{opacity:0;transform:scale(1.04)}}
+.fin-emoji{font-size:90px;animation:fin-pop .7s cubic-bezier(.3,1.4,.5,1) both}
+@keyframes fin-pop{from{transform:scale(0) rotate(-20deg)}to{transform:scale(1) rotate(0)}}
+.fin-title{font-size:56px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--tx);margin:12px 0 6px;animation:fin-slide .5s .2s ease-out both}
+.fin-sub{font-size:16px;color:var(--mu);animation:fin-slide .5s .35s ease-out both}
+.fin-hint{font-size:11px;color:var(--bd);letter-spacing:.08em;text-transform:uppercase;margin-top:28px;animation:fin-slide .5s .5s ease-out both}
+@keyframes fin-slide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
 /* ── ELEVATION STRIP ──────────────────────────────────────── */
 .elev-strip{flex-shrink:0;height:190px;background:var(--s1);border-top:1px solid var(--bd);position:relative}
 .elev-strip svg{width:100%;height:100%;display:block}
@@ -595,6 +607,7 @@ const S={
   lastPhaseLabel:null,
   triggeredWp:new Set(JSON.parse(localStorage.getItem("twp")||"[]")),
   kmTimeline:[],
+  _finishTriggered:false,
 };
 
 // ═══════════════════════════════════════════════════════════
@@ -1616,6 +1629,9 @@ function render(){
   const ll=[last.position.lat,last.position.lon];
   if(!pinMarker){pinMarker=L.marker(ll,{icon:makePinIcon()}).addTo(map);map.setView(ll,15);startAnim();}
 
+  // Détection arrivée (GPS proche du dernier waypoint ou km ≥ distKm - 0.4)
+  if(km>=C.race.distKm-0.4&&!S._finishTriggered) setTimeout(triggerFinishAnimation,600);
+
   // Charts
   renderPaceBars();
   renderElev();
@@ -1694,23 +1710,26 @@ const RACE_START=new Date('2026-06-06T10:00:00Z'); // 12h00 CEST
 
 function triggerStartAnimation(){
   if(window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
-  const pool=['🏁','🏁','🏁','🎉','🏃','🎊','🏁','⭐','🏁','🎉','🏁','💪'];
-  for(let i=0;i<28;i++){
+  const pool=['🏁','🏁','🏁','🎉','🏃','🎊','🏁','⭐','🏁','🎉','🏁','💪','🏅','🎆'];
+  // Rayon max = diagonale de l'écran pour atteindre les bords
+  const rMax=Math.sqrt(window.innerWidth**2+window.innerHeight**2)/2;
+  for(let i=0;i<44;i++){
     const el=document.createElement('div');
     el.textContent=pool[i%pool.length];
-    const sz=Math.round(18+Math.random()*32);
+    const sz=Math.round(22+Math.random()*36);
+    const delay=Math.random()*300;
     el.style.cssText=`position:fixed;z-index:9999;font-size:${sz}px;left:50%;top:50%;pointer-events:none;will-change:transform,opacity`;
     document.body.appendChild(el);
     const angle=Math.random()*Math.PI*2;
-    const dist=120+Math.random()*380;
-    const tx=Math.cos(angle)*dist, ty=Math.sin(angle)*dist-80;
-    const dur=1000+Math.random()*600;
+    const dist=rMax*(0.35+Math.random()*0.8); // 35% à 115% de la diagonale
+    const tx=Math.cos(angle)*dist, ty=Math.sin(angle)*dist;
+    const dur=2200+Math.random()*1200;
     el.animate([
       {transform:'translate(-50%,-50%) scale(0)',opacity:1},
-      {transform:`translate(calc(-50% + ${tx*.6}px),calc(-50% + ${ty*.6}px)) scale(1.3)`,opacity:1,offset:.35},
-      {transform:`translate(calc(-50% + ${tx}px),calc(-50% + ${ty+120}px)) scale(.3)`,opacity:0}
-    ],{duration:dur,easing:'cubic-bezier(.2,.8,.3,1)',fill:'forwards'});
-    setTimeout(()=>el.remove(),dur+100);
+      {transform:`translate(calc(-50% + ${tx*.45}px),calc(-50% + ${ty*.45}px)) scale(1.6)`,opacity:1,offset:.3},
+      {transform:`translate(calc(-50% + ${tx}px),calc(-50% + ${ty}px)) scale(.2)`,opacity:0}
+    ],{duration:dur,delay,easing:'cubic-bezier(.15,.85,.3,1)',fill:'forwards'});
+    setTimeout(()=>el.remove(),delay+dur+100);
   }
 }
 
@@ -1741,10 +1760,52 @@ function initCountdown(){
   setInterval(tick,1000);
 }
 
-// Test depuis la console : window.testDepart()
+// ═══════════════════════════════════════════════════════════
+//  FINISH ANIMATION
+// ═══════════════════════════════════════════════════════════
+function triggerFinishConfetti(){
+  if(window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  const pool=['🎉','🏅','🥇','🎊','⭐','💛','🎆','🏁','🎇','💥','✨','🥂'];
+  const W=window.innerWidth, H=window.innerHeight;
+  for(let i=0;i<70;i++){
+    const el=document.createElement('div');
+    el.textContent=pool[Math.floor(Math.random()*pool.length)];
+    const sz=16+Math.random()*26;
+    const x=Math.random()*W;
+    const delay=Math.random()*3500;
+    el.style.cssText=`position:fixed;z-index:5001;font-size:${sz}px;left:${x}px;top:-40px;pointer-events:none`;
+    document.body.appendChild(el);
+    const rot=(Math.random()-.5)*720;
+    const drift=(Math.random()-.5)*120;
+    el.animate([
+      {transform:`translateY(0) translateX(0) rotate(0deg)`,opacity:1},
+      {transform:`translateY(${H+60}px) translateX(${drift}px) rotate(${rot}deg)`,opacity:.6}
+    ],{duration:2800+Math.random()*2000,delay,easing:'linear',fill:'forwards'});
+    setTimeout(()=>el.remove(),delay+5000);
+  }
+}
+
+function triggerFinishAnimation(){
+  if(S._finishTriggered) return;
+  S._finishTriggered=true;
+  const ov=document.createElement('div');
+  ov.className='finish-ov';
+  ov.innerHTML=`
+    <div class="fin-emoji">🏅</div>
+    <div class="fin-title">ARRIVÉE !</div>
+    <div class="fin-sub">Antoine a terminé le Trail d'Écouves</div>
+    <div class="fin-hint">Toucher pour fermer</div>`;
+  document.body.appendChild(ov);
+  triggerFinishConfetti();
+  const close=()=>{ov.classList.add('closing');setTimeout(()=>ov.remove(),850);};
+  ov.addEventListener('click',close);
+  setTimeout(close,14000);
+}
+
+// Console : window.testDepart()  window.skipCountdown()  window.testArrivee()
 window.testDepart=function(){triggerStartAnimation();};
-// Fermer la modale manuellement si besoin (dev/test) : window.skipCountdown()
 window.skipCountdown=function(){closeCountdownModal();};
+window.testArrivee=function(){S._finishTriggered=false;triggerFinishAnimation();};
 
 // ═══════════════════════════════════════════════════════════
 //  INIT
