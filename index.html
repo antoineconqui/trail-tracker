@@ -231,6 +231,24 @@ header{
 .bsend:hover{background:#e5602a}
 .bcheer{background:rgba(255,107,43,.15);color:var(--ac);flex:0 0 auto;border:1px solid rgba(255,107,43,.3);padding:0 14px;height:44px}
 
+/* ── COUNTDOWN MODAL ─────────────────────────────────────── */
+.cdmodal{position:fixed;inset:0;background:rgba(6,8,15,.97);z-index:4000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);transition:opacity .7s,transform .7s}
+.cdmodal.closing{opacity:0;transform:scale(1.06);pointer-events:none}
+.cdmodal.hidden{display:none}
+.cdin{text-align:center;padding:44px 36px;max-width:540px;width:90%}
+.cd-flag{font-size:72px;display:block;margin-bottom:20px;animation:cd-float 3s ease-in-out infinite}
+@keyframes cd-float{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-10px) rotate(3deg)}}
+.cd-race{font-size:30px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--tx);margin-bottom:6px}
+.cd-ath{font-size:13px;color:var(--mu);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.cd-date{font-size:17px;font-weight:700;color:var(--ac);margin-bottom:32px;letter-spacing:.05em}
+.cdtimer{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:30px}
+.ct-blk{background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:16px 18px;min-width:74px}
+.ct-num{font-family:var(--fm);font-size:44px;font-weight:700;line-height:1;color:var(--tx);display:block}
+.ct-lbl{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mu);margin-top:5px;display:block}
+.ct-sep{font-family:var(--fm);font-size:38px;font-weight:300;color:var(--bd);margin-bottom:12px}
+.cd-msg{font-size:14px;color:var(--mu);line-height:1.65;max-width:380px;margin:0 auto 24px}
+.cd-badge{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--gn);letter-spacing:.08em;text-transform:uppercase;background:rgba(0,212,160,.1);border:1px solid rgba(0,212,160,.28);border-radius:20px;padding:5px 14px}
+
 /* ── ELEVATION STRIP ──────────────────────────────────────── */
 .elev-strip{flex-shrink:0;height:190px;background:var(--s1);border-top:1px solid var(--bd);position:relative}
 .elev-strip svg{width:100%;height:100%;display:block}
@@ -461,6 +479,27 @@ header{
 </div>
 <div class="sbar"><span id="sL">En attente…</span><span style="color:var(--mu);font-size:10px">🔴 position actuelle</span><span id="sR"></span></div>
 
+</div>
+
+<!-- Countdown pre-race -->
+<div id="cdModal" class="cdmodal">
+  <div class="cdin">
+    <span class="cd-flag">🏁</span>
+    <div class="cd-race">Trail d'Écouves 2026</div>
+    <div class="cd-ath">Antoine Conqui · 61 km · D+1950 m</div>
+    <div class="cd-date">Samedi 6 juin · Départ 12h00</div>
+    <div class="cdtimer">
+      <div class="ct-blk"><span class="ct-num" id="cdD">--</span><span class="ct-lbl">jours</span></div>
+      <div class="ct-sep">:</div>
+      <div class="ct-blk"><span class="ct-num" id="cdH">--</span><span class="ct-lbl">heures</span></div>
+      <div class="ct-sep">:</div>
+      <div class="ct-blk"><span class="ct-num" id="cdMn">--</span><span class="ct-lbl">min</span></div>
+      <div class="ct-sep">:</div>
+      <div class="ct-blk"><span class="ct-num" id="cdSc">--</span><span class="ct-lbl">sec</span></div>
+    </div>
+    <p class="cd-msg">Tu es au bon endroit 👋<br>Reviens le <strong>6 juin à 12h00</strong> pour suivre Antoine en direct sur ce tracker GPS.</p>
+    <div class="cd-badge"><span class="viewer-dot"></span>Live tracker actif dès le départ</div>
+  </div>
 </div>
 
 <!-- modals -->
@@ -1649,9 +1688,69 @@ async function poll(){
 }
 
 // ═══════════════════════════════════════════════════════════
+//  COUNTDOWN MODAL
+// ═══════════════════════════════════════════════════════════
+const RACE_START=new Date('2026-06-06T10:00:00Z'); // 12h00 CEST
+
+function triggerStartAnimation(){
+  if(window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  const pool=['🏁','🏁','🏁','🎉','🏃','🎊','🏁','⭐','🏁','🎉','🏁','💪'];
+  for(let i=0;i<28;i++){
+    const el=document.createElement('div');
+    el.textContent=pool[i%pool.length];
+    const sz=Math.round(18+Math.random()*32);
+    el.style.cssText=`position:fixed;z-index:9999;font-size:${sz}px;left:50%;top:50%;pointer-events:none;will-change:transform,opacity`;
+    document.body.appendChild(el);
+    const angle=Math.random()*Math.PI*2;
+    const dist=120+Math.random()*380;
+    const tx=Math.cos(angle)*dist, ty=Math.sin(angle)*dist-80;
+    const dur=1000+Math.random()*600;
+    el.animate([
+      {transform:'translate(-50%,-50%) scale(0)',opacity:1},
+      {transform:`translate(calc(-50% + ${tx*.6}px),calc(-50% + ${ty*.6}px)) scale(1.3)`,opacity:1,offset:.35},
+      {transform:`translate(calc(-50% + ${tx}px),calc(-50% + ${ty+120}px)) scale(.3)`,opacity:0}
+    ],{duration:dur,easing:'cubic-bezier(.2,.8,.3,1)',fill:'forwards'});
+    setTimeout(()=>el.remove(),dur+100);
+  }
+}
+
+function closeCountdownModal(){
+  const m=document.getElementById('cdModal');
+  if(!m||m.classList.contains('hidden')) return;
+  m.classList.add('closing');
+  setTimeout(()=>{m.classList.add('hidden');triggerStartAnimation();},700);
+}
+
+function initCountdown(){
+  const m=document.getElementById('cdModal');
+  if(!m) return;
+  if(new Date()>=RACE_START){m.classList.add('hidden');return;}
+  const tick=()=>{
+    const rem=RACE_START-new Date();
+    if(rem<=0){closeCountdownModal();return;}
+    const d=Math.floor(rem/86400000);
+    const h=Math.floor((rem%86400000)/3600000);
+    const mn=Math.floor((rem%3600000)/60000);
+    const s=Math.floor((rem%60000)/1000);
+    document.getElementById('cdD').textContent=String(d).padStart(2,'0');
+    document.getElementById('cdH').textContent=String(h).padStart(2,'0');
+    document.getElementById('cdMn').textContent=String(mn).padStart(2,'0');
+    document.getElementById('cdSc').textContent=String(s).padStart(2,'0');
+  };
+  tick();
+  setInterval(tick,1000);
+}
+
+// Test depuis la console : window.testDepart()
+window.testDepart=function(){triggerStartAnimation();};
+// Fermer la modale manuellement si besoin (dev/test) : window.skipCountdown()
+window.skipCountdown=function(){closeCountdownModal();};
+
+// ═══════════════════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════════════════
 async function init(){
+  initCountdown();
   buildStrip(); initChat(); initGpxDrop(); initMobileChat();
   await loadConfig();
   if(C.gpxUrl) fetch(C.gpxUrl)
