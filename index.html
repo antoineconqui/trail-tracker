@@ -477,7 +477,6 @@ header{
         <button class="breact" data-emoji="🎉">🎉</button>
       </div>
       <div class="chat-sec-lbl">Envoyer un message</div>
-      <input id="cName" placeholder="Ton prénom" maxlength="30">
       <input id="cMsg"  placeholder="Encourage Antoine ! 💪" maxlength="280">
       <div class="cbtns">
         <button class="btn bcheer" id="bCheer">🔥 Allez !</button>
@@ -859,12 +858,27 @@ function gpxDmKm(km0,km1){
   return Math.round(dm);
 }
 
+function zoneTip(kmStart,kmEnd,label){
+  const rows=[
+    {l:"Distance",v:`${(kmEnd-kmStart).toFixed(1)} km`},
+    {l:"Section",v:`km ${kmStart}–${kmEnd}`}
+  ];
+  if(GPX.loaded){
+    const dp=gpxDpKm(kmStart,kmEnd), dm=gpxDmKm(kmStart,kmEnd);
+    if(dp!==null&&dp>0) rows.push({l:"D+",v:`+${dp} m`});
+    if(dm!==null&&dm>10) rows.push({l:"D−",v:`−${dm} m`});
+  }
+  const rowsHtml=rows.map(r=>`<div class="tip-row"><span>${r.l}</span><span>${r.v}</span></div>`).join("");
+  return `<b>${label}</b>${rowsHtml}`;
+}
+
 function phaseTip(ph,phIdx){
   const curKm=S.projKm||S.distKm;
   const isDone=curKm>ph.kmEnd;
   const isCurrent=curKm>=ph.kmStart&&curKm<ph.kmEnd;
   const rows=[];
-  rows.push({l:"Km",v:`${ph.kmStart}–${ph.kmEnd}`});
+  rows.push({l:"Distance",v:`${(ph.kmEnd-ph.kmStart).toFixed(1)} km`});
+  rows.push({l:"Section",v:`km ${ph.kmStart}–${ph.kmEnd}`});
   const dp=gpxDpKm(ph.kmStart,ph.kmEnd);
   const dm=gpxDmKm(ph.kmStart,ph.kmEnd);
   if(dp!==null&&dp>0) rows.push({l:"D+",v:`+${dp} m`});
@@ -895,11 +909,12 @@ function attachElevTooltips(){
   svg.querySelectorAll("[data-tipkm],[data-tipph]").forEach(el=>{
     el.style.cursor="pointer";
     el.addEventListener("mouseenter",()=>{
-      if(el.dataset.tipph!==undefined){
+      if(el.dataset.tipzone!==undefined){
+        tip.innerHTML=zoneTip(parseFloat(el.dataset.tipkm),parseFloat(el.dataset.tipzone),el.dataset.tiplbl||"");
+      } else if(el.dataset.tipph!==undefined){
         tip.innerHTML=phaseTip(C.race.phases[+el.dataset.tipph],+el.dataset.tipph);
       } else {
-        const km=parseFloat(el.dataset.tipkm);
-        tip.innerHTML=checkpointTip(km,el.dataset.tiplbl||"",el.dataset.tipextra||"");
+        tip.innerHTML=checkpointTip(parseFloat(el.dataset.tipkm),el.dataset.tiplbl||"",el.dataset.tipextra||"");
       }
       tip.style.display="block";
     });
@@ -915,7 +930,9 @@ function attachElevTooltips(){
     el.addEventListener("mouseleave",()=>tip.style.display="none");
     // Touch
     el.addEventListener("click",(e)=>{
-      if(el.dataset.tipph!==undefined){
+      if(el.dataset.tipzone!==undefined){
+        tip.innerHTML=zoneTip(parseFloat(el.dataset.tipkm),parseFloat(el.dataset.tipzone),el.dataset.tiplbl||"");
+      } else if(el.dataset.tipph!==undefined){
         tip.innerHTML=phaseTip(C.race.phases[+el.dataset.tipph],+el.dataset.tipph);
       } else {
         tip.innerHTML=checkpointTip(parseFloat(el.dataset.tipkm),el.dataset.tiplbl||"",el.dataset.tipextra||"");
@@ -975,7 +992,7 @@ function renderElev(){
     // Zone rect + label en bas centré (group clippé pour éviter débordement latéral)
     h+=`<g clip-path="url(#phclip${i})">`;
     h+=`<rect x="${x1.toFixed(2)}" y="0" width="${(x2-x1).toFixed(2)}" height="${H}" fill="${ph.color}28"/>`;
-    h+=`<rect x="${x1.toFixed(1)}" y="${(H-14).toFixed(1)}" width="${(x2-x1).toFixed(1)}" height="14" fill="rgba(6,8,15,.7)"/>`;
+    h+=`<rect x="${x1.toFixed(1)}" y="${(H-14).toFixed(1)}" width="${(x2-x1).toFixed(1)}" height="14" fill="#06080f"/>`;
     // Hit area à l'intérieur du clip (reste dans les bornes de la zone)
     h+=`<rect x="${x1.toFixed(1)}" y="0" width="${(x2-x1).toFixed(1)}" height="${(H-16).toFixed(1)}" fill="transparent" data-tipph="${i}" style="pointer-events:all"/>`;
     h+=`</g>`;
@@ -1023,12 +1040,9 @@ function renderElev(){
     const x1=parseFloat(xOf(w.km)),x2=parseFloat(xOf(Math.min(w.kmEnd,td)));
     // Bande semi-transparente clippée sous la courbe
     h+=`<rect x="${x1.toFixed(1)}" y="0" width="${(x2-x1).toFixed(1)}" height="${H}" fill="rgba(255,255,255,.07)" clip-path="url(#belowCurve)" style="pointer-events:none"/>`;
-    // Pointillés seulement sous la courbe (départ = altitude réelle des bornes)
-    const ptS=GPX.pts.find(p=>p.cumDist>=w.km)||GPX.pts.at(-1);
-    const ptE=GPX.pts.find(p=>p.cumDist>=w.kmEnd)||GPX.pts.at(-1);
-    const yS=parseFloat(yOf(ptS.ele)),yE=parseFloat(yOf(ptE.ele));
-    h+=`<line x1="${x1.toFixed(1)}" y1="${yS.toFixed(1)}" x2="${x1.toFixed(1)}" y2="${(H-14).toFixed(1)}" stroke="rgba(255,255,255,.3)" stroke-width="1" stroke-dasharray="3,2" vector-effect="non-scaling-stroke" style="pointer-events:none"/>`;
-    h+=`<line x1="${x2.toFixed(1)}" y1="${yE.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${(H-14).toFixed(1)}" stroke="rgba(255,255,255,.3)" stroke-width="1" stroke-dasharray="3,2" vector-effect="non-scaling-stroke" style="pointer-events:none"/>`;
+    // Pointillés clippés sous la courbe via belowCurve (jamais au-dessus)
+    h+=`<line x1="${x1.toFixed(1)}" y1="0" x2="${x1.toFixed(1)}" y2="${(H-14).toFixed(1)}" stroke="rgba(255,255,255,.3)" stroke-width="1" stroke-dasharray="3,2" vector-effect="non-scaling-stroke" clip-path="url(#belowCurve)" style="pointer-events:none"/>`;
+    h+=`<line x1="${x2.toFixed(1)}" y1="0" x2="${x2.toFixed(1)}" y2="${(H-14).toFixed(1)}" stroke="rgba(255,255,255,.3)" stroke-width="1" stroke-dasharray="3,2" vector-effect="non-scaling-stroke" clip-path="url(#belowCurve)" style="pointer-events:none"/>`;
   }
 
   // ── Ravito markers (au premier plan, après les zones) ──
@@ -1059,9 +1073,9 @@ function renderElev(){
     const ey=Math.min(H-5, mcy+(H-mcy)*0.55);
     const emoji=labelEmoji(w.label);
     h+=`<text x="${mid.toFixed(1)}" y="${ey.toFixed(1)}" fill="white" font-size="11" text-anchor="middle" opacity=".8" style="pointer-events:none">${emoji}</text>`;
-    // Petite hit area centrée sur l'emoji (ne couvre pas les ravitos)
+    // Hit area centrée sur l'emoji — data-tipzone pour le tooltip de zone
     h+=`<circle cx="${mid.toFixed(1)}" cy="${ey.toFixed(1)}" r="12" fill="transparent"
-      data-tipkm="${w.km}" data-tiplbl="${w.label}"/>`;
+      data-tipkm="${w.km}" data-tipzone="${w.kmEnd}" data-tiplbl="${w.label.split(' ').slice(1).join(' ')||w.label}"/>`;
   }
 
   // ── Waypoints ponctuels ──
@@ -1252,6 +1266,27 @@ function showToast(lbl){
 }
 
 // ═══════════════════════════════════════════════════════════
+//  REACT FLOAT — emoji traversant l'écran 10s
+// ═══════════════════════════════════════════════════════════
+function triggerReactFloat(emoji){
+  if(window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  const el=document.createElement('div');
+  el.textContent=emoji;
+  const sz=36+Math.random()*28;
+  const startY=window.innerHeight*(0.08+Math.random()*0.75);
+  el.style.cssText=`position:fixed;z-index:890;font-size:${sz}px;left:-70px;top:${startY}px;pointer-events:none;opacity:.95`;
+  document.body.appendChild(el);
+  const drift=(Math.random()-.5)*100;
+  const dur=7500+Math.random()*2500; // 7.5–10s
+  el.animate([
+    {transform:'translateX(0) translateY(0) rotate(-8deg)',opacity:.95},
+    {transform:`translateX(${window.innerWidth*.42}px) translateY(${drift*.4}px) rotate(5deg)`,opacity:1,offset:.35},
+    {transform:`translateX(${window.innerWidth+80}px) translateY(${drift}px) rotate(12deg)`,opacity:0}
+  ],{duration:dur,easing:'ease-in-out',fill:'forwards'});
+  setTimeout(()=>el.remove(),dur+100);
+}
+
+// ═══════════════════════════════════════════════════════════
 //  CHAT
 // ═══════════════════════════════════════════════════════════
 function msgRaceContext(ts){
@@ -1280,7 +1315,11 @@ async function fetchChat(){
   try{
     const r=await fetch(`${C.proxy}/chat?sid=${C.sessionId}${since}`);
     const{messages}=await r.json();
-    if(messages?.length){S.chatMsgs.push(...messages);S.chatLastTs=messages.at(-1).ts;renderChat();}
+    if(messages?.length){
+      // Déclencher le float seulement pour les nouveaux cheers (pas au premier chargement)
+      if(since) messages.filter(m=>m.type==='cheer').forEach(m=>triggerReactFloat(m.msg));
+      S.chatMsgs.push(...messages);S.chatLastTs=messages.at(-1).ts;renderChat();
+    }
   }catch(e){}
 }
 async function sendChat(name,msg,type="msg"){
@@ -1314,13 +1353,22 @@ function renderChat(){
   el.scrollTop=el.scrollHeight;
   document.getElementById("viewerCnt").textContent=list.length+" msg";
 }
+// ── Cookie helpers pour le pseudo ──────────────────────────
+function getCookieName(){
+  const m=document.cookie.match(/(?:^|;)\s*chatName=([^;]+)/);
+  const v=m?decodeURIComponent(m[1]):null;
+  return v||localStorage.getItem("chatName")||null; // fallback localStorage
+}
+function setCookieName(name){
+  document.cookie=`chatName=${encodeURIComponent(name)};max-age=${365*86400};path=/;SameSite=Lax`;
+  localStorage.setItem("chatName",name);
+}
+
 function initChat(){
-  const nm=document.getElementById("cName");
-  const sn=localStorage.getItem("chatName"); if(sn) nm.value=sn;
   const getName=()=>{
-    const n=nm.value.trim();
-    if(!n){if(!localStorage.getItem("chatName"))showNameModal();return null;}
-    localStorage.setItem("chatName",n);return n;
+    const n=getCookieName();
+    if(!n){showNameModal();return null;}
+    return n;
   };
   document.getElementById("bSend").onclick=async()=>{
     const n=getName(),m=document.getElementById("cMsg").value.trim();
@@ -1330,27 +1378,27 @@ function initChat(){
     await fetchChat();
   };
   document.getElementById("bCheer").onclick=async()=>{
-    const n=getName()||"Anonyme";
+    const n=getName(); if(!n)return;
     await sendChat(n,"🔥🔥🔥","cheer");
     await fetchChat();
   };
   document.querySelectorAll(".breact").forEach(btn=>{
     btn.addEventListener("click",async()=>{
-      const n=getName()||"Anonyme";
+      const n=getName(); if(!n)return;
       await sendChat(n,btn.dataset.emoji,"cheer");
       await fetchChat();
     });
   });
   document.getElementById("cMsg").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();document.getElementById("bSend").click();}});
-  document.getElementById("cName").onchange=()=>{const v=nm.value.trim();if(v)localStorage.setItem("chatName",v);};
 }
 function showNameModal(){
   const ov=document.getElementById("nmOv"); ov.style.display="flex";
-  document.getElementById("nmOk").onclick=()=>{
+  const doSave=()=>{
     const v=document.getElementById("nmIn").value.trim(); if(!v)return;
-    localStorage.setItem("chatName",v);document.getElementById("cName").value=v;ov.style.display="none";
+    setCookieName(v); ov.style.display="none";
   };
-  document.getElementById("nmIn").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("nmOk").click();});
+  document.getElementById("nmOk").onclick=doSave;
+  document.getElementById("nmIn").addEventListener("keydown",e=>{if(e.key==="Enter")doSave();},{once:true});
 }
 
 function initMobileChat(){
@@ -1859,6 +1907,8 @@ window.testArrivee=function(){S._finishTriggered=false;triggerFinishAnimation();
 async function init(){
   initCountdown();
   buildStrip(); initChat(); initGpxDrop(); initMobileChat();
+  // Afficher la modale de pseudo si première visite
+  if(!getCookieName()) showNameModal();
   await loadConfig();
   if(C.gpxUrl) fetch(C.gpxUrl)
     .then(r=>{if(!r.ok) throw new Error(`GPX HTTP ${r.status}`); return r.text();})
@@ -1869,7 +1919,7 @@ async function init(){
   pingViewer(); setInterval(pingViewer,30000);
 }
 init();
-skipCountdown();
+//skipCountdown();
 </script>
 </body>
 </html>
