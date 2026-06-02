@@ -83,20 +83,10 @@
       "label": "⛰️ 4ème côte — 9% max"
     },
     {
-      "type": "ponctuel",
-      "km": 9.00, "lat": 48.547748, "lon": 0.123301,
-      "label": "⬇️ Creux intermédiaire — +68m"
-    },
-    {
       "type": "zone",
       "kmStart": 9.07, "kmEnd": 9.78,
       "lat": 48.547748, "lon": 0.123301,
       "label": "⛰️ Montée technique km 9"
-    },
-    {
-      "type": "ponctuel",
-      "km": 13.38, "lat": 48.567544, "lon": 0.136682,
-      "label": "⬇️ Fond de vallée — ravito 400m"
     },
     {
       "type": "zone",
@@ -108,11 +98,6 @@
       "type": "ponctuel",
       "km": 18.85, "lat": 48.547939, "lon": 0.096355,
       "label": "🏔️ Sommet 1ère montagne — +178m"
-    },
-    {
-      "type": "ponctuel",
-      "km": 23.75, "lat": 48.538832, "lon": 0.068529,
-      "label": "⬇️ Creux km 24 — plongeon dans 1km"
     },
     {
       "type": "zone",
@@ -127,20 +112,10 @@
       "label": "📉 Plongeon -9.4% — 750m / max -13%"
     },
     {
-      "type": "ponctuel",
-      "km": 25.95, "lat": 48.526921, "lon": 0.056410,
-      "label": "⬇️ Fond du plongeon — +71m"
-    },
-    {
       "type": "zone",
       "kmStart": 27.50, "kmEnd": 28.27,
       "lat": 48.527316, "lon": 0.047894,
       "label": "⛰️ Contre-pente km 27"
-    },
-    {
-      "type": "ponctuel",
-      "km": 30.75, "lat": 48.513196, "lon": 0.055147,
-      "label": "⬇️ Creux km 30 — ascension principale immédiate"
     },
     {
       "type": "zone",
@@ -158,11 +133,6 @@
       "kmStart": 36.35, "kmEnd": 37.50,
       "lat": 48.513567, "lon": 0.017543,
       "label": "📉 Descente post-sommet — 1.15km / max -15%"
-    },
-    {
-      "type": "ponctuel",
-      "km": 37.58, "lat": 48.506352, "lon": 0.022349,
-      "label": "⬇️ Creux post-sommet — +113m"
     },
     {
       "type": "zone",
@@ -185,11 +155,6 @@
       "type": "ponctuel",
       "km": 48.45, "lat": 48.506032, "lon": 0.028206,
       "label": "🏔️ Sommet km 48 — +114m"
-    },
-    {
-      "type": "ponctuel",
-      "km": 49.02, "lat": 48.502394, "lon": 0.027294,
-      "label": "⬇️ Creux km 49"
     },
     {
       "type": "zone",
@@ -219,11 +184,6 @@
       "kmStart": 55.00, "kmEnd": 56.10,
       "lat": 48.503125, "lon": 0.072701,
       "label": "📉 Descente avant dernier ravito — -8.9% / max -13%"
-    },
-    {
-      "type": "ponctuel",
-      "km": 56.17, "lat": 48.496039, "lon": 0.070640,
-      "label": "⬇️ Dernier creux — +19m"
     },
     {
       "type": "zone",
