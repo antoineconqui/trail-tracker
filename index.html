@@ -86,6 +86,8 @@ header{
 .ev-row:first-child .ev-dur{font-size:22px}
 .ev-eta{font-size:11px;color:var(--mu-strong);margin-top:2px}
 .leaflet-control-attribution{font-size:8px!important;opacity:.4}
+.leaflet-tooltip{background:var(--s1)!important;color:var(--tx)!important;border:1px solid var(--bd)!important;border-radius:8px!important;font-family:var(--fn)!important;font-size:13px!important;padding:6px 11px!important;box-shadow:0 4px 14px rgba(0,0,0,.5)!important}
+.leaflet-tooltip::before{display:none!important}
 .leaflet-popup-content-wrapper{background:var(--s1);color:var(--tx);border:1px solid var(--bd);border-radius:8px;font-family:var(--fn)}
 .leaflet-popup-tip{background:var(--s1)}
 .live-pin{position:relative;width:28px;height:28px}
@@ -666,7 +668,7 @@ function addRavitoMarkers(){
     const ic=L.divIcon({className:"",iconSize:[26,26],iconAnchor:[13,26],
       html:`<div style="width:26px;height:26px;border-radius:6px;background:${color};border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.5)">${icon}</div>`});
     L.marker([r.lat,r.lon],{icon:ic}).addTo(map)
-      .bindPopup(`<b>${r.name}</b><br>km ${r.km}${r.services?`<br><small>${r.services}</small>`:""}`);
+      .bindTooltip(`<b>${r.name}</b><br>km ${r.km}${r.services?` · ${r.services}`:""}`,{direction:'top',offset:[0,-10]});
   }
 }
 
@@ -705,7 +707,7 @@ function addWaypointMarkers(){
     const ic=L.divIcon({className:"",iconSize:sz,iconAnchor:anchor,
       html:`<div style="${style}">${emoji}</div>`});
     const marker=L.marker([lat,lon],{icon:ic,zIndexOffset:-10}).addTo(map)
-      .bindPopup(`<b>${name}</b><br><small>${kmLbl}</small>`);
+      .bindTooltip(`<b>${name}</b><br>${kmLbl}`,{direction:'top',offset:[0,-10]});
     // Highlight de zone sur la carte au survol
     if(w.isZone){
       marker.on('mouseover',()=>{
@@ -786,18 +788,60 @@ function checkpointTip(km,label,extra){
   return `<b>${label}</b>${extraHtml}${rowsHtml}`;
 }
 
+function gpxDmKm(km0,km1){
+  if(!GPX.loaded) return null;
+  const p0=GPX.pts.find(p=>p.cumDist>=km0),p1=GPX.pts.find(p=>p.cumDist>=km1);
+  if(!p0||!p1) return null;
+  let dm=0;
+  for(let i=GPX.pts.indexOf(p0)+1;i<=GPX.pts.indexOf(p1);i++){
+    const dz=GPX.pts[i].ele-GPX.pts[i-1].ele;
+    if(dz<-0.5) dm+=Math.abs(dz);
+  }
+  return Math.round(dm);
+}
+
+function phaseTip(ph,phIdx){
+  const curKm=S.projKm||S.distKm;
+  const isDone=curKm>ph.kmEnd;
+  const isCurrent=curKm>=ph.kmStart&&curKm<ph.kmEnd;
+  const rows=[];
+  rows.push({l:"Km",v:`${ph.kmStart}–${ph.kmEnd}`});
+  const dp=gpxDpKm(ph.kmStart,ph.kmEnd);
+  const dm=gpxDmKm(ph.kmStart,ph.kmEnd);
+  if(dp!==null&&dp>0) rows.push({l:"D+",v:`+${dp} m`});
+  if(dm!==null&&dm>10) rows.push({l:"D-",v:`−${dm} m`});
+  if(isCurrent){
+    const pct=Math.round((curKm-ph.kmStart)/(ph.kmEnd-ph.kmStart)*100);
+    rows.push({l:"Progression",v:`${pct}%`});
+  }
+  if(isDone){
+    const phKms=S.kmHist.filter(k=>k.phase===ph);
+    if(phKms.length){
+      const totalSec=phKms.reduce((a,k)=>a+k.pace,0);
+      const h=Math.floor(totalSec/3600),m=Math.floor((totalSec%3600)/60);
+      rows.push({l:"Durée",v:h>0?`${h}h${String(m).padStart(2,"0")}`:`${m} min`});
+      rows.push({l:"Allure moy.",v:fmtPace(totalSec/(ph.kmEnd-ph.kmStart))});
+    }
+  }
+  const prefix=isDone?"✓ ":isCurrent?"▶ ":"";
+  const rowsHtml=rows.map(r=>`<div class="tip-row"><span>${r.l}</span><span>${r.v}</span></div>`).join("");
+  return `<b>${prefix}${ph.title||ph.label}</b>${rowsHtml}`;
+}
+
 function attachElevTooltips(){
   const svg=document.getElementById("elevSvg");
   const tip=document.getElementById("elevTip");
   const strip=document.getElementById("elevS");
 
-  svg.querySelectorAll("[data-tipkm]").forEach(el=>{
+  svg.querySelectorAll("[data-tipkm],[data-tipph]").forEach(el=>{
     el.style.cursor="pointer";
     el.addEventListener("mouseenter",()=>{
-      const km=parseFloat(el.dataset.tipkm);
-      const lbl=el.dataset.tiplbl||"";
-      const extra=el.dataset.tipextra||"";
-      tip.innerHTML=checkpointTip(km,lbl,extra);
+      if(el.dataset.tipph!==undefined){
+        tip.innerHTML=phaseTip(C.race.phases[+el.dataset.tipph],+el.dataset.tipph);
+      } else {
+        const km=parseFloat(el.dataset.tipkm);
+        tip.innerHTML=checkpointTip(km,el.dataset.tiplbl||"",el.dataset.tipextra||"");
+      }
       tip.style.display="block";
     });
     el.addEventListener("mousemove",(e)=>{
@@ -812,10 +856,11 @@ function attachElevTooltips(){
     el.addEventListener("mouseleave",()=>tip.style.display="none");
     // Touch
     el.addEventListener("click",(e)=>{
-      const km=parseFloat(el.dataset.tipkm);
-      const lbl=el.dataset.tiplbl||"";
-      const extra=el.dataset.tipextra||"";
-      tip.innerHTML=checkpointTip(km,lbl,extra);
+      if(el.dataset.tipph!==undefined){
+        tip.innerHTML=phaseTip(C.race.phases[+el.dataset.tipph],+el.dataset.tipph);
+      } else {
+        tip.innerHTML=checkpointTip(parseFloat(el.dataset.tipkm),el.dataset.tiplbl||"",el.dataset.tipextra||"");
+      }
       tip.style.display=tip.style.display==="block"?"none":"block";
       const rect=strip.getBoundingClientRect();
       tip.style.left=Math.min(e.clientX-rect.left,rect.width-220)+"px";
@@ -873,7 +918,11 @@ function renderElev(){
     h+=`<rect x="${x1.toFixed(2)}" y="0" width="${(x2-x1).toFixed(2)}" height="${H}" fill="${ph.color}28"/>`;
     const phShort=(ph.title||ph.label).split(' ').slice(0,3).join(' ');
     h+=`<rect x="${x1.toFixed(1)}" y="${(H-14).toFixed(1)}" width="${(x2-x1).toFixed(1)}" height="14" fill="rgba(6,8,15,.7)"/>`;
-    h+=`<text x="${mx.toFixed(1)}" y="${(H-3).toFixed(1)}" fill="${ph.color}" font-size="10" font-family="Barlow Condensed" font-weight="700" text-anchor="middle">${phShort}</text>`;
+    // textLength force le texte à tenir dans la zone (Barlow Condensed compressé si trop long)
+    const phTxtW=Math.max(14,(x2-x1-4)).toFixed(1);
+    h+=`<text x="${mx.toFixed(1)}" y="${(H-3).toFixed(1)}" fill="${ph.color}" font-size="10" font-family="Barlow Condensed" font-weight="700" text-anchor="middle" textLength="${phTxtW}" lengthAdjust="spacingAndGlyphs">${phShort}</text>`;
+    // Hit area pour le tooltip de phase (zone supérieure, hors barre labels)
+    h+=`<rect x="${x1.toFixed(1)}" y="0" width="${(x2-x1).toFixed(1)}" height="${(H-16).toFixed(1)}" fill="transparent" data-tipph="${i}" style="pointer-events:all"/>`;
     h+=`</g>`;
     // Séparateur visible entre phases (sauf après la dernière)
     if(i<C.race.phases.length-1){
@@ -892,18 +941,18 @@ function renderElev(){
     const remSp=sp.slice(splitI);
     if(doneSp.length>1){
       const pd=doneSp.map((p,i)=>`${i===0?"M":"L"}${xOf(p.cumDist)},${yOf(p.ele)}`).join(" ");
-      h+=`<path d="${pd} L${xOf(doneSp.at(-1).cumDist)},${H} L0,${H} Z" fill="url(#eg)"/>`;
-      h+=`<path d="${pd}" fill="none" stroke="#ff6b2b" stroke-width="2" vector-effect="non-scaling-stroke"/>`;
+      h+=`<path d="${pd} L${xOf(doneSp.at(-1).cumDist)},${H} L0,${H} Z" fill="url(#eg)" style="pointer-events:none"/>`;
+      h+=`<path d="${pd}" fill="none" stroke="#ff6b2b" stroke-width="2" vector-effect="non-scaling-stroke" style="pointer-events:none"/>`;
     }
     if(remSp.length>1){
       const pd=remSp.map((p,i)=>`${i===0?"M":"L"}${xOf(p.cumDist)},${yOf(p.ele)}`).join(" ");
-      h+=`<path d="${pd} L${xOf(remSp.at(-1).cumDist)},${H} L${xOf(remSp[0].cumDist)},${H} Z" fill="url(#eg)" opacity=".15"/>`;
-      h+=`<path d="${pd}" fill="none" stroke="#4fa3ff" stroke-width="1.5" opacity=".3" vector-effect="non-scaling-stroke"/>`;
+      h+=`<path d="${pd} L${xOf(remSp.at(-1).cumDist)},${H} L${xOf(remSp[0].cumDist)},${H} Z" fill="url(#eg)" opacity=".15" style="pointer-events:none"/>`;
+      h+=`<path d="${pd}" fill="none" stroke="#4fa3ff" stroke-width="1.5" opacity=".3" vector-effect="non-scaling-stroke" style="pointer-events:none"/>`;
     }
   } else {
     const pd=sp.map((p,i)=>`${i===0?"M":"L"}${xOf(p.cumDist)},${yOf(p.ele)}`).join(" ");
-    h+=`<path d="${pd} L${xOf(sp.at(-1).cumDist)},${H} L0,${H} Z" fill="url(#eg)"/>`;
-    h+=`<path d="${pd}" fill="none" stroke="#ff6b2b" stroke-width="1.5" vector-effect="non-scaling-stroke"/>`;
+    h+=`<path d="${pd} L${xOf(sp.at(-1).cumDist)},${H} L0,${H} Z" fill="url(#eg)" style="pointer-events:none"/>`;
+    h+=`<path d="${pd}" fill="none" stroke="#ff6b2b" stroke-width="1.5" vector-effect="non-scaling-stroke" style="pointer-events:none"/>`;
   }
 
   // km labels
@@ -921,8 +970,8 @@ function renderElev(){
     const ptS=GPX.pts.find(p=>p.cumDist>=w.km)||GPX.pts.at(-1);
     const ptE=GPX.pts.find(p=>p.cumDist>=w.kmEnd)||GPX.pts.at(-1);
     const yS=parseFloat(yOf(ptS.ele)),yE=parseFloat(yOf(ptE.ele));
-    h+=`<line x1="${x1.toFixed(1)}" y1="${yS.toFixed(1)}" x2="${x1.toFixed(1)}" y2="${H}" stroke="rgba(255,255,255,.3)" stroke-width="1" stroke-dasharray="3,2" vector-effect="non-scaling-stroke" style="pointer-events:none"/>`;
-    h+=`<line x1="${x2.toFixed(1)}" y1="${yE.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${H}" stroke="rgba(255,255,255,.3)" stroke-width="1" stroke-dasharray="3,2" vector-effect="non-scaling-stroke" style="pointer-events:none"/>`;
+    h+=`<line x1="${x1.toFixed(1)}" y1="${yS.toFixed(1)}" x2="${x1.toFixed(1)}" y2="${(H-14).toFixed(1)}" stroke="rgba(255,255,255,.3)" stroke-width="1" stroke-dasharray="3,2" vector-effect="non-scaling-stroke" style="pointer-events:none"/>`;
+    h+=`<line x1="${x2.toFixed(1)}" y1="${yE.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${(H-14).toFixed(1)}" stroke="rgba(255,255,255,.3)" stroke-width="1" stroke-dasharray="3,2" vector-effect="non-scaling-stroke" style="pointer-events:none"/>`;
   }
 
   // ── Ravito markers (au premier plan, après les zones) ──
