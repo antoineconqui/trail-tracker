@@ -618,9 +618,9 @@ function nextRav(km){
 
 function ravitoIcon(services=""){
   const s=services.toLowerCase();
-  if(s.includes("famille"))  return{icon:"❤️",color:"#ff3d5a"};
-  if(s.includes("solide"))   return{icon:"🍽️",color:"#ffc532"};
-  return                            {icon:"💧",color:"#4fa3ff"};
+  if(s.includes("fan zone")||s.includes("famille")) return{icon:"❤️",color:"#ff3d5a"};
+  if(s.includes("complet")||s.includes("solide"))   return{icon:"🍽️",color:"#ffc532"};
+  return                                                   {icon:"💧",color:"#4fa3ff"};
 }
 function labelEmoji(label){
   // Prend le premier token avant l'espace (emoji en tête de label)
@@ -896,7 +896,22 @@ function renderElev(){
   for(let km=10;km<td;km+=10)
     h+=`<text x="${xOf(km)}" y="${H}" fill="#6b82a8" font-size="8" text-anchor="middle" font-family="DM Mono">${km}</text>`;
 
-  // Ravito markers — icône sur le profil à l'altitude réelle
+  // ── PASS 1 : fonds de zones (pointer-events:none, avant les ravitos) ──
+  for(const wp of C.race.waypoints||[]){
+    const w=wpNorm(wp);
+    if(!w.isZone||w.km>td) continue;
+    const x1=parseFloat(xOf(w.km)),x2=parseFloat(xOf(Math.min(w.kmEnd,td)));
+    // Bande semi-transparente
+    h+=`<rect x="${x1.toFixed(1)}" y="0" width="${(x2-x1).toFixed(1)}" height="${H}" fill="rgba(255,255,255,.05)" style="pointer-events:none"/>`;
+    // Pointillés seulement sous la courbe (départ = altitude réelle des bornes)
+    const ptS=GPX.pts.find(p=>p.cumDist>=w.km)||GPX.pts.at(-1);
+    const ptE=GPX.pts.find(p=>p.cumDist>=w.kmEnd)||GPX.pts.at(-1);
+    const yS=parseFloat(yOf(ptS.ele)),yE=parseFloat(yOf(ptE.ele));
+    h+=`<line x1="${x1.toFixed(1)}" y1="${yS.toFixed(1)}" x2="${x1.toFixed(1)}" y2="${H}" stroke="rgba(255,255,255,.3)" stroke-width="1" stroke-dasharray="3,2" vector-effect="non-scaling-stroke" style="pointer-events:none"/>`;
+    h+=`<line x1="${x2.toFixed(1)}" y1="${yE.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${H}" stroke="rgba(255,255,255,.3)" stroke-width="1" stroke-dasharray="3,2" vector-effect="non-scaling-stroke" style="pointer-events:none"/>`;
+  }
+
+  // ── Ravito markers (au premier plan, après les zones) ──
   for(const r of C.race.ravitos||[]){
     if(r.km>td) continue;
     const rx=xOf(r.km);
@@ -904,47 +919,44 @@ function renderElev(){
     const rpt=GPX.pts.find(p=>p.cumDist>=r.km)||GPX.pts.at(-1);
     const rcy=parseFloat(yOf(rpt.ele));
     const rey=Math.max(9,rcy-10);
-    // Ligne verticale de repère (pleine hauteur, discrète)
     h+=`<line x1="${rx}" y1="0" x2="${rx}" y2="${H}" stroke="${color}" stroke-width="1" stroke-dasharray="3,2" vector-effect="non-scaling-stroke" opacity=".35" style="pointer-events:none"/>`;
-    // Cercle sur le profil
     h+=`<circle cx="${rx}" cy="${rcy}" r="4" fill="${color}" opacity=".9" style="pointer-events:none"/>`;
     h+=`<circle cx="${rx}" cy="${rcy}" r="2.5" fill="white" opacity=".9" style="pointer-events:none"/>`;
-    // Icône au-dessus du cercle
     h+=`<text x="${rx}" y="${rey}" fill="${color}" font-size="14" text-anchor="middle" opacity=".95" style="pointer-events:none">${icon}</text>`;
-    // Hit area
+    // Hit area ravito — au premier plan grâce au z-order SVG
     h+=`<rect x="${(parseFloat(rx)-7).toFixed(1)}" y="0" width="14" height="${H}" fill="transparent"
       data-tipkm="${r.km}" data-tiplbl="${icon} ${r.name}" data-tipextra="${r.services||""}"/>`;
   }
 
-  // Waypoints — ponctuel ou zone
+  // ── PASS 2 : émojis de zones sous la courbe + petite hit area ──
   for(const wp of C.race.waypoints||[]){
     const w=wpNorm(wp);
-    if(w.km>td) continue;
+    if(!w.isZone||w.km>td) continue;
+    const x1=parseFloat(xOf(w.km)),x2=parseFloat(xOf(Math.min(w.kmEnd,td)));
+    const mid=(x1+x2)/2;
+    const midPt=GPX.pts.find(p=>p.cumDist>=w.kmMid)||GPX.pts.at(-1);
+    const mcy=parseFloat(yOf(midPt.ele));
+    // Position sous la courbe : entre la courbe et le bas
+    const ey=Math.min(H-5, mcy+(H-mcy)*0.55);
     const emoji=labelEmoji(w.label);
-    if(w.isZone){
-      const x1=parseFloat(xOf(w.km)),x2=parseFloat(xOf(Math.min(w.kmEnd,td)));
-      const mid=(x1+x2)/2;
-      const midPt=GPX.pts.find(p=>p.cumDist>=w.kmMid)||GPX.pts.at(-1);
-      const mcy=parseFloat(yOf(midPt.ele)),mey=Math.max(9,mcy-7);
-      // Bande de zone semi-transparente
-      h+=`<rect x="${x1.toFixed(1)}" y="0" width="${(x2-x1).toFixed(1)}" height="${H}" fill="rgba(255,255,255,.05)" style="pointer-events:none"/>`;
-      // Bordures pointillées de zone
-      h+=`<line x1="${x1.toFixed(1)}" y1="0" x2="${x1.toFixed(1)}" y2="${H}" stroke="rgba(255,255,255,.22)" stroke-width="1" stroke-dasharray="3,2" vector-effect="non-scaling-stroke" style="pointer-events:none"/>`;
-      h+=`<line x1="${x2.toFixed(1)}" y1="0" x2="${x2.toFixed(1)}" y2="${H}" stroke="rgba(255,255,255,.22)" stroke-width="1" stroke-dasharray="3,2" vector-effect="non-scaling-stroke" style="pointer-events:none"/>`;
-      // Emoji centré au milieu de la zone
-      h+=`<text x="${mid.toFixed(1)}" y="${mey}" fill="white" font-size="12" text-anchor="middle" opacity=".85" style="pointer-events:none">${emoji}</text>`;
-      // Hit area couvrant toute la zone
-      h+=`<rect x="${x1.toFixed(1)}" y="0" width="${(x2-x1).toFixed(1)}" height="${H}" fill="transparent"
-        data-tipkm="${w.km}" data-tiplbl="${w.label}" data-tipextra="Zone km ${w.km}–${w.kmEnd}"/>`;
-    } else {
-      const wpx=xOf(w.km);
-      const wpt=GPX.pts.find(p=>p.cumDist>=w.km)||GPX.pts.at(-1);
-      const wcy=parseFloat(yOf(wpt.ele)),wey=Math.max(9,wcy-7);
-      h+=`<circle cx="${wpx}" cy="${wcy}" r="2.5" fill="white" opacity=".75" style="pointer-events:none"/>`;
-      h+=`<text x="${wpx}" y="${wey}" fill="white" font-size="12" text-anchor="middle" opacity=".85" style="pointer-events:none">${emoji}</text>`;
-      h+=`<circle cx="${wpx}" cy="${wcy}" r="10" fill="transparent"
-        data-tipkm="${w.km}" data-tiplbl="${w.label}"/>`;
-    }
+    h+=`<text x="${mid.toFixed(1)}" y="${ey.toFixed(1)}" fill="white" font-size="11" text-anchor="middle" opacity=".8" style="pointer-events:none">${emoji}</text>`;
+    // Petite hit area centrée sur l'emoji (ne couvre pas les ravitos)
+    h+=`<circle cx="${mid.toFixed(1)}" cy="${ey.toFixed(1)}" r="12" fill="transparent"
+      data-tipkm="${w.km}" data-tiplbl="${w.label}"/>`;
+  }
+
+  // ── Waypoints ponctuels ──
+  for(const wp of C.race.waypoints||[]){
+    const w=wpNorm(wp);
+    if(w.isZone||w.km>td) continue;
+    const wpx=xOf(w.km);
+    const wpt=GPX.pts.find(p=>p.cumDist>=w.km)||GPX.pts.at(-1);
+    const wcy=parseFloat(yOf(wpt.ele)),wey=Math.max(9,wcy-7);
+    const emoji=labelEmoji(w.label);
+    h+=`<circle cx="${wpx}" cy="${wcy}" r="2.5" fill="white" opacity=".75" style="pointer-events:none"/>`;
+    h+=`<text x="${wpx}" y="${wey}" fill="white" font-size="12" text-anchor="middle" opacity=".85" style="pointer-events:none">${emoji}</text>`;
+    h+=`<circle cx="${wpx}" cy="${wcy}" r="10" fill="transparent"
+      data-tipkm="${w.km}" data-tiplbl="${w.label}"/>`;
   }
 
   // Live cursor — avatar rond avec pulse
