@@ -99,8 +99,18 @@ header{
 .dpanel{background:var(--s1);border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow-y:auto}
 .dpanel::-webkit-scrollbar{width:3px}
 .dpanel::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
-.blk{padding:8px 14px;border-bottom:1px solid var(--bd);flex-shrink:0}
-.lbl{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mu);margin-bottom:7px}
+.blk{padding:13px 16px;border-bottom:1px solid var(--bd);flex-shrink:0}
+.blk-phase{flex:1;min-height:0;overflow-y:auto}
+.lbl{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mu);margin-bottom:9px}
+
+/* Strava CTA */
+.strava-cta{display:flex;align-items:center;gap:13px;padding:14px 16px;margin:0;background:linear-gradient(135deg,rgba(252,76,2,.1),rgba(252,76,2,.05));border-top:1px solid rgba(252,76,2,.25);color:var(--tx);text-decoration:none;flex-shrink:0;transition:background .2s}
+.strava-cta:hover{background:rgba(252,76,2,.18)}
+.strava-ico{flex-shrink:0;width:32px;height:32px}
+.strava-info{flex:1;min-width:0}
+.strava-name{font-size:13px;font-weight:700;color:#FC4C02;letter-spacing:.04em}
+.strava-platform{font-size:11px;color:var(--mu);margin-top:2px}
+.strava-arr{font-size:15px;color:rgba(252,76,2,.6);flex-shrink:0}
 
 /* phase */
 .ph-tag{font-size:20px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
@@ -125,7 +135,7 @@ header{
 .hr-ceil-lbl b{color:var(--tx)}
 
 /* stats */
-.stats-g{display:grid;grid-template-columns:1fr 1fr;gap:9px 10px}
+.stats-g{display:grid;grid-template-columns:1fr 1fr;gap:13px 12px}
 .sv{font-family:var(--fm);font-size:26px;font-weight:500;line-height:1;letter-spacing:-.02em}
 .sv-hero{font-size:32px}
 .sl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);margin-top:3px}
@@ -385,7 +395,7 @@ header{
   <!-- DATA PANEL -->
   <div class="dpanel">
 
-    <div class="blk">
+    <div class="blk blk-phase">
       <div class="lbl">Segment en cours</div>
       <div class="ph-tag" id="phTitle" style="color:var(--mu)">
         <span class="ph-dot"></span><span id="phLbl">—</span>
@@ -455,6 +465,18 @@ header{
       <div class="pb-wrap" id="pbWrap"></div>
     </div>
 
+    <!-- Strava CTA -->
+    <a class="strava-cta" id="stravaCta" href="#" target="_blank" rel="noopener noreferrer">
+      <svg class="strava-ico" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M21 4 L13 16 L18 16 L10 28" stroke="#FC4C02" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M25 4 L17 16 L22 16 L14 28" stroke="#FC4C02" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" opacity=".4"/>
+      </svg>
+      <div class="strava-info">
+        <div class="strava-name">Antoine Conqui</div>
+        <div class="strava-platform">Suivre sur Strava</div>
+      </div>
+      <span class="strava-arr">↗</span>
+    </a>
 
   </div>
 
@@ -538,7 +560,7 @@ const C = {
   proxy:     "https://aged-frog-1690.antoineconqui.workers.dev",
   sessionId: "",    // auto-détecté depuis /current
   configUrl: "https://raw.githubusercontent.com/antoineconqui/trail-tracker/main/config-ecouves.json",
-  race: { name:"LiveTrack", distKm:0, totalDplus:0, totalDminus:0, phases:[], waypoints:[], ravitos:[], avatarUrl:"" },
+  race: { name:"LiveTrack", distKm:0, totalDplus:0, totalDminus:0, phases:[], waypoints:[], ravitos:[], avatarUrl:"", stravaUrl:"" },
   pollMs:30_000, chatMs:15_000,
 };
 
@@ -1451,6 +1473,11 @@ async function loadConfig(){
     if(cfg.ravitos)    C.race.ravitos=cfg.ravitos;
     if(cfg.gpxUrl)     C.gpxUrl=cfg.gpxUrl;
     if(cfg.avatarUrl)  C.race.avatarUrl=cfg.avatarUrl;
+    if(cfg.stravaUrl){
+      C.race.stravaUrl=cfg.stravaUrl;
+      const cta=document.getElementById("stravaCta");
+      if(cta) cta.href=cfg.stravaUrl;
+    }
     document.getElementById("hTitle").textContent=cfg.name;
     document.getElementById("pageTitle").textContent=cfg.name;
     document.getElementById("phStrip").innerHTML=""; buildStrip();
