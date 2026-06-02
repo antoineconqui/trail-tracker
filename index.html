@@ -655,6 +655,7 @@ L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{
   attribution:"&copy; CARTO",subdomains:"abcd",maxZoom:19}).addTo(map);
 const courseL=L.polyline([],{color:"#2a3a60",weight:3,opacity:.7,dashArray:"5 7"}).addTo(map);
 const trailL =L.polyline([],{color:"#ff6b2b",weight:3.5,opacity:.95}).addTo(map);
+const zoneHighlight=L.polyline([],{color:"#ffffff",weight:5,opacity:0,interactive:false}).addTo(map);
 // pinIcon dynamique → makePinIcon() utilise C.race.avatarUrl au moment de la création
 let pinMarker=null;
 
@@ -705,6 +706,15 @@ function addWaypointMarkers(){
       html:`<div style="${style}">${emoji}</div>`});
     const marker=L.marker([lat,lon],{icon:ic,zIndexOffset:-10}).addTo(map)
       .bindPopup(`<b>${name}</b><br><small>${kmLbl}</small>`);
+    // Highlight de zone sur la carte au survol
+    if(w.isZone){
+      marker.on('mouseover',()=>{
+        if(!GPX.loaded) return;
+        const pts=GPX.pts.filter(p=>p.cumDist>=w.km&&p.cumDist<=w.kmEnd);
+        zoneHighlight.setLatLngs(pts.map(p=>[p.lat,p.lon])).setStyle({opacity:.7});
+      });
+      marker.on('mouseout',()=>zoneHighlight.setLatLngs([]));
+    }
     _wpMarkers.push(marker);
   }
 }
@@ -831,11 +841,18 @@ function renderElev(){
   const xOf=km=>(km/td*W).toFixed(2);
   const yOf=e=>(H-6-(e-minE)/(maxE-minE+1)*(H-18)).toFixed(2);
   const curKm=S.projKm||S.distKm;
-  // Build clipPaths for phase zones
+  // Calcul anticipé des points downsampleds (nécessaire pour belowCurve clipPath)
+  const step=Math.max(1,Math.floor(pts.length/700));
+  const sp=pts.filter((_,i)=>i%step===0||i===pts.length-1);
+  const fullPd=sp.map((p,i)=>`${i===0?"M":"L"}${xOf(p.cumDist)},${yOf(p.ele)}`).join(" ");
+  const belowCurvePath=`${fullPd} L${xOf(sp.at(-1).cumDist)},${H} L0,${H} Z`;
+
+  // Build clipPaths for phase zones + belowCurve
   let clipDefs=`<defs><linearGradient id="eg" x1="0" y1="0" x2="0" y2="1">
     <stop offset="0%" stop-color="#ff6b2b" stop-opacity=".5"/>
     <stop offset="100%" stop-color="#ff6b2b" stop-opacity=".03"/>
-  </linearGradient>`;
+  </linearGradient>
+  <clipPath id="belowCurve"><path d="${belowCurvePath}"/></clipPath>`;
   let prevKm=0;
   for(let i=0;i<C.race.phases.length;i++){
     const ph=C.race.phases[i];
@@ -866,10 +883,7 @@ function renderElev(){
     prevKm=ph.kmEnd;
   }
 
-  // Elevation path (downsampled) — split done/remaining
-  const step=Math.max(1,Math.floor(pts.length/700));
-  const sp=pts.filter((_,i)=>i%step===0||i===pts.length-1);
-
+  // Elevation path (downsampled) — split done/remaining (step/sp calculés plus haut)
   if(curKm>0.1){
     // Find split index
     let splitI=sp.findIndex(p=>p.cumDist>=curKm);
@@ -901,8 +915,8 @@ function renderElev(){
     const w=wpNorm(wp);
     if(!w.isZone||w.km>td) continue;
     const x1=parseFloat(xOf(w.km)),x2=parseFloat(xOf(Math.min(w.kmEnd,td)));
-    // Bande semi-transparente
-    h+=`<rect x="${x1.toFixed(1)}" y="0" width="${(x2-x1).toFixed(1)}" height="${H}" fill="rgba(255,255,255,.05)" style="pointer-events:none"/>`;
+    // Bande semi-transparente clippée sous la courbe
+    h+=`<rect x="${x1.toFixed(1)}" y="0" width="${(x2-x1).toFixed(1)}" height="${H}" fill="rgba(255,255,255,.07)" clip-path="url(#belowCurve)" style="pointer-events:none"/>`;
     // Pointillés seulement sous la courbe (départ = altitude réelle des bornes)
     const ptS=GPX.pts.find(p=>p.cumDist>=w.km)||GPX.pts.at(-1);
     const ptE=GPX.pts.find(p=>p.cumDist>=w.kmEnd)||GPX.pts.at(-1);
@@ -919,7 +933,6 @@ function renderElev(){
     const rpt=GPX.pts.find(p=>p.cumDist>=r.km)||GPX.pts.at(-1);
     const rcy=parseFloat(yOf(rpt.ele));
     const rey=Math.max(9,rcy-10);
-    h+=`<line x1="${rx}" y1="0" x2="${rx}" y2="${H}" stroke="${color}" stroke-width="1" stroke-dasharray="3,2" vector-effect="non-scaling-stroke" opacity=".35" style="pointer-events:none"/>`;
     h+=`<circle cx="${rx}" cy="${rcy}" r="4" fill="${color}" opacity=".9" style="pointer-events:none"/>`;
     h+=`<circle cx="${rx}" cy="${rcy}" r="2.5" fill="white" opacity=".9" style="pointer-events:none"/>`;
     h+=`<text x="${rx}" y="${rey}" fill="${color}" font-size="14" text-anchor="middle" opacity=".95" style="pointer-events:none">${icon}</text>`;
