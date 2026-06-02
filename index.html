@@ -231,9 +231,9 @@ header{
 .cmsg.cheer .mt{font-size:28px;line-height:1.2}
 .cmsg.cheer .mts{font-size:11px;color:rgba(255,107,43,.7)}
 .react-row{display:flex;gap:8px;flex-shrink:0}
-.breact{height:38px;font-size:20px;background:var(--bd);border:1px solid #2a3a5c;border-radius:8px;cursor:pointer;transition:transform .1s,background .15s}
-.breact:hover{background:#2a3a5c;transform:scale(1.1)}
-.breact:active{transform:scale(.95)}
+.breact{height:38px;font-size:22px;background:none;border:none;cursor:pointer;transition:transform .12s;padding:0;line-height:1}
+.breact:hover{transform:scale(1.25)}
+.breact:active{transform:scale(.88)}
 .chat-empty{text-align:center;color:var(--mu);font-size:13px;padding:24px 12px;line-height:1.5;font-style:italic}
 .chat-form{flex-shrink:0;padding:8px;border-top:1px solid var(--bd);display:flex;flex-direction:column;gap:7px}
 .chat-form input{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:9px 12px;color:var(--tx);font-family:var(--fn);font-size:13px;width:100%;outline:none}
@@ -1313,19 +1313,37 @@ function showToast(lbl){
 // ═══════════════════════════════════════════════════════════
 function triggerReactFloat(emoji){
   if(window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  const wrap=document.querySelector('.map-wrap');
+  if(!wrap) return;
+  const W=wrap.offsetWidth, H=wrap.offsetHeight;
+  if(!W||!H) return;
+
+  // Zone de départ : hors km-overlay (~175px) et hors des bords
+  const xMin=195, xMax=W-55, yMin=55, yMax=H-55;
+  if(xMax<=xMin) return; // map trop étroite (mobile)
+  const sx=xMin+Math.random()*(xMax-xMin);
+  const sy=yMin+Math.random()*(yMax-yMin);
+
+  // Direction : toujours vers l'intérieur — biaisée vers le centre
+  const cx=W/2, cy=H/2;
+  const toCenter=Math.atan2(cy-sy, cx-sx);
+  const spread=Math.PI*0.85;
+  const angle=toCenter+(Math.random()-.5)*spread;
+  const dist=75+Math.random()*110;
+  const tx=Math.cos(angle)*dist, ty=Math.sin(angle)*dist;
+
   const el=document.createElement('div');
   el.textContent=emoji;
-  const sz=36+Math.random()*28;
-  const startY=window.innerHeight*(0.08+Math.random()*0.75);
-  el.style.cssText=`position:fixed;z-index:890;font-size:${sz}px;left:-70px;top:${startY}px;pointer-events:none;opacity:.95`;
-  document.body.appendChild(el);
-  const drift=(Math.random()-.5)*100;
-  const dur=7500+Math.random()*2500; // 7.5–10s
+  const sz=24+Math.random()*16;
+  el.style.cssText=`position:absolute;z-index:1050;font-size:${sz}px;left:${sx.toFixed(0)}px;top:${sy.toFixed(0)}px;transform:translate(-50%,-50%);pointer-events:none;will-change:transform,opacity`;
+  wrap.appendChild(el);
+
+  const dur=1300+Math.random()*700;
   el.animate([
-    {transform:'translateX(0) translateY(0) rotate(-8deg)',opacity:.95},
-    {transform:`translateX(${window.innerWidth*.42}px) translateY(${drift*.4}px) rotate(5deg)`,opacity:1,offset:.35},
-    {transform:`translateX(${window.innerWidth+80}px) translateY(${drift}px) rotate(12deg)`,opacity:0}
-  ],{duration:dur,easing:'ease-in-out',fill:'forwards'});
+    {transform:'translate(-50%,-50%) scale(0)',opacity:0},
+    {transform:`translate(calc(-50% + ${tx*.22}px),calc(-50% + ${ty*.22}px)) scale(1.6)`,opacity:1,offset:.17},
+    {transform:`translate(calc(-50% + ${tx}px),calc(-50% + ${ty}px)) scale(.5)`,opacity:0}
+  ],{duration:dur,easing:'ease-out',fill:'forwards'});
   setTimeout(()=>el.remove(),dur+100);
 }
 
@@ -1423,10 +1441,10 @@ function initChat(){
     await fetchChat();
   };
   document.querySelectorAll(".breact").forEach(btn=>{
-    btn.addEventListener("click",async()=>{
+    btn.addEventListener("click",()=>{
       const n=getName(); if(!n)return;
-      await sendChat(n,btn.dataset.emoji,"cheer");
-      await fetchChat();
+      triggerReactFloat(btn.dataset.emoji); // feedback immédiat, pas d'attente serveur
+      sendChat(n,btn.dataset.emoji,"cheer"); // fire-and-forget
     });
   });
   document.getElementById("cMsg").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();document.getElementById("bSend").click();}});
