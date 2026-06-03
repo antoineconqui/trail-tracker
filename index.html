@@ -448,8 +448,23 @@ header{
   .m-elev-content{flex:1;overflow:auto;min-height:0}
 
   /* ── CPANEL dans panneau chat ────────────────── */
-  #mShell .cpanel{display:flex !important;position:static !important;height:100%;transform:none !important;border-radius:0;border-top:1px solid var(--bd);border-left:none}
-  #mShell .chat-hd{flex-shrink:0}
+  #mShell .cpanel{display:flex !important;position:static !important;height:100%;transform:none !important;border-radius:0;border-top:none;border-left:none}
+
+  /* ── CHAT COMPACT (gain de hauteur) ─────────── */
+  /* Retirer header, titres, bouton séparé */
+  #mShell .chat-hd{display:none !important}
+  #mShell .chat-sec-lbl{display:none !important}
+  #mShell .bcheer{display:none !important}
+
+  /* Réactions pleine largeur */
+  #mShell .react-row{gap:3px;padding:4px 0 0}
+  #mShell .breact{height:42px;font-size:22px}
+
+  /* Chat form compact : send inline dans l'input */
+  #mShell .chat-form{padding:5px 8px 8px;gap:4px;position:relative}
+  #mShell #cMsg{padding-right:46px;height:40px;font-size:15px;border-radius:10px}
+  #mShell .cbtns{position:absolute;right:11px;bottom:11px;gap:0;z-index:2}
+  #mShell #bSend{width:34px;height:34px;flex:none;padding:0;border-radius:50%;font-size:17px;font-weight:900;letter-spacing:0}
 }
 /* Accessibilité : respect du préférence de mouvement réduit */
 @media(prefers-reduced-motion:reduce){
@@ -1779,9 +1794,12 @@ function initMobileLayout(){
   if(mini) mini.addEventListener('click',openMobileElevModal);
   document.getElementById('mElevClose').onclick=closeMobileElevModal;
 
-  // Strava topbar
+  // Strava topbar — activer + setter href
   const stravaTop=document.getElementById('mStravaTop');
-  if(stravaTop&&C.race.stravaUrl) stravaTop.href=C.race.stravaUrl;
+  if(stravaTop){
+    stravaTop.style.display='flex';
+    if(C.race.stravaUrl) stravaTop.href=C.race.stravaUrl;
+  }
 }
 
 function showMobilePanel(panel){
