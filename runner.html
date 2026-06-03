@@ -26,9 +26,10 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--fn)
 .pin-title{font-size:26px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
 .pin-sub{font-size:14px;color:var(--mu)}
 .pin-input{
-  width:100%;max-width:280px;background:var(--s1);border:1px solid var(--bd);
-  border-radius:14px;padding:16px;color:var(--tx);font-family:var(--fn);
-  font-size:24px;text-align:center;letter-spacing:.3em;outline:none;
+  width:100%;max-width:220px;background:var(--s1);border:1px solid var(--bd);
+  border-radius:14px;padding:16px;color:var(--tx);font-family:'DM Mono',monospace;
+  font-size:32px;text-align:center;letter-spacing:.5em;outline:none;
+  -webkit-text-security:disc; /* masque les chiffres sur iOS */
 }
 .pin-input:focus{border-color:var(--ac);box-shadow:0 0 0 2px rgba(255,107,43,.2)}
 .pin-btn{
@@ -153,7 +154,7 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--fn)
   <span class="pin-emoji">🏃</span>
   <div class="pin-title">Runner Dashboard</div>
   <div class="pin-sub">Code secret requis</div>
-  <input id="pinInput" class="pin-input" type="password" inputmode="text" placeholder="••••••" autocomplete="off" maxlength="20">
+  <input id="pinInput" class="pin-input" type="tel" inputmode="numeric" pattern="[0-9]*" placeholder="••••" autocomplete="off" maxlength="4">
   <div class="pin-error" id="pinError">Code incorrect 🔴</div>
   <button class="pin-btn" id="pinBtn">Accéder →</button>
 </div>
@@ -211,7 +212,7 @@ function checkPin() {
   // PIN stocké dans sessionStorage pour la session
   const stored = sessionStorage.getItem(PIN_KEY);
   // Le PIN correct est chargé depuis le config (voir loadConfig) ou fallback
-  const correct = window._runnerPin || 'trail2026';
+  const correct = window._runnerPin || '2906';
   if (val === correct) {
     sessionStorage.setItem(PIN_KEY, val);
     document.getElementById('pinScreen').style.display = 'none';
@@ -231,7 +232,7 @@ function checkPin() {
 (async () => {
   await loadConfig();
   const stored = sessionStorage.getItem(PIN_KEY);
-  const correct = window._runnerPin || 'trail2026';
+  const correct = window._runnerPin || '2906';
   if (stored === correct) {
     document.getElementById('pinScreen').style.display = 'none';
     document.getElementById('main').style.display = 'flex';
@@ -243,6 +244,10 @@ function checkPin() {
 
 document.getElementById('pinBtn').onclick = checkPin;
 document.getElementById('pinInput').addEventListener('keydown', e => { if (e.key === 'Enter') checkPin(); });
+document.getElementById('pinInput').addEventListener('input', e => {
+  // Auto-submit quand 4 chiffres saisis
+  if (/^\d{4}$/.test(e.target.value)) checkPin();
+});
 
 // ── CONFIG ────────────────────────────────────────
 async function loadConfig() {

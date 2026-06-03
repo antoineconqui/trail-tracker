@@ -1415,6 +1415,7 @@ function msgRaceContext(ts){
   return `${timeStr}${km!==null?" · km "+km.toFixed(1):""}`;
 }
 async function fetchChat(){
+  if(!C.sessionId) return; // pas de session active → skip
   const since=S.chatLastTs?`&since=${encodeURIComponent(S.chatLastTs)}`:"";
   try{
     const r=await fetch(`${C.proxy}/chat?sid=${C.sessionId}${since}`);
@@ -1427,6 +1428,7 @@ async function fetchChat(){
   }catch(e){}
 }
 async function sendChat(name,msg,type="msg"){
+  if(!C.sessionId) return; // pas de session active → skip
   await fetch(`${C.proxy}/chat`,{method:"POST",headers:{"Content-Type":"application/json"},
     body:JSON.stringify({sid:C.sessionId,name,msg,type})});
 }
