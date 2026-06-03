@@ -106,9 +106,10 @@ export default {
       if (!sid || !vid) return json({ error: "missing fields" }, 400);
       let registry = await env.KV.get(`viewers:${sid}`, "json") || {};
       const now = Date.now();
-      if (vid === "__clear__") { registry = {}; }          // vider toute la liste live
+      if (vid === "__clear__") { registry = {}; }
       else if (name === "__del__") { delete registry[vid]; }
-      else registry[vid] = { name: String(name || "—").slice(0, 30), ts: now };
+      else if (name && name.trim()) registry[vid] = { name: String(name).slice(0, 30), ts: now };
+      // name vide ou absent → pas d'entrée fantôme
       // Pruner les inactifs (> 300s)
       for (const [k, v] of Object.entries(registry))
         if (now - v.ts > 300_000) delete registry[k];

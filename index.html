@@ -766,7 +766,8 @@ function labelEmoji(label){
 const _vid=(()=>{let v=sessionStorage.getItem('vid');if(!v){v=Math.random().toString(36).slice(2,8);sessionStorage.setItem('vid',v);}return v;})();
 async function pingViewer(){
   if(!C.sessionId) return;
-  const name=getCookieName()||"";
+  const name=getCookieName();
+  if(!name) return; // pas de ping sans pseudo identifié → pas d'entrée fantôme "—"
   try{
     const r=await fetch(`${C.proxy}/viewers`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sid:C.sessionId,vid:_vid,name})});
     if(r.ok){const{count,viewers}=await r.json();document.getElementById("viewerCnt").textContent=count+" 👁";renderViewerList(viewers||[]);}
