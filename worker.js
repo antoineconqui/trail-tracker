@@ -58,7 +58,11 @@ export default {
         const pts = data.trackPoints || [];
         if (!pts.length) return json({ ok: true });
 
-        const batchId = new Date().toISOString();
+          // ID sémantique = dateTime du DERNIER point (pas le temps de traitement)
+        // → garantit que since/lu comparent des espaces temporels homogènes
+        // → fonctionne aussi bien pour la vraie course que pour la simulation
+        const lastPtDt = pts.length > 0 ? (pts[pts.length - 1].dateTime || "") : "";
+        const batchId  = lastPtDt || new Date().toISOString();
 
         // Index des batch IDs (JSON array trié, max 2000 entrées ≈ 16h à 30s)
         const idx = await env.KV.get(`${sid}:idx`, "json") || [];
@@ -70,7 +74,7 @@ export default {
           env.KV.put(`${sid}:b:${batchId}`, JSON.stringify(pts), { expirationTtl: TTL_RACE }),
           // Index mis à jour
           env.KV.put(`${sid}:idx`, JSON.stringify(trimIdx), { expirationTtl: TTL_RACE }),
-          // Marqueur de fraîcheur (string ISO, ~30 octets)
+          // Marqueur de fraîcheur = dernier point dateTime
           env.KV.put(`${sid}:lu`, batchId, { expirationTtl: TTL_RACE }),
         ]);
       }
