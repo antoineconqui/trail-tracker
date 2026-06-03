@@ -186,6 +186,40 @@ export default {
       return json({ viewers: active.map(v => v.name), count: active.length });
     }
 
+    // ══ POST /admin/flush ─ purge complète (admin) ═══════════
+    if (req.method === "POST" && u.pathname === "/admin/flush") {
+      if (req.headers.get("X-Admin-Secret") !== env.ADMIN_SECRET)
+        return json({ error: "unauthorized" }, 401);
+
+      const sid = u.searchParams.get("sid"); // optionnel : purge d'une session précise
+
+      // Clés fixes à supprimer
+      const fixed = ["current", "subscribers", "raceConfig"];
+      // Note : on ne supprime PAS raceConfig sauf si ?full=1 est passé
+      const full = u.searchParams.get("full") === "1";
+      const toDelete = full ? fixed : fixed.filter(k => k !== "raceConfig");
+
+      // Clés liées à la session
+      const sessionKeys = sid ? [
+        `${sid}:meta`, `${sid}:chat`, `${sid}:idx`, `${sid}:lu`,
+        `viewers:${sid}`,
+        // Batches : lister via l'index si disponible
+      ] : [];
+
+      // Supprimer les batches via l'index
+      if (sid) {
+        const idx = await env.KV.get(`${sid}:idx`, "json") || [];
+        for (const batchId of idx) sessionKeys.push(`${sid}:b:${batchId}`);
+        // Fallback ancien format
+        sessionKeys.push(`${sid}:pts`);
+      }
+
+      const allKeys = [...toDelete, ...sessionKeys];
+      await Promise.allSettled(allKeys.map(k => env.KV.delete(k)));
+
+      return json({ ok: true, deleted: allKeys });
+    }
+
     return json({ error: "unknown route" }, 404);
   }
 };
