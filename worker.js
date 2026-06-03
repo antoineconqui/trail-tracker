@@ -80,14 +80,34 @@ export default {
       return json({ ok: true, msg: m });
     }
 
+    // ══ POST /subscribe ─ inscription pré-course (sans sid requis) ════════
+    if (req.method === "POST" && u.pathname === "/subscribe") {
+      const { name, vid } = await req.json();
+      if (!vid) return json({ error: "missing vid" }, 400);
+      let registry = await env.KV.get("subscribers", "json") || {};
+      if (vid === "__clear__") { registry = {}; }          // vider toute la liste
+      else if (name === "__del__") { delete registry[vid]; }
+      else registry[vid] = { name: String(name || "—").slice(0, 30), ts: Date.now() };
+      await env.KV.put("subscribers", JSON.stringify(registry), { expirationTtl: 86400 * 4 }); // TTL 4 jours
+      const subs = Object.values(registry).sort((a, b) => a.ts - b.ts);
+      return json({ ok: true, count: subs.length, subscribers: subs.map(v => v.name) });
+    }
+
+    // ══ GET /subscribers ─ liste des inscrits pré-course ═════════════════
+    if (req.method === "GET" && u.pathname === "/subscribers") {
+      const registry = await env.KV.get("subscribers", "json") || {};
+      const subs = Object.values(registry).sort((a, b) => a.ts - b.ts);
+      return json({ subscribers: subs.map(v => v.name), count: subs.length });
+    }
+
     // ══ POST /viewers ─ heartbeat spectateur avec nom (registre unique) ══
     if (req.method === "POST" && u.pathname === "/viewers") {
       const { sid, vid, name } = await req.json();
       if (!sid || !vid) return json({ error: "missing fields" }, 400);
-      const registry = await env.KV.get(`viewers:${sid}`, "json") || {};
+      let registry = await env.KV.get(`viewers:${sid}`, "json") || {};
       const now = Date.now();
-      // __del__ = demande de suppression explicite
-      if (name === "__del__") { delete registry[vid]; }
+      if (vid === "__clear__") { registry = {}; }          // vider toute la liste live
+      else if (name === "__del__") { delete registry[vid]; }
       else registry[vid] = { name: String(name || "—").slice(0, 30), ts: now };
       // Pruner les inactifs (> 300s)
       for (const [k, v] of Object.entries(registry))

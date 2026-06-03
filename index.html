@@ -281,6 +281,10 @@ header{
 .cd-chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}
 .cd-chip{background:var(--s1);border:1px solid var(--bd);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;color:var(--tx)}
 .cd-chip.me{border-color:var(--ac);color:var(--ac);background:rgba(255,107,43,.1)}
+/* Liste des subscribers */
+.cd-viewers{margin-top:24px;width:100%;max-width:480px;animation:fin-slide .4s .1s ease-out both}
+.cd-viewers-ttl{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mu);margin-bottom:10px}
+.cd-chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}
 
 /* ── FINISH OVERLAY ──────────────────────────────────────── */
 .finish-ov{position:fixed;inset:0;z-index:5000;background:rgba(6,8,15,.92);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;animation:fin-in .5s ease-out;text-align:center;padding:48px 20px 32px;overflow-y:auto}
@@ -579,6 +583,12 @@ header{
     </div>
     <p class="cd-msg" id="cdMsg" style="display:none">Tu es inscrit·e ! Le suivi s'ouvre le <strong>6 juin à 12h00</strong> 🏃</p>
     <div class="cd-badge" id="cdBadge" style="display:none"><span class="viewer-dot"></span>Live tracker actif dès le départ</div>
+
+    <!-- Liste des supporters inscrits (masquée pendant la course) -->
+    <div class="cd-viewers" id="cdViewers">
+      <div class="cd-viewers-ttl" id="cdViewerTtl">Sois le premier à rejoindre !</div>
+      <div class="cd-chips" id="cdChips"></div>
+    </div>
   </div>
 </div>
 
@@ -1898,21 +1908,32 @@ function closeCountdownModal(){
   setTimeout(()=>{m.classList.add('hidden');triggerStartAnimation();},700);
 }
 
-function renderViewerList(viewers){
+function renderViewerList(names,count,isLive){
   const ttl=document.getElementById('cdViewerTtl');
   const chips=document.getElementById('cdChips');
-  if(!ttl||!chips) return;
-  const n=viewers.length;
+  const block=document.getElementById('cdViewers');
+  if(!ttl||!chips||!block) return;
+  // Pendant la course : masquer la liste (juste le compteur dans le header)
+  if(isLive){block.style.display='none';return;}
+  block.style.display='';
+  const n=count||names.length;
   ttl.textContent=n===0?'Sois le premier à rejoindre !':n===1?'1 supporter inscrit':`${n} supporters inscrits`;
   const me=getCookieName();
-  chips.innerHTML=viewers.map(name=>`<span class="cd-chip${name===me?' me':''}">${name===me?'👤 ':''}${name}</span>`).join('');
+  chips.innerHTML=names.map(name=>`<span class="cd-chip${name===me?' me':''}">${name===me?'👤 ':''}${name}</span>`).join('');
 }
 
 async function fetchViewerList(){
-  if(!C.sessionId) return;
   try{
-    const r=await fetch(`${C.proxy}/viewers?sid=${C.sessionId}`);
-    if(r.ok){const{viewers}=await r.json();renderViewerList(viewers||[]);}
+    const raceStarted=new Date()>=RACE_START;
+    if(raceStarted&&C.sessionId){
+      // Pendant la course : live viewers avec TTL court (compteur uniquement)
+      const r=await fetch(`${C.proxy}/viewers?sid=${C.sessionId}`);
+      if(r.ok){const{viewers=[],count=0}=await r.json();renderViewerList(viewers,count,true);}
+    } else {
+      // Pré-course : liste des inscrits (sans sid, TTL long)
+      const r=await fetch(`${C.proxy}/subscribers`);
+      if(r.ok){const{subscribers=[]}=await r.json();renderViewerList(subscribers,subscribers.length,false);}
+    }
   }catch(e){}
 }
 
@@ -1946,6 +1967,9 @@ function initCountdown(){
     }
     setCookieName(v);
     _showCountdownView();
+    // Inscription pré-course via /subscribe (pas de session requise)
+    fetch(`${C.proxy}/subscribe`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:v,vid:_vid})})
+      .then(r=>r.json()).then(({subscribers=[]})=>renderViewerList(subscribers,subscribers.length,false)).catch(()=>{});
     pingViewer();
     fetchViewerList();
     // Si course déjà commencée, proposer de rejoindre immédiatement
@@ -2097,14 +2121,24 @@ window.supporters=async function(){
 window.clearPseudo=async function(){
   const prev=getCookieName();
   if(!prev){console.warn('%c⚠ Aucun pseudo en cookie','color:#ffc532');return;}
-  // Expire le cookie immédiatement
   document.cookie='chatName=;max-age=0;path=/;SameSite=Lax';
   localStorage.removeItem('chatName');
-  // Retire le viewer du registre en envoyant un ping avec un nom vide et TTL 0
-  // (Le registre expirera naturellement; pour forcer, on envoie un nom vide)
-  if(C.sessionId) await fetch(`${C.proxy}/viewers`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sid:C.sessionId,vid:_vid,name:'__del__'})}).catch(()=>{});
-  console.log(`%c✓ Pseudo "${prev}" effacé — recharge la page pour te ré-identifier`,
-    'color:#00d4a0;font-weight:bold');
+  // Retire des deux registres (pré-course et live)
+  const body={method:'POST',headers:{'Content-Type':'application/json'}};
+  await Promise.allSettled([
+    fetch(`${C.proxy}/subscribe`,{...body,body:JSON.stringify({vid:_vid,name:'__del__'})}),
+    C.sessionId?fetch(`${C.proxy}/viewers`,{...body,body:JSON.stringify({sid:C.sessionId,vid:_vid,name:'__del__'})}):Promise.resolve()
+  ]);
+  console.log(`%c✓ Pseudo "${prev}" effacé — recharge la page pour te ré-identifier`,'color:#00d4a0;font-weight:bold');
+};
+
+// Vider toute la liste des subscribers inscrits (admin)
+window.clearViewers=async function(){
+  const body={method:'POST',headers:{'Content-Type':'application/json'}};
+  // Vide le registre subscribers en POSTant un payload spécial
+  await fetch(`${C.proxy}/subscribe`,{...body,body:JSON.stringify({vid:'__clear__',name:'__clear__'})}).catch(()=>{});
+  if(C.sessionId) await fetch(`${C.proxy}/viewers`,{...body,body:JSON.stringify({sid:C.sessionId,vid:'__clear__',name:'__clear__'})}).catch(()=>{});
+  console.log('%c✓ Liste des viewers vidée (reload la page pour confirmer)','color:#00d4a0;font-weight:bold');
 };
 
 // ═══════════════════════════════════════════════════════════
