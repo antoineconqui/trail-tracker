@@ -763,7 +763,8 @@ function labelEmoji(label){
 // ═══════════════════════════════════════════════════════════
 //  VIEWER PING
 // ═══════════════════════════════════════════════════════════
-const _vid=(()=>{let v=sessionStorage.getItem('vid');if(!v){v=Math.random().toString(36).slice(2,8);sessionStorage.setItem('vid',v);}return v;})();
+const _vid=(()=>{let v=localStorage.getItem('_vid');if(!v){v=Math.random().toString(36).slice(2,8);localStorage.setItem('_vid',v);}return v;})();
+// localStorage → même _vid sur tous les onglets du même navigateur = pas de doublon
 async function pingViewer(){
   if(!C.sessionId) return;
   const name=getCookieName();
