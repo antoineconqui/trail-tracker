@@ -612,7 +612,7 @@ const C = {
   sessionId: "",    // auto-détecté depuis /current
   configUrl: "https://raw.githubusercontent.com/antoineconqui/trail-tracker/main/config-ecouves.json",
   race: { name:"LiveTrack", distKm:0, totalDplus:0, totalDminus:0, phases:[], waypoints:[], ravitos:[], avatarUrl:"", stravaUrl:"" },
-  pollMs:30_000, chatMs:15_000,
+  pollMs:10_000, chatMs:20_000,
 };
 
 // ═══════════════════════════════════════════════════════════
@@ -1569,7 +1569,8 @@ async function fetchData(){
   const since=S.lastDT?`&since=${encodeURIComponent(new Date(new Date(S.lastDT).getTime()+1).toISOString())}`:"";
   const r=await fetch(`${C.proxy}/data?sid=${C.sessionId}${since}`);
   if(!r.ok) throw new Error(`/data ${r.status}`);
-  const{meta,points}=await r.json();
+  const{meta,points,updated}=await r.json();
+  if(updated===false) return; // freshness check : aucun nouveau point, skip le traitement
   if(meta&&!S.sessionStart){
     S.sessionStart=meta.start;
     document.getElementById("hAth").textContent=meta.userDisplayName||"";
@@ -2009,7 +2010,7 @@ function initCountdown(){
         <button class="cd-reg-btn" style="margin-top:14px;max-width:280px;display:inline-block" onclick="closeCountdownModal()">🏃 Rejoindre le suivi en direct</button>`;
     }
     fetchViewerList();
-    setInterval(fetchViewerList,15000);
+    setInterval(fetchViewerList,30000);
     return;
   }
 
@@ -2036,7 +2037,7 @@ function initCountdown(){
   tick();
   setInterval(tick,1000);
   fetchViewerList();
-  setInterval(fetchViewerList,15000);
+  setInterval(fetchViewerList,30000);
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2180,7 +2181,7 @@ async function init(){
   addRavitoMarkers();
   setInterval(renderClock,1000); setInterval(fetchChat,C.chatMs);
   await poll(); setInterval(poll,C.pollMs);
-  pingViewer(); setInterval(pingViewer,30000);
+  pingViewer(); setInterval(pingViewer,90_000); // 90s heartbeat → 3× moins d'écritures KV
 }
 init();
 //skipCountdown();
