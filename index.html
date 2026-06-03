@@ -2153,13 +2153,18 @@ window.clearPseudo=async function(){
   console.log(`%c✓ Pseudo "${prev}" effacé — recharge la page pour te ré-identifier`,'color:#00d4a0;font-weight:bold');
 };
 
-// Vider toute la liste des subscribers inscrits (admin)
+// Vider toute la liste + couper la source locale (purge durable)
 window.clearViewers=async function(){
   const body={method:'POST',headers:{'Content-Type':'application/json'}};
-  // Vide le registre subscribers en POSTant un payload spécial
-  await fetch(`${C.proxy}/subscribe`,{...body,body:JSON.stringify({vid:'__clear__',name:'__clear__'})}).catch(()=>{});
-  if(C.sessionId) await fetch(`${C.proxy}/viewers`,{...body,body:JSON.stringify({sid:C.sessionId,vid:'__clear__',name:'__clear__'})}).catch(()=>{});
-  console.log('%c✓ Liste des viewers vidée (reload la page pour confirmer)','color:#00d4a0;font-weight:bold');
+  await Promise.allSettled([
+    fetch(`${C.proxy}/subscribe`,{...body,body:JSON.stringify({vid:'__clear__',name:'__clear__'})}),
+    C.sessionId?fetch(`${C.proxy}/viewers`,{...body,body:JSON.stringify({sid:C.sessionId,vid:'__clear__',name:'__clear__'})}):Promise.resolve()
+  ]);
+  // Supprimer l'identité locale → pingViewer() ne ré-ajoutera pas le user
+  document.cookie='chatName=;max-age=0;path=/;SameSite=Lax';
+  localStorage.removeItem('chatName');
+  localStorage.removeItem('_vid'); // force un nouveau _vid au prochain chargement
+  console.log('%c✓ Viewers vidés + identité locale effacée\n  → recharge la page pour repartir à zéro','color:#00d4a0;font-weight:bold');
 };
 
 // ═══════════════════════════════════════════════════════════
