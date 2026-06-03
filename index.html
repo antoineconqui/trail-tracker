@@ -456,13 +456,10 @@ header{
   #mShell .chat-sec-lbl{display:none !important}
   #mShell .bcheer{display:none !important}
 
-  /* Réactions pleine largeur */
-  /* Réactions pleine largeur — grid écrase le flex de la règle générale */
-  #mShell .react-row{display:grid !important;grid-template-columns:repeat(5,1fr);gap:3px;width:100%;padding:4px 0 0}
-  #mShell .breact{height:42px;font-size:22px}
-  /* Bouton envoyer : cercle avec juste la flèche */
-  #mShell #bSend{font-size:0}
-  #mShell #bSend::after{content:'↑';font-size:18px;font-weight:900;display:block;line-height:1}
+  /* Réactions : 1 seule ligne de 10, pleine largeur */
+  #mShell .react-row{display:grid !important;grid-template-columns:repeat(10,1fr) !important;gap:2px;width:100%;padding:3px 0}
+  #mShell .breact{height:38px;font-size:20px}
+  /* Bouton envoyer : flèche uniquement via JS (voir initMobileLayout) */
 
   /* Chat form compact : send inline dans l'input */
   #mShell .chat-form{padding:5px 8px 8px;gap:4px;position:relative}
@@ -659,7 +656,7 @@ header{
   <!-- Toggle pill -->
   <div class="m-toggle">
     <button class="m-tab m-active" id="mTabData">📊 Données</button>
-    <button class="m-tab" id="mTabChat">💬 Chat&nbsp;<span class="m-vcnt" id="mVcntTab">—</span></button>
+    <button class="m-tab" id="mTabChat">💬 Chat&nbsp;<span class="viewer-dot" style="display:inline-block;vertical-align:middle;margin-right:2px"></span><span class="m-vcnt" id="mVcntTab">—</span></button>
     <div class="m-dots"><span class="m-dot m-dot--on"></span><span class="m-dot"></span></div>
   </div>
   <!-- Bottom panel container -->
@@ -952,7 +949,7 @@ async function pingViewer(){
   if(!name) return; // pas de ping sans pseudo identifié → pas d'entrée fantôme "—"
   try{
     const r=await fetch(`${C.proxy}/viewers`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sid:C.sessionId,vid:_vid,name})});
-    if(r.ok){const{count,viewers}=await r.json();document.getElementById("viewerCnt").textContent=count+" 👁";renderViewerList(viewers||[]);}
+    if(r.ok){const{count,viewers}=await r.json();document.getElementById("viewerCnt").textContent=count;renderViewerList(viewers||[]);}
   }catch(e){}
 }
 
@@ -1804,6 +1801,10 @@ function initMobileLayout(){
     stravaTop.style.display='flex';
     if(C.race.stravaUrl) stravaTop.href=C.race.stravaUrl;
   }
+
+  // Bouton envoyer : juste la flèche sur mobile
+  const bSend=document.getElementById('bSend');
+  if(bSend) bSend.textContent='→';
 }
 
 function showMobilePanel(panel){
