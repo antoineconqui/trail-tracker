@@ -244,13 +244,13 @@ header{
 .bcheer{background:rgba(255,107,43,.15);color:var(--ac);flex:0 0 auto;border:1px solid rgba(255,107,43,.3);padding:0 14px;height:44px}
 
 /* ── COUNTDOWN MODAL ─────────────────────────────────────── */
-.cdmodal{position:fixed;inset:0;background:rgba(6,8,15,.95);z-index:4000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);transition:opacity .7s,transform .7s;overflow-y:auto}
+.cdmodal{position:fixed;inset:0;background:rgba(6,8,15,.95);z-index:4000;display:flex;align-items:flex-start;justify-content:center;backdrop-filter:blur(10px);transition:opacity .7s,transform .7s;overflow-y:auto;padding:env(safe-area-inset-top,0) 0 0}
 .cdmodal.closing{opacity:0;transform:scale(1.06);pointer-events:none}
 .cdmodal.hidden{display:none}
 /* GIF background */
 .cd-bg{position:fixed;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;opacity:.14;z-index:0;pointer-events:none;transition:opacity 1s}
-.cdin{text-align:center;padding:44px 36px 36px;max-width:560px;width:90%;position:relative;z-index:1}
-.cd-flag{font-size:72px;display:block;margin-bottom:18px;animation:cd-float 3s ease-in-out infinite}
+.cdin{text-align:center;padding:clamp(20px,5dvh,44px) clamp(16px,5vw,36px) 32px;max-width:560px;width:100%;position:relative;z-index:1;box-sizing:border-box}
+.cd-flag{font-size:clamp(42px,10vw,72px);display:block;margin-bottom:clamp(8px,3vw,18px);animation:cd-float 3s ease-in-out infinite}
 @keyframes cd-float{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-10px) rotate(3deg)}}
 .cd-race{font-size:30px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--tx);margin-bottom:6px}
 .cd-ath{font-size:13px;color:var(--mu);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
@@ -267,9 +267,10 @@ header{
 /* Countdown */
 .cdtimer{display:flex;align-items:center;justify-content:center;gap:10px;margin:20px 0 18px}
 .ct-blk{background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:14px 16px;min-width:70px}
-.ct-num{font-family:var(--fm);font-size:42px;font-weight:700;line-height:1;color:var(--tx);display:block}
+.ct-num{font-family:var(--fm);font-size:clamp(28px,8vw,42px);font-weight:700;line-height:1;color:var(--tx);display:block}
 .ct-lbl{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mu);margin-top:5px;display:block}
-.ct-sep{font-family:var(--fm);font-size:36px;font-weight:300;color:var(--bd);margin-bottom:10px}
+.ct-sep{font-family:var(--fm);font-size:clamp(24px,6vw,36px);font-weight:300;color:var(--bd);margin-bottom:10px}
+.ct-blk{background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:clamp(8px,3vw,14px) clamp(10px,3.5vw,16px);min-width:clamp(52px,14vw,70px)}
 .cd-msg{font-size:13px;color:var(--mu);line-height:1.6;max-width:360px;margin:0 auto 16px}
 .cd-badge{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--gn);letter-spacing:.08em;text-transform:uppercase;background:rgba(0,212,160,.1);border:1px solid rgba(0,212,160,.28);border-radius:20px;padding:5px 14px;margin-bottom:24px}
 /* Viewer list */
@@ -430,9 +431,12 @@ header{
   .m-seg-body{padding:0 12px;max-height:0;overflow:hidden;transition:max-height .28s ease,padding .28s;font-size:13px;color:var(--tx);line-height:1.5}
   .m-seg-body.open{max-height:200px;padding:0 12px 12px}
 
-  /* ── BOUTON PROFIL ALTIMÉTRIQUE ─────────────── */
-  .m-elev-btn{background:rgba(255,255,255,.05);border:1px solid var(--bd);border-radius:10px;padding:10px;color:var(--mu);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:.06em;cursor:pointer;text-align:center;flex-shrink:0}
-  .m-elev-btn:active{background:rgba(255,255,255,.1)}
+  /* ── MINI ÉLÉVATION ─────────────────────────── */
+  .m-elev-mini{width:100%;height:62px;border-radius:10px;background:var(--s1);border:1px solid var(--bd);flex-shrink:0;display:block;cursor:pointer;overflow:visible}
+
+  /* ── STRAVA TOPBAR ───────────────────────────── */
+  .m-strava-btn{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;background:rgba(252,76,2,.1);border:1px solid rgba(252,76,2,.28);flex-shrink:0;text-decoration:none}
+  .m-strava-btn:active{background:rgba(252,76,2,.22)}
 
   /* ── MODAL PROFIL ALTIMÉTRIQUE ──────────────── */
   .m-elev-modal{position:fixed;inset:0;z-index:3000;background:rgba(6,8,15,.97);display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .25s}
@@ -472,6 +476,10 @@ header{
     <div class="h-pill wait" id="lPill"><span class="h-dot"></span><span id="lLbl">—</span></div>
   </div>
   <div class="m-km-r" style="display:none"><div class="m-km-r-val" id="mKmR">—</div><div class="m-km-r-lbl">km rest.</div></div>
+  <!-- Strava compact (mobile only) -->
+  <a class="m-strava-btn" id="mStravaTop" href="#" target="_blank" rel="noopener noreferrer" style="display:none" title="Voir sur Strava">
+    <svg width="16" height="16" viewBox="0 0 32 32" fill="none"><path d="M20 4 L12 16 L17 16 L9 28" stroke="#FC4C02" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M25 4 L17 16 L22 16 L14 28" stroke="#FC4C02" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" opacity=".45"/></svg>
+  </a>
 </header>
 
 <div class="app-main">
@@ -682,8 +690,8 @@ header{
         </div>
         <div class="m-seg-body" id="mSegBody"></div>
       </div>
-      <!-- Voir le profil altimétrique -->
-      <button class="m-elev-btn" id="mElevBtn">🗺 Voir le profil altimétrique</button>
+      <!-- Mini profil altimétrique (tappable → modal complet) -->
+      <svg id="mElevMini" class="m-elev-mini" viewBox="0 0 300 40" preserveAspectRatio="none"></svg>
     </div>
     <!-- CHAT PANEL (cpanel sera déplacé ici par JS) -->
     <div class="m-panel m-panel-chat m-hidden" id="mPanelChat"></div>
@@ -799,6 +807,7 @@ function parseGpx(text){
   if(!S.pts.length) map.fitBounds(courseL.getBounds(),{padding:[40,40]});
   renderElev();
   renderMinimap();
+  renderMobileElev();
   addWaypointMarkers();
 }
 
@@ -1765,9 +1774,14 @@ function initMobileLayout(){
     chev.classList.toggle('open',open);
   };
 
-  // Modal profil altimétrique
-  document.getElementById('mElevBtn').onclick=openMobileElevModal;
+  // Mini élévation tappable → modal
+  const mini=document.getElementById('mElevMini');
+  if(mini) mini.addEventListener('click',openMobileElevModal);
   document.getElementById('mElevClose').onclick=closeMobileElevModal;
+
+  // Strava topbar
+  const stravaTop=document.getElementById('mStravaTop');
+  if(stravaTop&&C.race.stravaUrl) stravaTop.href=C.race.stravaUrl;
 }
 
 function showMobilePanel(panel){
@@ -1850,6 +1864,45 @@ function renderMobile(){
   const vcntSrc=document.getElementById('viewerCnt');
   const vcntTab=document.getElementById('mVcntTab');
   if(vcntSrc&&vcntTab) vcntTab.textContent=vcntSrc.textContent;
+
+  renderMobileElev();
+}
+
+function renderMobileElev(){
+  const svg=document.getElementById('mElevMini');
+  if(!svg||!GPX.loaded||!GPX.pts.length) return;
+  const W=300,H=40,pts=GPX.pts;
+  const step=Math.max(1,Math.floor(pts.length/200));
+  const sp=pts.filter((_,i)=>i%step===0||i===pts.length-1);
+  const maxE=Math.max(...sp.map(p=>p.ele));
+  const minE=Math.min(...sp.map(p=>p.ele))-3;
+  const td=GPX.totalDist;
+  const xOf=km=>(km/td*W).toFixed(1);
+  const yOf=e=>(H-2-(e-minE)/(maxE-minE+1)*(H-6)).toFixed(1);
+  const curKm=S.projKm||S.distKm;
+  let h='';
+  if(curKm>0.1){
+    const si=sp.findIndex(p=>p.cumDist>=curKm);
+    const done=si>0?sp.slice(0,si+1):[];
+    const rem=si>=0?sp.slice(si):sp;
+    if(done.length>1){
+      const pd=done.map((p,i)=>`${i===0?'M':'L'}${xOf(p.cumDist)},${yOf(p.ele)}`).join(' ');
+      h+=`<path d="${pd}" fill="none" stroke="#ff6b2b" stroke-width="2.5" vector-effect="non-scaling-stroke"/>`;
+    }
+    if(rem.length>1){
+      const pd=rem.map((p,i)=>`${i===0?'M':'L'}${xOf(p.cumDist)},${yOf(p.ele)}`).join(' ');
+      h+=`<path d="${pd}" fill="none" stroke="#4fa3ff" stroke-width="1.5" opacity=".35" vector-effect="non-scaling-stroke"/>`;
+    }
+    // Curseur position
+    const cp=pts.find(p=>p.cumDist>=curKm)||pts.at(-1);
+    const cx=xOf(curKm),cy=yOf(cp.ele);
+    h+=`<circle cx="${cx}" cy="${cy}" r="4" fill="#ff6b2b" opacity=".3"><animate attributeName="r" values="4;8;4" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" values=".3;0;.3" dur="1.8s" repeatCount="indefinite"/></circle>`;
+    h+=`<circle cx="${cx}" cy="${cy}" r="3.5" fill="#ff6b2b" stroke="white" stroke-width="1.5" vector-effect="non-scaling-stroke"/>`;
+  } else {
+    const pd=sp.map((p,i)=>`${i===0?'M':'L'}${xOf(p.cumDist)},${yOf(p.ele)}`).join(' ');
+    h+=`<path d="${pd}" fill="none" stroke="#ff6b2b" stroke-width="1.5" opacity=".6" vector-effect="non-scaling-stroke"/>`;
+  }
+  svg.innerHTML=h;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1874,6 +1927,8 @@ async function loadConfig(){
       C.race.stravaUrl=cfg.stravaUrl;
       const cta=document.getElementById("stravaCta");
       if(cta) cta.href=cfg.stravaUrl;
+      const top=document.getElementById("mStravaTop");
+      if(top) top.href=cfg.stravaUrl;
     }
     if(cfg.landingGifUrl){
       const bg=document.getElementById("cdBg");
