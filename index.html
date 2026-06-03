@@ -1476,21 +1476,30 @@ function initChat(){
     if(!n){showNameModal();return null;}
     return n;
   };
+  let _sending=false;
   document.getElementById("bSend").onclick=async()=>{
+    if(_sending) return;
     const n=getName(),m=document.getElementById("cMsg").value.trim();
-    if(!n||!m)return;
+    if(!n||!m) return;
+    _sending=true;
+    document.getElementById("bSend").style.opacity='.5';
     await sendChat(n,m,"msg");
     document.getElementById("cMsg").value="";
     await fetchChat();
+    _sending=false;
+    document.getElementById("bSend").style.opacity='';
   };
   document.querySelectorAll(".breact").forEach(btn=>{
     btn.addEventListener("click",()=>{
       const n=getName(); if(!n)return;
-      triggerReactFloat(btn.dataset.emoji); // feedback immédiat, pas d'attente serveur
-      sendChat(n,btn.dataset.emoji,"cheer"); // fire-and-forget
+      triggerReactFloat(btn.dataset.emoji);
+      sendChat(n,btn.dataset.emoji,"cheer");
     });
   });
-  document.getElementById("cMsg").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();document.getElementById("bSend").click();}});
+  // {once} remplacé par guard _sending pour éviter les doubles via keydown+click
+  document.getElementById("cMsg").addEventListener("keydown",e=>{
+    if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();if(!_sending)document.getElementById("bSend").click();}
+  });
 }
 function showNameModal(){
   const ov=document.getElementById("nmOv"); ov.style.display="flex";
@@ -2286,7 +2295,9 @@ async function init(){
     .then(parseGpx).catch(e=>console.warn("GPX:",e));
   addRavitoMarkers();
   setInterval(renderClock,1000); setInterval(fetchChat,C.chatMs);
-  await poll(); setInterval(poll,C.pollMs);
+  await poll();
+  if(C.sessionId) fetchChat(); // charge l'historique dès qu'une session est trouvée
+  setInterval(poll,C.pollMs);
   pingViewer(); setInterval(pingViewer,90_000); // 90s heartbeat → 3× moins d'écritures KV
 }
 init();
