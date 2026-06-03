@@ -97,9 +97,7 @@ header{
 @keyframes ping{0%{transform:scale(.5);opacity:.8}100%{transform:scale(2.4);opacity:0}}
 
 /* ── DATA PANEL ──────────────────────────────────────────── */
-.dpanel{background:var(--s1);border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow-y:auto}
-.dpanel::-webkit-scrollbar{width:3px}
-.dpanel::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
+.dpanel{background:var(--s1);border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden}
 .blk{padding:13px 16px;border-bottom:1px solid var(--bd);flex-shrink:0}
 .blk-phase{flex:1;min-height:0;overflow-y:auto}
 .lbl{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mu);margin-bottom:9px}
@@ -2192,6 +2190,45 @@ window.testArrivee=function(){S._finishTriggered=false;triggerFinishAnimation();
   window.stopSim=function(){
     if(_timer){clearInterval(_timer);_timer=null;}
     console.log('%c⏹ Simulation arrêtée','color:#ffc532;font-weight:bold');
+  };
+
+  // Clear complet : arrêt + purge KV + reset état dashboard
+  window.clearSim=async function(){
+    window.stopSim();
+    // Purge KV (garde raceConfig)
+    await fetch(`${C.proxy}/admin/flush`,{method:'POST',headers:{'X-Admin-Secret':'kapsalon'}}).catch(()=>{});
+    // Reset état JS
+    C.sessionId='';
+    Object.assign(S,{
+      pts:[],distKm:0,projKm:0,elevGain:0,elevLoss:0,
+      sessionStart:null,lastDT:null,lastReceived:null,
+      lastProjIdx:0,lastProjResult:null,
+      kmHist:[],kmCursor:0,kmStartTs:null,kmStartHr:[],
+      chatMsgs:[],chatLastTs:null,
+      breachCount:0,prevOverCeil:false,lastPhaseLabel:null,
+      _finishTriggered:false,kmTimeline:[]
+    });
+    // Reset carte
+    if(pinMarker){pinMarker.remove();pinMarker=null;}
+    trailL.setLatLngs([]);
+    if(animId){cancelAnimationFrame(animId);animId=null;}
+    // Restaurer le tracé GPX complet
+    if(GPX.loaded&&GPX.pts.length){
+      const step=Math.max(1,Math.floor(GPX.pts.length/600));
+      courseL.setLatLngs(GPX.pts.filter((_,i)=>i%step===0||i===GPX.pts.length-1).map(p=>[p.lat,p.lon]));
+      map.fitBounds(courseL.getBounds(),{padding:[40,40]});
+    }
+    // Reset UI
+    renderKmHist();
+    renderChat();
+    renderElev();
+    renderMinimap();
+    document.getElementById('sbadge').textContent='⏳ EN ATTENTE';
+    document.getElementById('sbadge').className='sbadge wait';
+    document.getElementById('lPill').className='h-pill wait';
+    document.getElementById('lLbl').textContent='—';
+    document.getElementById('sL').textContent='En attente…';
+    console.log('%c✓ Simulation réinitialisée — dashboard propre','color:#00d4a0;font-weight:bold');
   };
 })();
 
