@@ -902,17 +902,11 @@ function checkpointTip(km,label,extra){
     }
   }
 
-  // ETA avec modèle de dérive
-  const{base,slope}=paceDriftModel();
-  if(base){
-    // Intégrale : totalSec = base*d + 0.5*slope*d²
-    const raw=base*dist+0.5*slope*dist*dist;
-    // Bornes : 50% à 250% du temps base (protection contre extrapolations folles)
-    const totalSec=Math.max(dist*base*0.5,Math.min(dist*base*2.5,raw));
-    const etaDate=new Date(Date.now()+totalSec*1000);
-    rows.push({l:"Heure estimée",v:`~${fmtTime(etaDate)}`});
-    const h=Math.floor(totalSec/3600),m=Math.floor((totalSec%3600)/60);
-    rows.push({l:"Temps restant",v:h>0?`${h}h${String(m).padStart(2,"0")}`:`${m} min`});
+  // ETA via helper partagé _etaRows
+  const eta=_etaRows(km);
+  if(eta){
+    rows.push({l:"Heure estimée",v:eta.eta});
+    rows.push({l:"Temps restant",v:eta.dur});
   }
 
   const rowsHtml=rows.map(r=>`<div class="tip-row"><span>${r.l}</span><span>${r.v}</span></div>`).join("");
@@ -932,15 +926,38 @@ function gpxDmKm(km0,km1){
   return Math.round(dm);
 }
 
+function _etaRows(kmTarget){
+  // Helper partagé : calcul ETA vers un km cible via paceDriftModel
+  const curKm=S.projKm||S.distKm;
+  if(kmTarget<=curKm) return null; // déjà franchi
+  const dist=kmTarget-curKm;
+  const{base,slope}=paceDriftModel();
+  if(!base) return null;
+  const raw=base*dist+0.5*slope*dist*dist;
+  const totalSec=Math.max(dist*base*0.5,Math.min(dist*base*2.5,raw));
+  const h=Math.floor(totalSec/3600),m=Math.floor((totalSec%3600)/60);
+  return{
+    eta:`~${fmtTime(new Date(Date.now()+totalSec*1000))}`,
+    dur:h>0?`${h}h${String(m).padStart(2,"0")}`:`${m} min`
+  };
+}
+
 function zoneTip(kmStart,kmEnd,label){
+  const curKm=S.projKm||S.distKm;
+  if(kmStart<=curKm) return `<span class="tip-passed">✓ ${label}</span>`;
   const rows=[
-    {l:"Distance",v:`${(kmEnd-kmStart).toFixed(1)} km`},
-    {l:"Section",v:`km ${kmStart}–${kmEnd}`}
+    {l:"À",v:`${(kmStart-curKm).toFixed(1)} km`},
+    {l:"Zone",v:`km ${kmStart}–${kmEnd} (${(kmEnd-kmStart).toFixed(1)} km)`}
   ];
   if(GPX.loaded){
     const dp=gpxDpKm(kmStart,kmEnd), dm=gpxDmKm(kmStart,kmEnd);
     if(dp!==null&&dp>0) rows.push({l:"D+",v:`+${dp} m`});
     if(dm!==null&&dm>10) rows.push({l:"D−",v:`−${dm} m`});
+  }
+  const eta=_etaRows(kmStart);
+  if(eta){
+    rows.push({l:"Heure estimée",v:eta.eta});
+    rows.push({l:"Temps restant",v:eta.dur});
   }
   const rowsHtml=rows.map(r=>`<div class="tip-row"><span>${r.l}</span><span>${r.v}</span></div>`).join("");
   return `<b>${label}</b>${rowsHtml}`;

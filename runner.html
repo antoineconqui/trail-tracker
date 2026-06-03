@@ -297,12 +297,12 @@ async function fetchMessages() {
     if (messages && messages.length) {
       const newOnes = messages.filter(m => !lastTs || m.ts > lastTs);
       if (newOnes.length) {
+        // Vibrer si au moins un vrai message texte parmi les nouveaux
+        const hasText = newOnes.some(m => m.type !== 'cheer');
         if (lastTs) {
-          // Nouveaux messages : vibration
-          if (navigator.vibrate) navigator.vibrate(150);
-          appendMessages(newOnes);
+          if (hasText && navigator.vibrate) navigator.vibrate(150);
+          appendMessages(newOnes); // filtre interne pour l'affichage
         } else {
-          // Premier chargement
           msgs = messages;
           renderAll();
         }
@@ -345,16 +345,16 @@ async function fetchStats() {
 function renderAll() {
   const el = document.getElementById('msgList');
   el.innerHTML = '';
-  msgs.forEach(m => el.appendChild(buildBubble(m, false)));
+  msgs.filter(m => m.type !== 'cheer').forEach(m => el.appendChild(buildBubble(m, false)));
   scrollToBottom();
 }
 
 function appendMessages(newMsgs) {
   const el = document.getElementById('msgList');
-  const wasEmpty = !msgs.length;
+  const wasEmpty = !msgs.filter(m => m.type !== 'cheer').length;
   newMsgs.forEach(m => {
     msgs.push(m);
-    el.appendChild(buildBubble(m, true));
+    if (m.type !== 'cheer') el.appendChild(buildBubble(m, true)); // pas de bulles pour les reacts
   });
   if (atBottom) {
     scrollToBottom();
