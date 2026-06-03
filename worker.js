@@ -85,9 +85,10 @@ export default {
       const { name, vid } = await req.json();
       if (!vid) return json({ error: "missing vid" }, 400);
       let registry = await env.KV.get("subscribers", "json") || {};
-      if (vid === "__clear__") { registry = {}; }          // vider toute la liste
+      if (vid === "__clear__") { registry = {}; }
       else if (name === "__del__") { delete registry[vid]; }
-      else registry[vid] = { name: String(name || "—").slice(0, 30), ts: Date.now() };
+      else if (name && name.trim()) registry[vid] = { name: String(name).slice(0, 30), ts: Date.now() };
+      // name vide → pas d'entrée fantôme
       await env.KV.put("subscribers", JSON.stringify(registry), { expirationTtl: 86400 * 4 }); // TTL 4 jours
       const subs = Object.values(registry).sort((a, b) => a.ts - b.ts);
       return json({ ok: true, count: subs.length, subscribers: subs.map(v => v.name) });
