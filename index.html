@@ -567,8 +567,8 @@ header{
       <button id="cdJoin" class="cd-reg-btn">Rejoindre les supporters 🎉</button>
     </div>
 
-    <!-- Countdown (affiché après inscription ou si cookie déjà présent) -->
-    <div class="cdtimer" id="cdCountdown" style="display:none">
+    <!-- Countdown — toujours visible -->
+    <div class="cdtimer" id="cdCountdown">
       <div class="ct-blk"><span class="ct-num" id="cdD">--</span><span class="ct-lbl">jours</span></div>
       <div class="ct-sep">:</div>
       <div class="ct-blk"><span class="ct-num" id="cdH">--</span><span class="ct-lbl">heures</span></div>
@@ -579,12 +579,6 @@ header{
     </div>
     <p class="cd-msg" id="cdMsg" style="display:none">Tu es inscrit·e ! Le suivi s'ouvre le <strong>6 juin à 12h00</strong> 🏃</p>
     <div class="cd-badge" id="cdBadge" style="display:none"><span class="viewer-dot"></span>Live tracker actif dès le départ</div>
-
-    <!-- Liste des viewers -->
-    <div class="cd-viewers" id="cdViewers">
-      <div class="cd-viewers-ttl" id="cdViewerTtl">Sois le premier à rejoindre !</div>
-      <div class="cd-chips" id="cdChips"></div>
-    </div>
   </div>
 </div>
 
@@ -1939,7 +1933,7 @@ function initCountdown(){
   // Cas : course déjà commencée ET déjà identifié → pas de landing
   if(raceStarted&&hasName){m.classList.add('hidden');return;}
 
-  // Si déjà identifié, passer directement au countdown
+  // Si déjà identifié, masquer le formulaire directement
   if(hasName) _showCountdownView();
 
   // Handler d'inscription
@@ -1987,7 +1981,7 @@ function initCountdown(){
       }
       return;
     }
-    if(getCookieName()) document.getElementById('cdCountdown').style.display='flex';
+    // countdown toujours visible — pas de condition
     const d=Math.floor(rem/86400000),h=Math.floor((rem%86400000)/3600000),mn=Math.floor((rem%3600000)/60000),s=Math.floor((rem%60000)/1000);
     document.getElementById('cdD').textContent=String(d).padStart(2,'0');
     document.getElementById('cdH').textContent=String(h).padStart(2,'0');
@@ -2081,10 +2075,37 @@ function triggerFinishAnimation(){
   ov.querySelector('.fin-close').addEventListener('click',close);
 }
 
-// Console : window.testDepart()  window.skipCountdown()  window.testArrivee()
+// ── Console helpers ────────────────────────────────────────
 window.testDepart=function(){triggerStartAnimation();};
 window.skipCountdown=function(){closeCountdownModal();};
 window.testArrivee=function(){S._finishTriggered=false;triggerFinishAnimation();};
+
+// Log les supporters connectés
+window.supporters=async function(){
+  if(!C.sessionId){console.warn('%c⚠ Pas de session active','color:#ffc532');return;}
+  try{
+    const r=await fetch(`${C.proxy}/viewers?sid=${C.sessionId}`);
+    const{viewers=[],count=0}=await r.json();
+    console.log(`%c👥 ${count} supporter(s) connecté(s)%c (session ${C.sessionId})`,
+      'color:#00d4a0;font-weight:bold;font-size:13px','color:#6b82a8;font-size:11px');
+    if(viewers.length) console.table(viewers.map((n,i)=>({'#':i+1,'Pseudo':n})));
+    else console.log('%c  Aucun supporter actif','color:#6b82a8');
+  }catch(e){console.error('supporters():', e);}
+};
+
+// Effacer le cookie de pseudo + retirer de la liste des supporters
+window.clearPseudo=async function(){
+  const prev=getCookieName();
+  if(!prev){console.warn('%c⚠ Aucun pseudo en cookie','color:#ffc532');return;}
+  // Expire le cookie immédiatement
+  document.cookie='chatName=;max-age=0;path=/;SameSite=Lax';
+  localStorage.removeItem('chatName');
+  // Retire le viewer du registre en envoyant un ping avec un nom vide et TTL 0
+  // (Le registre expirera naturellement; pour forcer, on envoie un nom vide)
+  if(C.sessionId) await fetch(`${C.proxy}/viewers`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sid:C.sessionId,vid:_vid,name:'__del__'})}).catch(()=>{});
+  console.log(`%c✓ Pseudo "${prev}" effacé — recharge la page pour te ré-identifier`,
+    'color:#00d4a0;font-weight:bold');
+};
 
 // ═══════════════════════════════════════════════════════════
 //  INIT
