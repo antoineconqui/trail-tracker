@@ -247,22 +247,40 @@ header{
 .bcheer{background:rgba(255,107,43,.15);color:var(--ac);flex:0 0 auto;border:1px solid rgba(255,107,43,.3);padding:0 14px;height:44px}
 
 /* ── COUNTDOWN MODAL ─────────────────────────────────────── */
-.cdmodal{position:fixed;inset:0;background:rgba(6,8,15,.97);z-index:4000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);transition:opacity .7s,transform .7s}
+.cdmodal{position:fixed;inset:0;background:rgba(6,8,15,.95);z-index:4000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);transition:opacity .7s,transform .7s;overflow-y:auto}
 .cdmodal.closing{opacity:0;transform:scale(1.06);pointer-events:none}
 .cdmodal.hidden{display:none}
-.cdin{text-align:center;padding:44px 36px;max-width:540px;width:90%}
-.cd-flag{font-size:72px;display:block;margin-bottom:20px;animation:cd-float 3s ease-in-out infinite}
+/* GIF background */
+.cd-bg{position:fixed;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;opacity:.14;z-index:0;pointer-events:none;transition:opacity 1s}
+.cdin{text-align:center;padding:44px 36px 36px;max-width:560px;width:90%;position:relative;z-index:1}
+.cd-flag{font-size:72px;display:block;margin-bottom:18px;animation:cd-float 3s ease-in-out infinite}
 @keyframes cd-float{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-10px) rotate(3deg)}}
 .cd-race{font-size:30px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--tx);margin-bottom:6px}
 .cd-ath{font-size:13px;color:var(--mu);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
-.cd-date{font-size:17px;font-weight:700;color:var(--ac);margin-bottom:32px;letter-spacing:.05em}
-.cdtimer{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:30px}
-.ct-blk{background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:16px 18px;min-width:74px}
-.ct-num{font-family:var(--fm);font-size:44px;font-weight:700;line-height:1;color:var(--tx);display:block}
+.cd-date{font-size:17px;font-weight:700;color:var(--ac);margin-bottom:28px;letter-spacing:.05em}
+/* Registration form */
+.cd-reg{margin:0 auto 4px;width:100%;max-width:340px}
+.cd-reg-hint{font-size:13px;color:var(--mu);margin-bottom:14px;line-height:1.55}
+.cd-reg-input{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:13px 16px;color:var(--tx);font-family:var(--fn);font-size:15px;outline:none;text-align:center;transition:border-color .2s,box-shadow .2s;margin-bottom:10px}
+.cd-reg-input:focus{border-color:var(--ac);box-shadow:0 0 0 2px rgba(255,107,43,.2)}
+.cd-reg-input.shake{animation:cd-shake .35s ease}
+@keyframes cd-shake{0%,100%{transform:none}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.cd-reg-btn{width:100%;background:var(--ac);color:#fff;border:none;border-radius:12px;padding:13px;font-family:var(--fn);font-size:15px;font-weight:800;cursor:pointer;letter-spacing:.04em;transition:background .2s,transform .1s}
+.cd-reg-btn:hover{background:#e5602a}.cd-reg-btn:active{transform:scale(.98)}
+/* Countdown */
+.cdtimer{display:flex;align-items:center;justify-content:center;gap:10px;margin:20px 0 18px}
+.ct-blk{background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:14px 16px;min-width:70px}
+.ct-num{font-family:var(--fm);font-size:42px;font-weight:700;line-height:1;color:var(--tx);display:block}
 .ct-lbl{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mu);margin-top:5px;display:block}
-.ct-sep{font-family:var(--fm);font-size:38px;font-weight:300;color:var(--bd);margin-bottom:12px}
-.cd-msg{font-size:14px;color:var(--mu);line-height:1.65;max-width:380px;margin:0 auto 24px}
-.cd-badge{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--gn);letter-spacing:.08em;text-transform:uppercase;background:rgba(0,212,160,.1);border:1px solid rgba(0,212,160,.28);border-radius:20px;padding:5px 14px}
+.ct-sep{font-family:var(--fm);font-size:36px;font-weight:300;color:var(--bd);margin-bottom:10px}
+.cd-msg{font-size:13px;color:var(--mu);line-height:1.6;max-width:360px;margin:0 auto 16px}
+.cd-badge{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--gn);letter-spacing:.08em;text-transform:uppercase;background:rgba(0,212,160,.1);border:1px solid rgba(0,212,160,.28);border-radius:20px;padding:5px 14px;margin-bottom:24px}
+/* Viewer list */
+.cd-viewers{margin-top:24px;width:100%;max-width:480px;animation:fin-slide .4s .1s ease-out both}
+.cd-viewers-ttl{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mu);margin-bottom:10px}
+.cd-chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}
+.cd-chip{background:var(--s1);border:1px solid var(--bd);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;color:var(--tx)}
+.cd-chip.me{border-color:var(--ac);color:var(--ac);background:rgba(255,107,43,.1)}
 
 /* ── FINISH OVERLAY ──────────────────────────────────────── */
 .finish-ov{position:fixed;inset:0;z-index:5000;background:rgba(6,8,15,.92);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;animation:fin-in .5s ease-out;text-align:center;padding:48px 20px 32px;overflow-y:auto}
@@ -533,14 +551,24 @@ header{
 
 </div>
 
-<!-- Countdown pre-race -->
+<!-- Landing page / Countdown pre-race -->
 <div id="cdModal" class="cdmodal">
+  <div class="cd-bg" id="cdBg"></div>
   <div class="cdin">
     <span class="cd-flag">🏁</span>
     <div class="cd-race">Trail d'Écouves 2026</div>
-    <div class="cd-ath">Antoine Conqui · 61 km · 2200 D+</div>
+    <div class="cd-ath">Antoine Conqui · 61 km · D+2200 m</div>
     <div class="cd-date">Samedi 6 juin · Départ 12h00</div>
-    <div class="cdtimer">
+
+    <!-- Formulaire d'inscription (affiché si pas de cookie) -->
+    <div class="cd-reg" id="cdReg">
+      <p class="cd-reg-hint">Identifie-toi pour accéder au suivi en direct 👇</p>
+      <input id="cdName" class="cd-reg-input" placeholder="Ton prénom ou pseudo" maxlength="30" autocomplete="given-name">
+      <button id="cdJoin" class="cd-reg-btn">Rejoindre les supporters 🎉</button>
+    </div>
+
+    <!-- Countdown (affiché après inscription ou si cookie déjà présent) -->
+    <div class="cdtimer" id="cdCountdown" style="display:none">
       <div class="ct-blk"><span class="ct-num" id="cdD">--</span><span class="ct-lbl">jours</span></div>
       <div class="ct-sep">:</div>
       <div class="ct-blk"><span class="ct-num" id="cdH">--</span><span class="ct-lbl">heures</span></div>
@@ -549,7 +577,14 @@ header{
       <div class="ct-sep">:</div>
       <div class="ct-blk"><span class="ct-num" id="cdSc">--</span><span class="ct-lbl">sec</span></div>
     </div>
-    <div class="cd-badge"><span class="viewer-dot"></span>Live tracker actif dès le départ</div>
+    <p class="cd-msg" id="cdMsg" style="display:none">Tu es inscrit·e ! Le suivi s'ouvre le <strong>6 juin à 12h00</strong> 🏃</p>
+    <div class="cd-badge" id="cdBadge" style="display:none"><span class="viewer-dot"></span>Live tracker actif dès le départ</div>
+
+    <!-- Liste des viewers -->
+    <div class="cd-viewers" id="cdViewers">
+      <div class="cd-viewers-ttl" id="cdViewerTtl">Sois le premier à rejoindre !</div>
+      <div class="cd-chips" id="cdChips"></div>
+    </div>
   </div>
 </div>
 
@@ -726,9 +761,10 @@ function labelEmoji(label){
 const _vid=(()=>{let v=sessionStorage.getItem('vid');if(!v){v=Math.random().toString(36).slice(2,8);sessionStorage.setItem('vid',v);}return v;})();
 async function pingViewer(){
   if(!C.sessionId) return;
+  const name=getCookieName()||"";
   try{
-    const r=await fetch(`${C.proxy}/viewers`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sid:C.sessionId,vid:_vid})});
-    if(r.ok){const{count}=await r.json();document.getElementById("viewerCnt").textContent=count+" 👁";}
+    const r=await fetch(`${C.proxy}/viewers`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sid:C.sessionId,vid:_vid,name})});
+    if(r.ok){const{count,viewers}=await r.json();document.getElementById("viewerCnt").textContent=count+" 👁";renderViewerList(viewers||[]);}
   }catch(e){}
 }
 
@@ -1504,6 +1540,10 @@ async function loadConfig(){
       const cta=document.getElementById("stravaCta");
       if(cta) cta.href=cfg.stravaUrl;
     }
+    if(cfg.landingGifUrl){
+      const bg=document.getElementById("cdBg");
+      if(bg) bg.style.backgroundImage=`url('${cfg.landingGifUrl}')`;
+    }
     document.getElementById("hTitle").textContent=cfg.name;
     document.getElementById("pageTitle").textContent=cfg.name;
     document.getElementById("phStrip").innerHTML=""; buildStrip();
@@ -1854,21 +1894,101 @@ function triggerStartAnimation(){
 function closeCountdownModal(){
   const m=document.getElementById('cdModal');
   if(!m||m.classList.contains('hidden')) return;
+  // Obligatoire : l'utilisateur doit s'être identifié
+  if(!getCookieName()){
+    const inp=document.getElementById('cdName');
+    if(inp){inp.classList.add('shake');inp.focus();setTimeout(()=>inp.classList.remove('shake'),400);}
+    return;
+  }
   m.classList.add('closing');
   setTimeout(()=>{m.classList.add('hidden');triggerStartAnimation();},700);
+}
+
+function renderViewerList(viewers){
+  const ttl=document.getElementById('cdViewerTtl');
+  const chips=document.getElementById('cdChips');
+  if(!ttl||!chips) return;
+  const n=viewers.length;
+  ttl.textContent=n===0?'Sois le premier à rejoindre !':n===1?'1 supporter inscrit':`${n} supporters inscrits`;
+  const me=getCookieName();
+  chips.innerHTML=viewers.map(name=>`<span class="cd-chip${name===me?' me':''}">${name===me?'👤 ':''}${name}</span>`).join('');
+}
+
+async function fetchViewerList(){
+  if(!C.sessionId) return;
+  try{
+    const r=await fetch(`${C.proxy}/viewers?sid=${C.sessionId}`);
+    if(r.ok){const{viewers}=await r.json();renderViewerList(viewers||[]);}
+  }catch(e){}
+}
+
+function _showCountdownView(){
+  document.getElementById('cdReg').style.display='none';
+  document.getElementById('cdCountdown').style.display='flex';
+  document.getElementById('cdMsg').style.display='block';
+  document.getElementById('cdBadge').style.display='inline-flex';
 }
 
 function initCountdown(){
   const m=document.getElementById('cdModal');
   if(!m) return;
-  if(new Date()>=RACE_START){m.classList.add('hidden');return;}
+
+  const raceStarted=new Date()>=RACE_START;
+  const hasName=!!getCookieName();
+
+  // Cas : course déjà commencée ET déjà identifié → pas de landing
+  if(raceStarted&&hasName){m.classList.add('hidden');return;}
+
+  // Si déjà identifié, passer directement au countdown
+  if(hasName) _showCountdownView();
+
+  // Handler d'inscription
+  const doRegister=()=>{
+    const v=(document.getElementById('cdName').value||'').trim();
+    if(!v){
+      const inp=document.getElementById('cdName');
+      inp.classList.add('shake');inp.focus();setTimeout(()=>inp.classList.remove('shake'),400);
+      return;
+    }
+    setCookieName(v);
+    _showCountdownView();
+    pingViewer();
+    fetchViewerList();
+    // Si course déjà commencée, proposer de rejoindre immédiatement
+    if(raceStarted){
+      document.getElementById('cdMsg').innerHTML=`La course est en cours !<br>
+        <button class="cd-reg-btn" style="margin-top:14px;max-width:280px;display:inline-block" onclick="closeCountdownModal()">🏃 Rejoindre le suivi en direct</button>`;
+    }
+  };
+  document.getElementById('cdJoin').onclick=doRegister;
+  document.getElementById('cdName').addEventListener('keydown',e=>{if(e.key==='Enter')doRegister();});
+
+  if(raceStarted){
+    // Course en cours, montrer le message approprié selon l'état
+    if(hasName){
+      document.getElementById('cdMsg').innerHTML=`La course est en cours !<br>
+        <button class="cd-reg-btn" style="margin-top:14px;max-width:280px;display:inline-block" onclick="closeCountdownModal()">🏃 Rejoindre le suivi en direct</button>`;
+    }
+    fetchViewerList();
+    setInterval(fetchViewerList,15000);
+    return;
+  }
+
+  // Countdown actif
   const tick=()=>{
     const rem=RACE_START-new Date();
-    if(rem<=0){closeCountdownModal();return;}
-    const d=Math.floor(rem/86400000);
-    const h=Math.floor((rem%86400000)/3600000);
-    const mn=Math.floor((rem%3600000)/60000);
-    const s=Math.floor((rem%60000)/1000);
+    if(rem<=0){
+      if(getCookieName()) closeCountdownModal();
+      else{
+        _showCountdownView();
+        document.getElementById('cdMsg').innerHTML=`La course vient de commencer !<br>
+          <span style="font-size:12px;color:var(--mu)">Identifie-toi pour rejoindre le suivi</span>`;
+        ['cdD','cdH','cdMn','cdSc'].forEach(id=>document.getElementById(id).textContent='00');
+      }
+      return;
+    }
+    if(getCookieName()) document.getElementById('cdCountdown').style.display='flex';
+    const d=Math.floor(rem/86400000),h=Math.floor((rem%86400000)/3600000),mn=Math.floor((rem%3600000)/60000),s=Math.floor((rem%60000)/1000);
     document.getElementById('cdD').textContent=String(d).padStart(2,'0');
     document.getElementById('cdH').textContent=String(h).padStart(2,'0');
     document.getElementById('cdMn').textContent=String(mn).padStart(2,'0');
@@ -1876,6 +1996,8 @@ function initCountdown(){
   };
   tick();
   setInterval(tick,1000);
+  fetchViewerList();
+  setInterval(fetchViewerList,15000);
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1970,8 +2092,6 @@ window.testArrivee=function(){S._finishTriggered=false;triggerFinishAnimation();
 async function init(){
   initCountdown();
   buildStrip(); initChat(); initGpxDrop(); initMobileChat();
-  // Afficher la modale de pseudo si première visite
-  if(!getCookieName()) showNameModal();
   await loadConfig();
   if(C.gpxUrl) fetch(C.gpxUrl)
     .then(r=>{if(!r.ok) throw new Error(`GPX HTTP ${r.status}`); return r.text();})

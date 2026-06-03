@@ -80,14 +80,29 @@ export default {
       return json({ ok: true, msg: m });
     }
 
-    // ══ POST /viewers ─ heartbeat spectateurs (TTL 90s par viewer) ══
+    // ══ POST /viewers ─ heartbeat spectateur avec nom (registre unique) ══
     if (req.method === "POST" && u.pathname === "/viewers") {
-      const { sid, vid } = await req.json();
+      const { sid, vid, name } = await req.json();
       if (!sid || !vid) return json({ error: "missing fields" }, 400);
-      // Stocke une clé par viewer avec TTL 90s — expire automatiquement si le tab se ferme
-      await env.KV.put(`viewer:${sid}:${vid}`, "1", { expirationTtl: 90 });
-      const list = await env.KV.list({ prefix: `viewer:${sid}:` });
-      return json({ ok: true, count: list.keys.length });
+      const registry = await env.KV.get(`viewers:${sid}`, "json") || {};
+      const now = Date.now();
+      registry[vid] = { name: String(name || "—").slice(0, 30), ts: now };
+      // Pruner les inactifs (> 300s)
+      for (const [k, v] of Object.entries(registry))
+        if (now - v.ts > 300_000) delete registry[k];
+      await env.KV.put(`viewers:${sid}`, JSON.stringify(registry), { expirationTtl: 3600 });
+      const active = Object.values(registry);
+      return json({ ok: true, count: active.length, viewers: active.map(v => v.name) });
+    }
+
+    // ══ GET /viewers ─ liste des spectateurs actifs ═══════════
+    if (req.method === "GET" && u.pathname === "/viewers") {
+      const sid = u.searchParams.get("sid");
+      if (!sid) return json({ error: "missing sid" }, 400);
+      const registry = await env.KV.get(`viewers:${sid}`, "json") || {};
+      const now = Date.now();
+      const active = Object.values(registry).filter(v => now - v.ts < 300_000);
+      return json({ viewers: active.map(v => v.name), count: active.length });
     }
 
     // ══ GET /chat ══════════════════════════════════════════════
