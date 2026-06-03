@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title id="pageTitle">LiveTrack</title>
+<link rel="icon" id="favicon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><text y='32' font-size='32'>🏁</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -1696,6 +1697,23 @@ function renderNextEvents(km){
 }
 
 // ═══════════════════════════════════════════════════════════
+//  FAVICON DYNAMIQUE
+// ═══════════════════════════════════════════════════════════
+function updateFavicon(){
+  const now=new Date();
+  let emoji='🏁';
+  if(now>=RACE_START && !S._finishTriggered){
+    // Course en cours → montagne (runner)
+    const km=S.projKm||S.distKm;
+    emoji=km>0?'⛰️':'🏁';
+  } else if(S._finishTriggered){
+    emoji='🥇';
+  }
+  document.getElementById('favicon').href=
+    `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><text y='32' font-size='32'>${emoji}</text></svg>`;
+}
+
+// ═══════════════════════════════════════════════════════════
 //  RENDER
 // ═══════════════════════════════════════════════════════════
 function render(){
@@ -1793,6 +1811,7 @@ function render(){
 
   // Détection arrivée (GPS proche du dernier waypoint ou km ≥ distKm - 0.4)
   if(km>=C.race.distKm-0.4&&!S._finishTriggered) setTimeout(triggerFinishAnimation,600);
+  updateFavicon();
 
   // Charts
   renderPaceBars();
