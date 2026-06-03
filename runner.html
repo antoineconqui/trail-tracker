@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Antoine — Live Chat</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#06080f;--s1:#0c1020;--s2:#111828;--bd:#1a2540;
+  --tx:#ccd6f0;--mu:#6b82a8;--ac:#ff6b2b;--gn:#00d4a0;
+  --fn:'Barlow Condensed',sans-serif;
+}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--fn);
+  font-size:18px;overflow:hidden}
+
+/* ── PIN SCREEN ─────────────────────────────────── */
+#pinScreen{
+  position:fixed;inset:0;background:var(--bg);z-index:100;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:20px;padding:32px;
+}
+.pin-emoji{font-size:64px}
+.pin-title{font-size:26px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.pin-sub{font-size:14px;color:var(--mu)}
+.pin-input{
+  width:100%;max-width:280px;background:var(--s1);border:1px solid var(--bd);
+  border-radius:14px;padding:16px;color:var(--tx);font-family:var(--fn);
+  font-size:24px;text-align:center;letter-spacing:.3em;outline:none;
+}
+.pin-input:focus{border-color:var(--ac);box-shadow:0 0 0 2px rgba(255,107,43,.2)}
+.pin-btn{
+  width:100%;max-width:280px;height:56px;background:var(--ac);color:#fff;
+  border:none;border-radius:14px;font-family:var(--fn);font-size:20px;
+  font-weight:800;letter-spacing:.06em;cursor:pointer;
+}
+.pin-btn:active{filter:brightness(.9)}
+.pin-error{color:#ff3d5a;font-size:14px;font-weight:700;display:none}
+
+/* ── MAIN LAYOUT ─────────────────────────────────── */
+#main{height:100dvh;display:flex;flex-direction:column}
+
+/* ── HEADER ─────────────────────────────────────── */
+#header{
+  flex-shrink:0;background:var(--s1);border-bottom:1px solid var(--bd);
+  padding:10px 14px;display:flex;align-items:center;justify-content:space-between;
+  gap:10px;
+}
+.h-me{font-size:15px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--ac)}
+.h-stats{display:flex;gap:14px;align-items:center}
+.hstat{text-align:right;line-height:1.1}
+.hstat-v{font-family:'DM Mono',monospace;font-size:16px;font-weight:700}
+.hstat-l{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--mu)}
+.h-refresh{width:36px;height:36px;background:rgba(255,255,255,.06);border:1px solid var(--bd);
+  border-radius:8px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:16px;flex-shrink:0;transition:background .15s}
+.h-refresh:active{background:rgba(255,255,255,.12)}
+.h-dot{width:8px;height:8px;border-radius:50%;background:var(--gn);animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── MESSAGES ────────────────────────────────────── */
+#msgList{
+  flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;
+  overscroll-behavior:contain;
+}
+#msgList::-webkit-scrollbar{width:3px}
+#msgList::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
+
+.bubble{max-width:85%;border-radius:18px;padding:12px 15px;word-break:break-word}
+.bubble-in{
+  align-self:flex-start;background:var(--s2);border:1px solid var(--bd);
+  border-bottom-left-radius:6px;
+}
+.bubble-out{
+  align-self:flex-end;background:rgba(255,107,43,.2);
+  border:1px solid rgba(255,107,43,.35);border-bottom-right-radius:6px;
+}
+.bubble-cheer{
+  align-self:center;background:rgba(255,107,43,.12);
+  border:1px solid rgba(255,107,43,.3);text-align:center;
+}
+.b-name{font-size:12px;font-weight:700;color:var(--ac);margin-bottom:4px;letter-spacing:.04em}
+.b-out-lbl{font-size:12px;font-weight:700;color:rgba(255,107,43,.7);margin-bottom:4px;text-align:right}
+.b-text{font-size:17px;line-height:1.45}
+.b-cheer-emoji{font-size:28px;margin-bottom:4px}
+.b-meta{font-size:11px;color:var(--mu);margin-top:5px}
+.bubble-out .b-meta{text-align:right}
+.bubble-new{animation:pop-in .25s ease-out}
+@keyframes pop-in{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:none}}
+
+.empty-state{flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;color:var(--mu);font-size:15px;gap:10px}
+.empty-state span{font-size:40px}
+
+/* ── QUICK REPLIES ───────────────────────────────── */
+#quickRow{
+  flex-shrink:0;padding:8px 10px 0;
+  display:flex;gap:6px;overflow-x:auto;
+}
+#quickRow::-webkit-scrollbar{display:none}
+.qbtn{
+  flex-shrink:0;height:40px;padding:0 14px;background:var(--s1);
+  border:1px solid var(--bd);border-radius:20px;
+  color:var(--tx);font-family:var(--fn);font-size:15px;font-weight:700;
+  cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s;
+}
+.qbtn:active{background:var(--s2);border-color:var(--ac)}
+
+/* ── REPLY BAR ───────────────────────────────────── */
+#replyBar{
+  flex-shrink:0;padding:8px 10px 12px;
+  display:flex;gap:8px;align-items:center;
+  background:var(--s1);border-top:1px solid var(--bd);
+}
+#replyInput{
+  flex:1;background:var(--bg);border:1px solid var(--bd);border-radius:22px;
+  padding:11px 16px;color:var(--tx);font-family:var(--fn);font-size:17px;
+  outline:none;transition:border-color .2s;
+}
+#replyInput:focus{border-color:var(--ac)}
+#sendBtn{
+  width:48px;height:48px;background:var(--ac);border:none;border-radius:50%;
+  color:#fff;font-size:22px;cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:filter .15s;
+}
+#sendBtn:active{filter:brightness(.85)}
+#sendBtn.sending{background:var(--mu);pointer-events:none}
+
+/* ── NEW MSG BADGE ───────────────────────────────── */
+#newBadge{
+  position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+  background:var(--ac);color:#fff;border-radius:20px;padding:6px 18px;
+  font-size:14px;font-weight:700;cursor:pointer;z-index:50;
+  box-shadow:0 4px 12px rgba(255,107,43,.5);
+  display:none;animation:float-up .3s ease-out;
+}
+@keyframes float-up{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+@media(prefers-color-scheme:light){
+  :root{--bg:#f0f2f8;--s1:#e8eaf4;--s2:#dde0ef;--bd:#c8ccd8;--tx:#1a1f30;--mu:#7080a0}
+}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- PIN SCREEN -->
+<div id="pinScreen">
+  <span class="pin-emoji">🏃</span>
+  <div class="pin-title">Runner Dashboard</div>
+  <div class="pin-sub">Code secret requis</div>
+  <input id="pinInput" class="pin-input" type="password" inputmode="text" placeholder="••••••" autocomplete="off" maxlength="20">
+  <div class="pin-error" id="pinError">Code incorrect 🔴</div>
+  <button class="pin-btn" id="pinBtn">Accéder →</button>
+</div>
+
+<!-- MAIN INTERFACE -->
+<div id="main" style="display:none">
+
+  <div id="header">
+    <div>
+      <div class="h-me">🏃 Antoine</div>
+      <div style="font-size:11px;color:var(--mu);display:flex;align-items:center;gap:5px;margin-top:2px">
+        <span class="h-dot"></span><span id="statusLbl">En attente…</span>
+      </div>
+    </div>
+    <div class="h-stats">
+      <div class="hstat"><div class="hstat-v" id="statKm">—</div><div class="hstat-l">km</div></div>
+      <div class="hstat"><div class="hstat-v" id="statHr">—</div><div class="hstat-l">bpm</div></div>
+      <div class="hstat"><div class="hstat-v" id="statTm">—</div><div class="hstat-l">tps</div></div>
+    </div>
+    <div class="h-refresh" id="refreshBtn" title="Rafraîchir">🔄</div>
+  </div>
+
+  <div id="msgList"></div>
+
+  <div id="quickRow">
+    <button class="qbtn" data-msg="💪 Merci à tous !">💪 Merci !</button>
+    <button class="qbtn" data-msg="🔥 On y va !">🔥 On y va !</button>
+    <button class="qbtn" data-msg="😤 Dans le dur mais je tiens !">😤 Dans le dur</button>
+    <button class="qbtn" data-msg="❤️ Merci, ça fait du bien !">❤️ Ça booste</button>
+    <button class="qbtn" data-msg="🏔️ Sommet en vue !">🏔️ Sommet !</button>
+    <button class="qbtn" data-msg="🏁 Derniers kms, on lâche rien !">🏁 Sprint final</button>
+  </div>
+
+  <div id="replyBar">
+    <input id="replyInput" type="text" placeholder="Répondre…" maxlength="280" autocomplete="off">
+    <button id="sendBtn">↑</button>
+  </div>
+
+</div>
+
+<div id="newBadge" onclick="scrollToBottom()">↓ nouveaux messages</div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────
+const PROXY = 'https://aged-frog-1690.antoineconqui.workers.dev';
+const RUNNER_NAME = 'Antoine 🏃';
+const PIN_KEY = 'runnerPin';
+const POLL_MS = 5000; // 5s — plus réactif que le dashboard
+let sid = null, lastTs = null, atBottom = true;
+let msgs = [], sessionStart = null;
+
+// ── PIN AUTH ──────────────────────────────────────
+function checkPin() {
+  const val = document.getElementById('pinInput').value.trim();
+  // PIN stocké dans sessionStorage pour la session
+  const stored = sessionStorage.getItem(PIN_KEY);
+  // Le PIN correct est chargé depuis le config (voir loadConfig) ou fallback
+  const correct = window._runnerPin || 'trail2026';
+  if (val === correct) {
+    sessionStorage.setItem(PIN_KEY, val);
+    document.getElementById('pinScreen').style.display = 'none';
+    document.getElementById('main').style.display = 'flex';
+    boot();
+  } else {
+    const err = document.getElementById('pinError');
+    err.style.display = 'block';
+    document.getElementById('pinInput').value = '';
+    document.getElementById('pinInput').focus();
+    setTimeout(() => err.style.display = 'none', 2500);
+    if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+  }
+}
+
+// Auto-login si PIN en session
+(async () => {
+  await loadConfig();
+  const stored = sessionStorage.getItem(PIN_KEY);
+  const correct = window._runnerPin || 'trail2026';
+  if (stored === correct) {
+    document.getElementById('pinScreen').style.display = 'none';
+    document.getElementById('main').style.display = 'flex';
+    boot();
+  } else {
+    document.getElementById('pinInput').focus();
+  }
+})();
+
+document.getElementById('pinBtn').onclick = checkPin;
+document.getElementById('pinInput').addEventListener('keydown', e => { if (e.key === 'Enter') checkPin(); });
+
+// ── CONFIG ────────────────────────────────────────
+async function loadConfig() {
+  try {
+    const r = await fetch('https://raw.githubusercontent.com/antoineconqui/trail-tracker/main/config-ecouves.json');
+    if (r.ok) {
+      const cfg = await r.json();
+      if (cfg.runnerPin) window._runnerPin = cfg.runnerPin;
+    }
+  } catch(e) {}
+}
+
+// ── BOOT ──────────────────────────────────────────
+async function boot() {
+  // Charger la session courante
+  try {
+    const r = await fetch(`${PROXY}/current`);
+    const { sid: s } = await r.json();
+    sid = s;
+  } catch(e) {}
+
+  await refreshAll();
+  setInterval(refreshAll, POLL_MS);
+  document.getElementById('refreshBtn').onclick = refreshAll;
+}
+
+// ── REFRESH MESSAGES + STATS ──────────────────────
+async function refreshAll() {
+  if (!sid) {
+    // Retenter de trouver une session
+    try {
+      const r = await fetch(`${PROXY}/current`);
+      const { sid: s } = await r.json();
+      if (s) { sid = s; }
+    } catch(e) {}
+    if (!sid) { document.getElementById('statusLbl').textContent = 'En attente de session…'; return; }
+  }
+
+  await Promise.all([fetchMessages(), fetchStats()]);
+}
+
+async function fetchMessages() {
+  try {
+    const since = lastTs ? `&since=${encodeURIComponent(lastTs)}` : '';
+    const r = await fetch(`${PROXY}/chat?sid=${sid}${since}`);
+    const { messages } = await r.json();
+    if (messages && messages.length) {
+      const newOnes = messages.filter(m => !lastTs || m.ts > lastTs);
+      if (newOnes.length) {
+        if (lastTs) {
+          // Nouveaux messages : vibration
+          if (navigator.vibrate) navigator.vibrate(150);
+          appendMessages(newOnes);
+        } else {
+          // Premier chargement
+          msgs = messages;
+          renderAll();
+        }
+        lastTs = messages.at(-1).ts;
+      }
+    }
+    if (!lastTs && !messages.length) {
+      document.getElementById('msgList').innerHTML = `
+        <div class="empty-state"><span>💬</span>Aucun message pour l'instant…</div>`;
+    }
+    document.getElementById('statusLbl').textContent = 'Connecté';
+  } catch(e) {
+    document.getElementById('statusLbl').textContent = '⚠️ Erreur réseau';
+  }
+}
+
+async function fetchStats() {
+  try {
+    const since = lastTs ? `&since=${encodeURIComponent(new Date(new Date(lastTs).getTime()-60000).toISOString())}` : '';
+    const r = await fetch(`${PROXY}/data?sid=${sid}${since}`);
+    const { meta, points, updated } = await r.json();
+    if (meta && !sessionStart) {
+      sessionStart = meta.start;
+    }
+    if (points && points.length) {
+      const last = points.at(-1);
+      document.getElementById('statHr').textContent = last.heartRateBeatsPerMin || '—';
+    }
+    if (sessionStart) {
+      const ms = Date.now() - new Date(sessionStart).getTime();
+      if (ms > 0) {
+        const h = Math.floor(ms/3600000), m = Math.floor((ms%3600000)/60000);
+        document.getElementById('statTm').textContent = `${h}h${String(m).padStart(2,'0')}`;
+      }
+    }
+  } catch(e) {}
+}
+
+// ── RENDER ────────────────────────────────────────
+function renderAll() {
+  const el = document.getElementById('msgList');
+  el.innerHTML = '';
+  msgs.forEach(m => el.appendChild(buildBubble(m, false)));
+  scrollToBottom();
+}
+
+function appendMessages(newMsgs) {
+  const el = document.getElementById('msgList');
+  const wasEmpty = !msgs.length;
+  newMsgs.forEach(m => {
+    msgs.push(m);
+    el.appendChild(buildBubble(m, true));
+  });
+  if (atBottom) {
+    scrollToBottom();
+  } else {
+    const badge = document.getElementById('newBadge');
+    badge.style.display = 'block';
+  }
+  if (wasEmpty) el.querySelector('.empty-state')?.remove();
+}
+
+function buildBubble(m, animate) {
+  const isMe = m.name === RUNNER_NAME || m.name === 'Antoine';
+  const isCheer = m.type === 'cheer';
+  const div = document.createElement('div');
+  if (isCheer) {
+    div.className = `bubble bubble-cheer${animate?' bubble-new':''}`;
+    div.innerHTML = `<div class="b-cheer-emoji">${m.msg}</div><div class="b-meta">${m.name} · ${fmtTime(m.ts)}</div>`;
+  } else if (isMe) {
+    div.className = `bubble bubble-out${animate?' bubble-new':''}`;
+    div.innerHTML = `<div class="b-out-lbl">Moi</div><div class="b-text">${escHtml(m.msg)}</div><div class="b-meta">${fmtTime(m.ts)}</div>`;
+  } else {
+    div.className = `bubble bubble-in${animate?' bubble-new':''}`;
+    div.innerHTML = `<div class="b-name">${escHtml(m.name)}</div><div class="b-text">${escHtml(m.msg)}</div><div class="b-meta">${fmtTime(m.ts)}</div>`;
+  }
+  return div;
+}
+
+// ── SEND ──────────────────────────────────────────
+async function sendMessage(text) {
+  if (!text.trim() || !sid) return;
+  const btn = document.getElementById('sendBtn');
+  btn.classList.add('sending');
+  btn.textContent = '…';
+  try {
+    await fetch(`${PROXY}/chat`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ sid, name: RUNNER_NAME, msg: text, type: 'msg' })
+    });
+    document.getElementById('replyInput').value = '';
+    await fetchMessages();
+    if (navigator.vibrate) navigator.vibrate(40);
+  } catch(e) {}
+  btn.classList.remove('sending');
+  btn.textContent = '↑';
+}
+
+document.getElementById('sendBtn').onclick = () => {
+  sendMessage(document.getElementById('replyInput').value.trim());
+};
+document.getElementById('replyInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') sendMessage(e.target.value.trim());
+});
+document.querySelectorAll('.qbtn').forEach(btn => {
+  btn.addEventListener('click', () => sendMessage(btn.dataset.msg));
+});
+
+// ── SCROLL ────────────────────────────────────────
+function scrollToBottom() {
+  const el = document.getElementById('msgList');
+  el.scrollTop = el.scrollHeight;
+  document.getElementById('newBadge').style.display = 'none';
+  atBottom = true;
+}
+
+document.getElementById('msgList').addEventListener('scroll', function() {
+  const el = this;
+  atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
+  if (atBottom) document.getElementById('newBadge').style.display = 'none';
+});
+
+// ── UTILS ─────────────────────────────────────────
+function fmtTime(iso) {
+  const d = new Date(iso);
+  if (!sessionStart) return d.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+  const ms = d - new Date(sessionStart);
+  if (ms < 0) return d.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+  const h = Math.floor(ms/3600000), m = Math.floor((ms%3600000)/60000);
+  return `+${h}h${String(m).padStart(2,'0')}`;
+}
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>
