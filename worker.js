@@ -151,7 +151,13 @@ export default {
       let registry = await env.KV.get("subscribers", "json") || {};
       if (vid === "__clear__") { registry = {}; }
       else if (name === "__del__") { delete registry[vid]; }
-      else if (name && name.trim()) registry[vid] = { name: String(name).slice(0, 30), ts: Date.now() };
+      else if (name && name.trim()) {
+        const clean = String(name).trim().slice(0, 30);
+        // Supprimer toute entrée existante avec le même nom (multi-device, re-inscription)
+        for (const k of Object.keys(registry))
+          if (k !== vid && registry[k].name.toLowerCase() === clean.toLowerCase()) delete registry[k];
+        registry[vid] = { name: clean, ts: Date.now() };
+      }
       await env.KV.put("subscribers", JSON.stringify(registry), { expirationTtl: 86400 * 4 });
       const subs = Object.values(registry).sort((a, b) => a.ts - b.ts);
       return json({ ok: true, count: subs.length, subscribers: subs.map(v => v.name) });
