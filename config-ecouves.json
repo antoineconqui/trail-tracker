@@ -12,8 +12,8 @@
   "phases": [
     {
       "label":       "PH 1",
-      "title":       "Secteur dentelé",
-      "description": "Quatre montées à 7–12% en 13 km. Le profil en dents de scie ne laisse pas trouver de rythme. Fond de vallée km 13.38. Premier ravito eau 400 m après.",
+      "title":       "Zéé partii",
+      "description": "Quatre montées à 7–12% en 13 km. Le profil en dents de scie ne laisse pas trouver de rythme. Fond de vallée km 13.38. Premier ravito eau à la fin.",
       "kmStart": 0,     "kmEnd": 13.79,
       "fcMax":   148,   "color": "#00d4a0"
     },
@@ -33,28 +33,28 @@
     },
     {
       "label":       "PH 4",
-      "title":       "Ascension principale",
+      "title":       "Montée de salopard",
       "description": "La montée décisive : depuis +63 m (km 30.75) jusqu'au sommet +226 m (km 36.35), soit +163 m en 5.6 km. Ravito complet km 33.50 à mi-pente. La descente post-sommet démarre immédiatement à -15.1%.",
       "kmStart": 30.75, "kmEnd": 37.58,
       "fcMax":   160,   "color": "#ff9b3a"
     },
     {
       "label":       "PH 5",
-      "title":       "Du sommet au point le plus bas",
+      "title":       "Descente aux enfers",
       "description": "Depuis le creux post-sommet km 37.58, descente vers la Fan Zone km 40.20, puis plongée jusqu'au point le plus bas du parcours km 43.08 — légèrement sous le niveau du départ. Remontée jusqu'au ravito eau km 47.95.",
       "kmStart": 37.58, "kmEnd": 47.95,
       "fcMax":   158,   "color": "#ff6b2b"
     },
     {
       "label":       "PH 6",
-      "title":       "Secteur technique aval",
+      "title":       "Les quadris en sueur",
       "description": "Succession de montées et descentes courtes et raides : côte à 14% km 49, descente à -12% km 51, montée à 10% km 53. Les chocs excentriques s'accumulent. Dernier ravito eau km 56.",
       "kmStart": 47.95, "kmEnd": 56.00,
       "fcMax":   162,   "color": "#e84848"
     },
     {
       "label":       "PH 7",
-      "title":       "Effort de rupture",
+      "title":       "Hardcore à la mort",
       "description": "La montée la plus raide du parcours : 1 km à 9.7%, maximum 16.2%, après 56 km d'effort. Dernier sommet km 58.25 (+133 m). Deux descentes finales. 5 km. La tête prend le relais des jambes.",
       "kmStart": 56.00, "kmEnd": 61.00,
       "fcMax":   170,   "color": "#ff1f4a"

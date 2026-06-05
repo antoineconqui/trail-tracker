@@ -180,12 +180,12 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--fn)
   <div id="msgList"></div>
 
   <div id="quickRow">
-    <button class="qbtn" data-msg="💪 Merci à tous !">💪 Merci !</button>
-    <button class="qbtn" data-msg="🔥 On y va !">🔥 On y va !</button>
-    <button class="qbtn" data-msg="😤 Dans le dur mais je tiens !">😤 Dans le dur</button>
-    <button class="qbtn" data-msg="❤️ Merci, ça fait du bien !">❤️ Ça booste</button>
-    <button class="qbtn" data-msg="🏔️ Sommet en vue !">🏔️ Sommet !</button>
-    <button class="qbtn" data-msg="🏁 Derniers kms, on lâche rien !">🏁 Sprint final</button>
+    <button class="qbtn" data-msg="❤️ Merci la team ❤️">Merci</button>
+    <button class="qbtn" data-msg="💪 Physiologiquement en footing 💪">En footing</button>
+    <button class="qbtn" data-msg="🥵 Point faible : Trop fort 🥵">Trop fort</button>
+    <button class="qbtn" data-msg="😎 Peinard 😎">Peinard</button>
+    <button class="qbtn" data-msg="😤 Dans le dur 😤">Dans le dur</button>
+    <button class="qbtn" data-msg="💀 Envie de canner 💀">Envie de canner</button>
   </div>
 
   <div id="replyBar">
@@ -212,7 +212,7 @@ function checkPin() {
   // PIN stocké dans sessionStorage pour la session
   const stored = sessionStorage.getItem(PIN_KEY);
   // Le PIN correct est chargé depuis le config (voir loadConfig) ou fallback
-  const correct = window._runnerPin || '2906';
+  const correct = window._runnerPin || '1702';
   if (val === correct) {
     sessionStorage.setItem(PIN_KEY, val);
     document.getElementById('pinScreen').style.display = 'none';
@@ -232,7 +232,7 @@ function checkPin() {
 (async () => {
   await loadConfig();
   const stored = sessionStorage.getItem(PIN_KEY);
-  const correct = window._runnerPin || '2906';
+  const correct = window._runnerPin || '1702';
   if (stored === correct) {
     document.getElementById('pinScreen').style.display = 'none';
     document.getElementById('main').style.display = 'flex';
