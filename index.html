@@ -335,7 +335,7 @@ header{
 @keyframes tIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 
 /* Éléments exclusifs mobile — masqués sur desktop */
-#mElevModal{display:none}
+.m-elev-modal{display:none}
 .h-desktop-tip{display:none}
 
 /* ── MOBILE ──────────────────────────────────────────────── */
@@ -379,7 +379,7 @@ header{
   .h-id{display:flex;flex-direction:column;justify-content:center}
   .h-race{font-size:16px}
   .h-ath{display:none}
-  .h-desktop-tip{font-size:9px;color:var(--mu);letter-spacing:.06em;margin-top:1px;opacity:.7}
+  .h-desktop-tip{display:block;font-size:9px;color:var(--mu);letter-spacing:.06em;margin-top:1px;opacity:.7}
   .sbadge{display:none}
   /* Masquer les stats desktop, laisser de la place aux éléments mobile */
   .h-meta>.hstat,.h-pill{display:none}
