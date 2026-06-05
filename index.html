@@ -272,7 +272,7 @@ header{
 .ct-sep{font-family:var(--fm);font-size:clamp(24px,6vw,36px);font-weight:300;color:var(--bd);margin-bottom:10px}
 .cd-msg{font-size:13px;color:var(--mu);line-height:1.6;max-width:360px;margin:0 auto 16px}
 .cd-badge{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--gn);letter-spacing:.08em;text-transform:uppercase;background:rgba(0,212,160,.1);border:1px solid rgba(0,212,160,.28);border-radius:20px;padding:5px 14px;margin-bottom:12px}
-.cd-edit-btn{display:none;background:none;border:none;color:var(--mu);font-size:11px;cursor:pointer;padding:3px 10px;border-radius:8px;letter-spacing:.04em;margin-bottom:16px;transition:color .15s,background .15s}
+.cd-edit-btn{display:none;background:none;border:none;color:var(--mu);font-size:11px;cursor:pointer;padding:3px 10px;border-radius:8px;letter-spacing:.04em;margin:0 auto 16px;transition:color .15s,background .15s}
 .cd-edit-btn:hover{color:var(--tx);background:var(--s2)}
 /* Viewer list */
 .cd-viewers{margin-top:24px;width:100%;max-width:480px;animation:fin-slide .4s .1s ease-out both}
@@ -2379,7 +2379,7 @@ function _showCountdownView(){
   document.getElementById('cdBadge').style.display='inline-flex';
   const editBtn=document.getElementById('cdEditBtn');
   const editLabel=document.getElementById('cdEditLabel');
-  if(editBtn){editBtn.style.display='inline-block';if(editLabel)editLabel.textContent=getCookieName()||'';}
+  if(editBtn){editBtn.style.display='block';if(editLabel)editLabel.textContent=getCookieName()||'';}
 }
 
 function initCountdown(){
