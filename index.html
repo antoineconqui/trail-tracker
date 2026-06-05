@@ -271,7 +271,9 @@ header{
 .ct-lbl{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mu);margin-top:5px;display:block;text-align:center}
 .ct-sep{font-family:var(--fm);font-size:clamp(24px,6vw,36px);font-weight:300;color:var(--bd);margin-bottom:10px}
 .cd-msg{font-size:13px;color:var(--mu);line-height:1.6;max-width:360px;margin:0 auto 16px}
-.cd-badge{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--gn);letter-spacing:.08em;text-transform:uppercase;background:rgba(0,212,160,.1);border:1px solid rgba(0,212,160,.28);border-radius:20px;padding:5px 14px;margin-bottom:24px}
+.cd-badge{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--gn);letter-spacing:.08em;text-transform:uppercase;background:rgba(0,212,160,.1);border:1px solid rgba(0,212,160,.28);border-radius:20px;padding:5px 14px;margin-bottom:12px}
+.cd-edit-btn{display:none;background:none;border:none;color:var(--mu);font-size:11px;cursor:pointer;padding:3px 10px;border-radius:8px;letter-spacing:.04em;margin-bottom:16px;transition:color .15s,background .15s}
+.cd-edit-btn:hover{color:var(--tx);background:var(--s2)}
 /* Viewer list */
 .cd-viewers{margin-top:24px;width:100%;max-width:480px;animation:fin-slide .4s .1s ease-out both}
 .cd-viewers-ttl{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mu);margin-bottom:10px}
@@ -764,6 +766,7 @@ header{
     </div>
     <p class="cd-msg" id="cdMsg" style="display:none">Tu es inscrit·e ! Le suivi s'ouvre le <strong>6 juin à 12h00</strong> 🏃</p>
     <div class="cd-badge" id="cdBadge" style="display:none"><span class="viewer-dot"></span>Live tracker actif dès le départ</div>
+    <button class="cd-edit-btn" id="cdEditBtn">✏️ <span id="cdEditLabel"></span></button>
 
     <!-- Liste des supporters inscrits (masquée pendant la course) -->
     <div class="cd-viewers" id="cdViewers">
@@ -2374,6 +2377,9 @@ function _showCountdownView(){
   document.getElementById('cdCountdown').style.display='flex';
   document.getElementById('cdMsg').style.display='block';
   document.getElementById('cdBadge').style.display='inline-flex';
+  const editBtn=document.getElementById('cdEditBtn');
+  const editLabel=document.getElementById('cdEditLabel');
+  if(editBtn){editBtn.style.display='inline-block';if(editLabel)editLabel.textContent=getCookieName()||'';}
 }
 
 function initCountdown(){
@@ -2414,6 +2420,15 @@ function initCountdown(){
   };
   document.getElementById('cdJoin').onclick=doRegister;
   document.getElementById('cdName').addEventListener('keydown',e=>{if(e.key==='Enter')doRegister();});
+  document.getElementById('cdEditBtn').onclick=()=>{
+    const inp=document.getElementById('cdName');
+    inp.value=getCookieName()||'';
+    document.getElementById('cdReg').style.display='';
+    document.getElementById('cdBadge').style.display='none';
+    document.getElementById('cdMsg').style.display='none';
+    document.getElementById('cdEditBtn').style.display='none';
+    inp.focus();inp.select();
+  };
 
   if(raceStarted){
     // Course en cours, montrer le message approprié selon l'état
