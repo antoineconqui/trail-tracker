@@ -334,6 +334,10 @@ header{
 .wp-toast{position:fixed;bottom:48px;left:50%;transform:translateX(-50%);background:var(--s1);border:1px solid var(--ac);border-radius:16px;padding:9px 20px;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ac);z-index:900;animation:tIn .3s ease-out;pointer-events:none;box-shadow:0 4px 20px rgba(255,107,43,.3);max-width:min(90vw,520px);text-align:center;white-space:normal;line-height:1.3}
 @keyframes tIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 
+/* Éléments exclusifs mobile — masqués sur desktop */
+#mElevModal{display:none}
+.h-desktop-tip{display:none}
+
 /* ── MOBILE ──────────────────────────────────────────────── */
 @media(max-width:960px){
   .app-main{grid-template-columns:1fr;overflow-y:auto}
@@ -375,6 +379,7 @@ header{
   .h-id{display:flex;flex-direction:column;justify-content:center}
   .h-race{font-size:16px}
   .h-ath{display:none}
+  .h-desktop-tip{font-size:9px;color:var(--mu);letter-spacing:.06em;margin-top:1px;opacity:.7}
   .sbadge{display:none}
   /* Masquer les stats desktop, laisser de la place aux éléments mobile */
   .h-meta>.hstat,.h-pill{display:none}
@@ -480,6 +485,7 @@ header{
   <div class="h-id">
     <div class="h-race" id="hTitle">LiveTrack</div>
     <div class="h-ath"  id="hAth">—</div>
+    <div class="h-desktop-tip">version complète sur desktop</div>
   </div>
   <div class="sbadge wait" id="sbadge">⏳ EN ATTENTE</div>
   <!-- Éléments exclusifs mobile (display:none sur desktop) -->
@@ -493,7 +499,7 @@ header{
   <div class="m-km-r" style="display:none"><div class="m-km-r-val" id="mKmR">—</div><div class="m-km-r-lbl">km rest.</div></div>
   <!-- Strava compact (mobile only) -->
   <a class="m-strava-btn" id="mStravaTop" href="#" target="_blank" rel="noopener noreferrer" style="display:none" title="Voir sur Strava">
-    <svg width="16" height="16" viewBox="0 0 32 32" fill="none"><path d="M20 4 L12 16 L17 16 L9 28" stroke="#FC4C02" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M25 4 L17 16 L22 16 L14 28" stroke="#FC4C02" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" opacity=".45"/></svg>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066z" fill="#FC4C02"/><path d="M7.909 0L0 14.95h4.765l3.144-6.234 3.143 6.234h4.765z" fill="#FC4C02"/></svg>
   </a>
 </header>
 
