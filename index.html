@@ -2379,6 +2379,8 @@ function initCountdown(){
   const m=document.getElementById('cdModal');
   if(!m) return;
 
+  if(new URLSearchParams(location.search).has('skip')){m.classList.add('hidden');return;}
+
   const raceStarted=new Date()>=RACE_START;
   const hasName=!!getCookieName();
 
