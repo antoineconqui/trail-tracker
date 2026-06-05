@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title id="pageTitle">LiveTrack</title>
 <link rel="icon" id="favicon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><text y='32' font-size='32'>🏁</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -372,7 +372,7 @@ header{
 @media(max-width:480px){
 
   /* ── Layout racine : 3 zones fixes, zéro scroll global ── */
-  #app{display:flex;flex-direction:column;height:100dvh;overflow:hidden}
+  #app{position:fixed;inset:0;display:flex;flex-direction:column;overflow:hidden}
 
   /* ── TOPBAR (48px) ───────────────────────────── */
   header{height:48px;padding:0 10px;flex-shrink:0}
@@ -467,7 +467,8 @@ header{
 
   /* Chat form compact : send inline dans l'input */
   #mShell .chat-form{padding:5px 8px 8px;gap:4px;position:relative}
-  #mShell #cMsg{padding-right:46px;height:40px;font-size:15px;border-radius:10px}
+  #mShell #cMsg{padding-right:46px;height:40px;font-size:16px;border-radius:10px}
+  #cdName{font-size:16px}
   #mShell .cbtns{position:absolute;right:11px;bottom:11px;gap:0;z-index:2}
   #mShell #bSend{width:34px;height:34px;flex:none;padding:0;border-radius:50%;font-size:17px;font-weight:900;letter-spacing:0}
 }
