@@ -127,12 +127,17 @@ export default {
     }
 
     // ══ POST /chat ════════════════════════════════════════════
+    // Messages texte ({sid}:chat, cap 500) et réactions ({sid}:reacts, cap 300)
+    // stockés séparément pour que les réactions n'écrasent jamais les messages
     if (req.method === "POST" && u.pathname === "/chat") {
       const { sid, name, msg, type } = await req.json();
       if (!sid || !name || !msg) return json({ error: "missing fields" }, 400);
       const m = { id: Date.now(), name: String(name).slice(0,30), msg: String(msg).slice(0,280), type: type||"msg", ts: new Date().toISOString() };
-      const existing = await env.KV.get(`${sid}:chat`, "json") || [];
-      await env.KV.put(`${sid}:chat`, JSON.stringify([...existing, m].slice(-150)), { expirationTtl: TTL_CHAT });
+      const isReact = m.type === "cheer";
+      const key = isReact ? `${sid}:reacts` : `${sid}:chat`;
+      const cap = isReact ? 300 : 500;
+      const existing = await env.KV.get(key, "json") || [];
+      await env.KV.put(key, JSON.stringify([...existing, m].slice(-cap)), { expirationTtl: TTL_CHAT });
       return json({ ok: true, msg: m });
     }
 
@@ -140,8 +145,12 @@ export default {
     if (req.method === "GET" && u.pathname === "/chat") {
       const sid = u.searchParams.get("sid"), since = u.searchParams.get("since");
       if (!sid) return json({ error: "missing sid" }, 400);
-      const msgs = await env.KV.get(`${sid}:chat`, "json") || [];
-      return json({ messages: since ? msgs.filter(m => m.ts > since) : msgs });
+      const [msgs, reacts] = await Promise.all([
+        env.KV.get(`${sid}:chat`, "json"),
+        env.KV.get(`${sid}:reacts`, "json"),
+      ]);
+      const all = [...(msgs||[]), ...(reacts||[])].sort((a,b) => a.ts.localeCompare(b.ts));
+      return json({ messages: since ? all.filter(m => m.ts > since) : all });
     }
 
     // ══ POST /subscribe ─ inscription pré-course ══════════════
